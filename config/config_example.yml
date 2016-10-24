@@ -1,0 +1,64 @@
+repositories_path: /Users/thylong/www/repositories
+projects:
+    regexrace:
+        repository: thylong/regexrace
+        url: http://regexrace.org
+        health: /status
+        google_project: regexrace
+    thylong:
+        repository: thylong/thylong.github.io
+        url: http://thylong.com
+        health: /
+    cabu:
+        repository: thylong/cabu
+    ian:
+        repository: thylong/ian
+
+setup:
+    requirements:
+        - git
+        - gcloud
+    brew_packages:
+        - httpie
+        - fish
+        - keybase
+        - mongodb
+        - lynx
+        - node
+        - nmap
+        - python
+        - python3
+        - rsyslog
+        - composer
+        - cmake
+        - ruby
+        - tree
+        - cask
+        - wget
+    cask_packages:
+        - appcleaner
+        - atom
+        - caffeine
+        - charles
+        - dash
+        - filezilla
+        - firefox
+        - google-chrome
+        - iterm2
+        - jadengeller-helium
+        - keka
+        - libreoffice
+        - mediainfo
+        - robomongo
+        - skype
+        - slack
+        - spectacle
+        - spotify
+        - steam
+        - torbrowser
+        - tunnelblick
+        - utorrent
+        - vagrant
+        - virtualbox
+        - vlc
+        - wireshark

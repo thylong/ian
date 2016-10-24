@@ -1,0 +1,89 @@
+managers:
+    pip:
+        base_url: https://pypi.org/project/
+        install_cmd: install
+        uninstall_cmd: uninstall
+    npm:
+        base_url: https://www.npmjs.com/package/
+        install_cmd: install -g
+        uninstall_cmd: uninstall -g
+    gem:
+        base_url: https://rubygems.org/gems/
+        install_cmd: install
+        uninstall_cmd: uninstall
+    composer: # alias packagist
+        base_url: https://packagist.org/packages/
+        install_cmd: global install
+        uninstall_cmd: global remove
+repositories: {}
+projects:
+  cabu:
+    repository: thylong/cabu
+  ian:
+    repository: thylong/ian
+  regexrace:
+    db_cmd: mongo localhost
+    deploy_cmd: bash deploy.sh
+    health: /status
+    repository: thylong/regexrace
+    rollback_cmd: bash rollback.sh
+    url: http://regexrace.org
+  thylong:
+    health: /
+    repository: thylong/thylong.github.io
+    url: http://thylong.com
+setup:
+  brew_packages:
+  - httpie
+  - fish
+  - keybase
+  - mongodb
+  - lynx
+  - node
+  - nmap
+  - python
+  - python3
+  - rsyslog
+  - composer
+  - cmake
+  - ruby
+  - tree
+  - cask
+  - tmux
+  - wget
+  - reattach-to-user-namespace
+  cask_packages:
+  - appcleaner
+  - atom
+  - caffeine
+  - charles
+  - dash
+  - filezilla
+  - firefox
+  - google-chrome
+  - iterm2
+  - jadengeller-helium
+  - keka
+  - libreoffice
+  - mediainfo
+  - robomongo
+  - skype
+  - slack
+  - spectacle
+  - spotify
+  - steam
+  - torbrowser
+  - tunnelblick
+  - utorrent
+  - vagrant
+  - virtualbox
+  - vlc
+  - wireshark
+  requirements:
+  - git
+  - gcloud
+packages:
+  baily-cli:
+    cmd: baily-cli
+    description: baily-cli
+    type: npm
