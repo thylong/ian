@@ -57,11 +57,11 @@ Currently implemented : System, Network, Security, current load.`,
 		hostinfoCmd := exec.Command("hostinfo")
 
 		fmt.Println("====================")
-		printFromCmdStds(hostinfoCmd)
+		executeCommand(hostinfoCmd)
 		fmt.Println("====================")
 		fmt.Println("external_ip :", jsonContent["origin"])
 		fmt.Println("uptime :")
-		printFromCmdStds(uptimeCmd)
+		executeCommand(uptimeCmd)
 	},
 }
 
@@ -72,13 +72,13 @@ var envUpdateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Updating env...")
 		// Upgrade brew & packages
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "update"))
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "upgrade"))
+		executeCommand(exec.Command("/usr/local/bin/brew", "update"))
+		executeCommand(exec.Command("/usr/local/bin/brew", "upgrade"))
 
 		// Cleanup cask
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "cask", "cleanup"))
+		executeCommand(exec.Command("/usr/local/bin/brew", "cask", "cleanup"))
 		// Cleanup brew
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "cleanup"))
+		executeCommand(exec.Command("/usr/local/bin/brew", "cleanup"))
 	},
 }
 

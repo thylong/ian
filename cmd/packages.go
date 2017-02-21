@@ -93,7 +93,7 @@ var installPackagesCmd = &cobra.Command{
 				cmdParams = append(installParams, arg)
 
 				termCmd := exec.Command(selectedPackageManager, cmdParams...)
-				printFromCmdStds(termCmd)
+				executeCommand(termCmd)
 
 				err := writePackageEntry(selectedPackageManager, arg)
 				if err != nil {
@@ -148,7 +148,7 @@ var uninstallPackagesCmd = &cobra.Command{
 				fmt.Println(cmdParams)
 
 				termCmd := exec.Command(selectedPackageManager, cmdParams...)
-				printFromCmdStds(termCmd)
+				executeCommand(termCmd)
 
 				err := unwritePackageEntry(selectedPackageManager, arg)
 				if err != nil {
@@ -201,7 +201,7 @@ func searchOnPackageManager(packageManager string, packageName string) {
 	fmt.Println(packageManager, "search", packageName)
 	fmt.Println("=======================")
 	termCmd := exec.Command(packageManager, "search", packageName)
-	printFromCmdStds(termCmd)
+	executeCommand(termCmd)
 }
 
 func writePackageEntry(selectedPackageManager string, arg string) error {

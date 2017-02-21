@@ -95,7 +95,7 @@ func setupBrewPackages() {
 	}
 
 	for _, brewPackage := range brewPackages.([]interface{}) {
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "install", brewPackage.(string)))
+		executeCommand(exec.Command("/usr/local/bin/brew", "install", brewPackage.(string)))
 	}
 }
 
@@ -103,7 +103,7 @@ func setupBrewPackages() {
 func setupCask() {
 	fmt.Println("Installing cask...")
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
-		printFromCmdStds(exec.Command("brew", "tap", "caskroom/cask"))
+		executeCommand(exec.Command("brew", "tap", "caskroom/cask"))
 	} else {
 		fmt.Println("cask already installed, skipping...")
 	}
@@ -119,7 +119,7 @@ func setupCaskPackages() {
 	}
 
 	for _, caskPackage := range caskPackages.([]interface{}) {
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "cask", "install", caskPackage.(string)))
+		executeCommand(exec.Command("/usr/local/bin/brew", "cask", "install", caskPackage.(string)))
 	}
 }
 
@@ -139,7 +139,7 @@ func setupDotFiles() {
 	if nickname, _ := reader.ReadString('\n'); nickname != "\n" {
 		nickname = string(bytes.TrimSuffix([]byte(nickname), []byte("\n")))
 		termCmd := exec.Command("git", "clone", "-v", "https://github.com/"+nickname+"/dotfiles", dotfilesPath)
-		printFromCmdStds(termCmd)
+		executeCommand(termCmd)
 
 		re := regexp.MustCompile(".git$")
 

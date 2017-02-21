@@ -92,7 +92,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 }
 
 // Execute a command and print output from stdout & stderr.
-func printFromCmdStds(termCmd *exec.Cmd) {
+func executeCommand(termCmd *exec.Cmd) {
 	subcmdStds, err := termCmd.CombinedOutput()
 
 	if err != nil {

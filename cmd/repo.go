@@ -55,7 +55,7 @@ var listCmd = &cobra.Command{
 		fmt.Println(viper.GetString("repositories_path"))
 		termCmd.Dir = viper.GetString("repositories_path")
 
-		printFromCmdStds(termCmd)
+		executeCommand(termCmd)
 	},
 }
 
@@ -70,7 +70,7 @@ var cloneCmd = &cobra.Command{
 			termCmd := exec.Command("git", "clone", "-v", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			printFromCmdStds(termCmd)
+			executeCommand(termCmd)
 		}
 	},
 }
@@ -86,7 +86,7 @@ var cleanCmd = &cobra.Command{
 			termCmd := exec.Command("git", "clean", "-dffx", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			printFromCmdStds(termCmd)
+			executeCommand(termCmd)
 		}
 	},
 }
@@ -102,7 +102,7 @@ var updateCmd = &cobra.Command{
 			termCmd := exec.Command("git", "fetch", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			printFromCmdStds(termCmd)
+			executeCommand(termCmd)
 		}
 	},
 }
@@ -118,7 +118,7 @@ var upgradeCmd = &cobra.Command{
 			termCmd := exec.Command("git", "pull", "--rebase", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			printFromCmdStds(termCmd)
+			executeCommand(termCmd)
 		}
 	},
 }
@@ -134,7 +134,7 @@ var removeCmd = &cobra.Command{
 			termCmd := exec.Command("rm", "-rf", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			printFromCmdStds(termCmd)
+			executeCommand(termCmd)
 		}
 	},
 }
@@ -150,7 +150,7 @@ var statusCmd = &cobra.Command{
 			termCmd := exec.Command("git", "status")
 			termCmd.Dir = viper.GetString("repositories_path") + "/" + arg
 
-			printFromCmdStds(termCmd)
+			executeCommand(termCmd)
 		}
 	},
 }

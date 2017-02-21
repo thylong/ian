@@ -124,7 +124,7 @@ var deployProjectCmd = &cobra.Command{
 		deployCmd := strings.Split(projectConfig.(map[interface{}]interface{})["deploy_cmd"].(string), " ")
 		termCmd := exec.Command(deployCmd[0], deployCmd[:1]...)
 		termCmd.Dir = viper.GetString("repositories_path")
-		printFromCmdStds(termCmd)
+		executeCommand(termCmd)
 	},
 }
 
@@ -137,7 +137,7 @@ var rollbackProjectCmd = &cobra.Command{
 		rollbackCmd := strings.Split(projectConfig.(map[interface{}]interface{})["rollback_cmd"].(string), " ")
 		termCmd := exec.Command(rollbackCmd[0], rollbackCmd[:1]...)
 		termCmd.Dir = viper.GetString("repositories_path")
-		printFromCmdStds(termCmd)
+		executeCommand(termCmd)
 	},
 }
 
