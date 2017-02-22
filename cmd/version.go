@@ -20,16 +20,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	RootCmd.AddCommand(versionCmd)
+}
+
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version information",
 	Long:  `Print the version information.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ian version: pre-alpha")
+		fmt.Print("ian version: pre-alpha")
 	},
-}
-
-func init() {
-	RootCmd.AddCommand(versionCmd)
 }

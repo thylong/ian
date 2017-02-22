@@ -23,23 +23,42 @@ import (
 )
 
 // Brew immutable instance.
-var Brew = BrewPackageManager{Path: "/usr/local/bin/brew"}
+var Brew = BrewPackageManager{Path: "/usr/local/bin/brew", Name: "brew"}
 
 // BrewPackageManager is a (widely used) unofficial Mac OS package manager.
 // (more: https://brew.sh/)
 type BrewPackageManager struct {
 	Path string
+	Name string
 }
 
 // Install given Brew package.
 func (b BrewPackageManager) Install(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err.Error())
+		return
+	}
+
+	err = WritePackageEntry(b.Name, packageName)
+	if err != nil {
+		fmt.Fprint(os.Stderr, err.Error())
+	}
 	return err
 }
 
 // Uninstall given Brew package.
 func (b BrewPackageManager) Uninstall(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", packageName))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err.Error())
+		return
+	}
+
+	err = UnwritePackageEntry(b.Name, packageName)
+	if err != nil {
+		fmt.Fprint(os.Stderr, err.Error())
+	}
 	return err
 }
 
@@ -52,7 +71,21 @@ func (b BrewPackageManager) Cleanup() (err error) {
 	return err
 }
 
-// UpdateAll pulls last versions infos from realted repositories.
+// UpdateOne pulls last versions infos from related repositories.
+// This is not performing any updates and should be coupled
+// with upgradeAll command.
+func (b BrewPackageManager) UpdateOne(packageName string) (err error) {
+	err = command.ExecuteCommand(exec.Command(b.Path, "update"))
+	return err
+}
+
+// UpgradeOne Brew packages to the last known versions.
+func (b BrewPackageManager) UpgradeOne(packageName string) (err error) {
+	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade", packageName))
+	return err
+}
+
+// UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b BrewPackageManager) UpdateAll() (err error) {
@@ -84,13 +117,18 @@ func (b BrewPackageManager) GetExecPath() string {
 	return b.Path
 }
 
+// GetName return the name of the package manager.
+func (b BrewPackageManager) GetName() string {
+	return b.Name
+}
+
 // Setup installs Cask
 func (b BrewPackageManager) Setup() (err error) {
-	fmt.Println("Installing cask...")
+	fmt.Print("Installing cask...")
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
 		err = command.ExecuteCommand(exec.Command("brew", "tap", "caskroom/cask"))
 		return err
 	}
-	fmt.Println("cask already installed, skipping...")
+	fmt.Print("cask already installed, skipping...")
 	return nil
 }

@@ -19,7 +19,6 @@ import (
 	"os"
 	"os/exec"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
@@ -43,7 +42,8 @@ var setupCmd = &cobra.Command{
 		fmt.Println("====================")
 
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
-			log.Fatal("Missing OS package manager !")
+			fmt.Println("Missing OS package manager !")
+			os.Exit(1)
 		}
 
 		config.SetupConfigFile()
@@ -83,6 +83,10 @@ func setupGUIPackages() {
 	}
 
 	for _, GUIPackage := range GUIPackages {
-		command.ExecuteCommand(exec.Command("/usr/local/bin/brew", "cask", "install", GUIPackage))
+		if OSPackageManager.GetName() == "brew" {
+			command.ExecuteCommand(exec.Command(OSPackageManager.GetExecPath(), "cask", "install", GUIPackage))
+		} else {
+			OSPackageManager.Install(GUIPackage)
+		}
 	}
 }

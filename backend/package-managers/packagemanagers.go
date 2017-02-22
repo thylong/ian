@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package packages
+package packagemanagers
 
 import (
 	"errors"
@@ -21,12 +21,81 @@ import (
 	"net/http"
 	"os/exec"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
 	yaml "gopkg.in/yaml.v2"
 )
+
+// PackageManager handles standard interactions with all Package Managers.
+type PackageManager interface {
+	Install(packageName string) (err error)
+	Uninstall(packageName string) (err error)
+	Cleanup() (err error)
+	UpdateOne(string) (err error)
+	UpgradeOne(string) (err error)
+	UpdateAll() (err error)
+	UpgradeAll() (err error)
+	IsInstalled() bool
+	IsOSPackageManager() bool
+	GetExecPath() string
+	GetName() string
+	Setup() (err error)
+}
+
+var supportedPackageManagers = make(map[string]PackageManager)
+
+func init() {
+	supportedPackageManagers["brew"] = Brew
+	supportedPackageManagers["pip"] = Pip
+	supportedPackageManagers["npm"] = Npm
+	supportedPackageManagers["apt"] = Apt
+	supportedPackageManagers["yum"] = Yum
+	supportedPackageManagers["rubygems"] = RubyGems
+}
+
+// GetOSPackageManager returns the main Package Manager of the current OS.
+// As only MacOS is supported for now, it returns a Brew instance.
+func GetOSPackageManager() PackageManager {
+	return Brew
+}
+
+// GetPackageManager returns the corresponding PackageManager otherwise default
+// to OS package manager.
+func GetPackageManager(PackageManagerFlag string) PackageManager {
+	packageManager, ok := supportedPackageManagers[PackageManagerFlag]
+
+	if !ok {
+		return packageManager
+	}
+	return GetOSPackageManager()
+}
+
+// WritePackageEntry in the local config.yml
+func WritePackageEntry(selectedPackageManager string, arg string) error {
+	config.ConfigMap.Packages[arg] = map[string]string{
+		"cmd":         arg,
+		"description": arg,
+		"type":        selectedPackageManager,
+	}
+	ymlContent, _ := yaml.Marshal(config.ConfigMap)
+	err := ioutil.WriteFile(config.ConfigFullPath, ymlContent, 0666)
+	if err != nil {
+		return errors.New("Unable to edit config file.")
+	}
+	return nil
+}
+
+// UnwritePackageEntry in the local config.yml
+func UnwritePackageEntry(selectedPackageManager string, arg string) error {
+	delete(config.ConfigMap.Packages, arg)
+	ymlContent, _ := yaml.Marshal(config.ConfigMap)
+	err := ioutil.WriteFile(config.ConfigFullPath, ymlContent, 0666)
+	if err != nil {
+		return errors.New("Unable to edit config file.")
+	}
+	return nil
+}
 
 // IsAvailableOnPackageManagers returns true if found in the repositories of
 // one of the available package managers.
@@ -54,7 +123,7 @@ func isAvailableOnPackageManager(packageManager string, baseURL string, packageN
 
 	resp, err := client.Head(baseURL + packageName)
 	if err != nil || resp.StatusCode != 200 {
-		log.Debug(packageManager + " is not reachable.")
+		fmt.Printf("%s is not reachable.", packageManager)
 		return false
 	}
 	return true
@@ -74,35 +143,9 @@ func SearchOnPackageManagers(packageName string) (results map[string]string, err
 // SearchOnPackageManager returns infos on packages found in the repositories of
 // the given package manager.
 func SearchOnPackageManager(packageManager string, packageName string) {
-	fmt.Println("=======================")
-	fmt.Println(packageManager, "search", packageName)
-	fmt.Println("=======================")
+	fmt.Print("=======================")
+	fmt.Printf("%s search %s", packageManager, packageName)
+	fmt.Print("=======================")
 	termCmd := exec.Command(packageManager, "search", packageName)
 	command.ExecuteCommand(termCmd)
-}
-
-// WritePackageEntry in the local config.yml
-func WritePackageEntry(selectedPackageManager string, arg string) error {
-	config.Config.Packages[arg] = map[string]string{
-		"cmd":         arg,
-		"description": arg,
-		"type":        selectedPackageManager,
-	}
-	ymlContent, _ := yaml.Marshal(config.Config)
-	err := ioutil.WriteFile(config.ConfigFullPath, ymlContent, 0666)
-	if err != nil {
-		return errors.New("Unable to edit config file.")
-	}
-	return nil
-}
-
-// UnwritePackageEntry in the local config.yml
-func UnwritePackageEntry(selectedPackageManager string, arg string) error {
-	delete(config.Config.Packages, arg)
-	ymlContent, _ := yaml.Marshal(config.Config)
-	err := ioutil.WriteFile(config.ConfigFullPath, ymlContent, 0666)
-	if err != nil {
-		return errors.New("Unable to edit config file.")
-	}
-	return nil
 }

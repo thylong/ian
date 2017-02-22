@@ -18,24 +18,24 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	RootCmd.AddCommand(newsCmd)
+	newsCmd.AddCommand(lastNewsCmd)
+	// newsCmd.AddCommand(cityNewsCmd)
+}
 
 // newsCmd represents the news command
 var newsCmd = &cobra.Command{
 	Use:   "news",
 	Short: "Retrieve last news from Google News",
 	Long:  `We should have to open a browser to know what's going on in the world...`,
-}
-
-func init() {
-	RootCmd.AddCommand(newsCmd)
-	newsCmd.AddCommand(lastNewsCmd)
-	// newsCmd.AddCommand(cityNewsCmd)
 }
 
 var lastNewsCmd = &cobra.Command{
@@ -61,12 +61,13 @@ var cityNewsCmd = &cobra.Command{
 func displayNews(url string) {
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Fprint(os.Stderr, err.Error())
 	}
 	defer resp.Body.Close()
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Fprint(os.Stderr, err.Error())
+		os.Exit(1)
 	}
 
 	type Item struct {
@@ -86,7 +87,8 @@ func displayNews(url string) {
 	var rss RSS
 	err = xml.Unmarshal(content, &rss)
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Fprint(os.Stderr, err.Error())
+		os.Exit(1)
 	}
 	for c, item := range rss.Items.ItemList {
 		re := regexp.MustCompile("url=(.*)")

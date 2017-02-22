@@ -28,13 +28,6 @@ import (
 	"github.com/thylong/ian/backend/command"
 )
 
-// projectCmd represents the project command
-var projectCmd = &cobra.Command{
-	Use:   "project",
-	Short: "Interact with listed project",
-	Long:  `Get health statuses, general and detailed config about the listed projects.`,
-}
-
 func init() {
 	RootCmd.AddCommand(projectCmd)
 	projectCmd.AddCommand(statusProjectCmd)
@@ -43,6 +36,13 @@ func init() {
 	projectCmd.AddCommand(deployProjectCmd)
 	projectCmd.AddCommand(rollbackProjectCmd)
 	projectCmd.AddCommand(dbProjectCmd)
+}
+
+// projectCmd represents the project command
+var projectCmd = &cobra.Command{
+	Use:   "project",
+	Short: "Interact with listed project",
+	Long:  `Get health statuses, general and detailed config about the listed projects.`,
 }
 
 var statusProjectCmd = &cobra.Command{
@@ -58,14 +58,14 @@ var statusProjectCmd = &cobra.Command{
 			url := baseURL.(string) + healthEndpoint.(string)
 			resp, err := http.Get(url)
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Fprint(os.Stderr, err.Error())
 			}
 			defer resp.Body.Close()
 
 			if statusCode := resp.StatusCode; statusCode == 200 {
-				fmt.Println(arg + " : OK")
+				fmt.Printf("%s : OK", arg)
 			} else {
-				fmt.Println(arg + " : ERROR")
+				fmt.Printf("%s : ERROR", arg)
 			}
 		}
 	},
@@ -83,7 +83,7 @@ var statsProjectCmd = &cobra.Command{
 
 			resp, err := http.Get(url)
 			if err != nil {
-				fmt.Println("Error : ", err.Error())
+				fmt.Printf("Error : %s", err.Error())
 			}
 			content, err := ioutil.ReadAll(resp.Body)
 			defer resp.Body.Close()
@@ -91,15 +91,15 @@ var statsProjectCmd = &cobra.Command{
 			var jsonContent map[string]interface{}
 			err = json.Unmarshal(content, &jsonContent)
 			if err != nil {
-				fmt.Println("Error : ", err.Error())
+				fmt.Printf("Error : %s", err.Error())
 				return
 			}
 
-			fmt.Println(arg + " :")
-			fmt.Println("- Forks : ", jsonContent["forks_count"])
-			fmt.Println("- Stars : ", jsonContent["stargazers_count"])
-			fmt.Println("- Open Issues : ", jsonContent["open_issues_count"])
-			fmt.Println("- Last update : ", jsonContent["updated_at"])
+			fmt.Print(arg + " :")
+			fmt.Printf("- Forks: %v", jsonContent["forks_count"])
+			fmt.Printf("- Stars: %v", jsonContent["stargazers_count"])
+			fmt.Printf("- Open Issues: %v", jsonContent["open_issues_count"])
+			fmt.Printf("- Last update: %v", jsonContent["updated_at"])
 		}
 	},
 }
@@ -111,7 +111,7 @@ var configProjectCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		projectConfig := viper.GetStringMap("projects")
 		for _, project := range projectConfig {
-			fmt.Println(project)
+			fmt.Print(project)
 		}
 	},
 }

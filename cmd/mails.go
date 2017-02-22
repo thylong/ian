@@ -37,6 +37,6 @@ package cmd
 // 	Short: "Get last unread mails",
 // 	Long:  `Get last unread mails.`,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		fmt.Println("unreads called")
+// 		fmt.Print("unreads called")
 // 	},
 // }

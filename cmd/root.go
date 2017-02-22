@@ -17,18 +17,11 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
-	pm "github.com/thylong/ian/backend/packages/managers"
+	pm "github.com/thylong/ian/backend/package-managers"
 )
 
 // OSPackageManager is the main package manager used by the current OS.
 var OSPackageManager pm.PackageManager
-
-// RootCmd is executed by default (top level).
-var RootCmd = &cobra.Command{
-	Use:   "ian",
-	Short: "Ian is a very simple automation tool for developer with Mac environment",
-	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
-}
 
 func init() {
 	OSPackageManager = pm.GetOSPackageManager()
@@ -57,11 +50,18 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	cobra.AddTemplateFunc("InjectPackagesInTemplate", InjectPackagesInTemplate)
 }
 
+// RootCmd is executed by default (top level).
+var RootCmd = &cobra.Command{
+	Use:   "ian",
+	Short: "Ian is a very simple automation tool for developer with Mac environment",
+	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
+}
+
 // InjectPackagesInTemplate prints packages list with usage.
 func InjectPackagesInTemplate() string {
 	packagesUsages := `Package Commands:
 `
-	for packageName, packageMeta := range config.Config.Packages {
+	for packageName, packageMeta := range config.ConfigMap.Packages {
 		packagesUsages += `  ` + packageName + ` ` + packageMeta["description"] + ` type:` + packageMeta["type"] + "\n"
 	}
 	return packagesUsages

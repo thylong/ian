@@ -26,7 +26,6 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
 )
@@ -40,8 +39,8 @@ var IanConfigPath string
 // ConfigFullPath represents the path to config file.
 var ConfigFullPath string
 
-// YamlConfig is used to marshal/unmarshal config file.
-type YamlConfig struct {
+// YamlConfigMap is used to marshal/unmarshal config file.
+type YamlConfigMap struct {
 	Managers     map[string]map[string]string `json:"managers"`
 	Repositories map[string]string            `json:"repositories"`
 	Projects     map[string]map[string]string `json:"projects"`
@@ -49,14 +48,15 @@ type YamlConfig struct {
 	Packages     map[string]map[string]string `json:"packages"`
 }
 
-// Config contains the config content.
-var Config YamlConfig
+// ConfigMap contains the config content.
+var ConfigMap YamlConfigMap
 
 func init() {
 	// Init and keep track of config.
 	usr, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
 	}
 	ConfigPath = usr.HomeDir + "/.config"
 	IanConfigPath = ConfigPath + "/ian/"
@@ -67,12 +67,13 @@ func init() {
 
 	err = viper.ReadInConfig()
 	if err != nil {
-		fmt.Println("Problem with config file: ", err.Error())
+		fmt.Fprintf(os.Stderr, "Problem with config file: %s", err.Error())
+		os.Exit(1)
 	} else {
 		configContent, _ := ioutil.ReadFile(ConfigFullPath)
-		err = yaml.Unmarshal(configContent, &Config)
+		err = yaml.Unmarshal(configContent, &ConfigMap)
 		if err != nil {
-			log.Warning("Unable to parse config file.")
+			fmt.Println("Unable to parse config file.")
 			return
 		}
 		viper.WatchConfig()
@@ -96,14 +97,26 @@ func SetupConfigFile() {
 	// Create config.yml file
 	_, err = os.Stat(ConfigFullPath)
 	if err != nil {
-		fmt.Println("Creating ", ConfigFullPath)
-		err := ioutil.WriteFile(ConfigFullPath, GetConfigDefaultContent(), 0766)
+		configContent := GetConfigDefaultContent()
+
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Ian allows you manage all your Github repositories")
+		fmt.Print("leave blank if you don't want to benefit of this feature.")
+		fmt.Print("Otherwise, set up the fullpath to the parent directory of all your repositories: ")
+		if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
+			repositoriesPathConfigLine := "\nrepositories_path: " + fullPathToRepositories
+			configContent = append(configContent, repositoriesPathConfigLine...)
+		}
+
+		fmt.Printf("Creating %s", ConfigFullPath)
+		err := ioutil.WriteFile(ConfigFullPath, configContent, 0766)
 		if err != nil {
-			panic(err.Error())
+			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+			os.Exit(1)
 		}
 		return
 	}
-	fmt.Println("Config file found.")
+	fmt.Print("Config file found.")
 }
 
 // SetupDotFiles ask for a Github nickname and retrieve the dotfiles repo
@@ -112,7 +125,8 @@ func SetupDotFiles() {
 	reader := bufio.NewReader(os.Stdin)
 	usr, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
 	}
 	dotfilesPath := usr.HomeDir + "/.dotfiles"
 
@@ -133,11 +147,11 @@ func SetupDotFiles() {
 				continue
 			}
 			if err := os.Symlink(usr.HomeDir+"/.dotfiles/"+f.Name(), usr.HomeDir+"/"+f.Name()); err != nil {
-				log.Debug(err)
+				fmt.Fprint(os.Stderr, err)
 			}
 		}
 	} else {
-		fmt.Println("Skipping dotfiles configuration.")
+		fmt.Print("Skipping dotfiles configuration.")
 	}
 }
 

@@ -17,23 +17,30 @@ package command
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 )
 
 // ExecuteCommand a command and print output from stdout.
 func ExecuteCommand(subCmd *exec.Cmd) (err error) {
-	cmdReader, err := subCmd.StdoutPipe()
+	cmdOutReader, err := subCmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("Error creating StdoutPipe for Cmd: %v StdErr: %v", err, os.Stderr)
+		return fmt.Errorf("Error creating StdoutPipe for Cmd: %v", err)
+	}
+	cmdErrReader, err := subCmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("Error creating StderrPipe for Cmd: %v", err)
 	}
 
-	scanner := bufio.NewScanner(cmdReader)
-	go func() {
-		for scanner.Scan() {
-			fmt.Printf("%s\n", scanner.Text())
-		}
-	}()
+	for _, cmdReader := range []io.ReadCloser{cmdOutReader, cmdErrReader} {
+		scanner := bufio.NewScanner(cmdReader)
+		go func() {
+			for scanner.Scan() {
+				fmt.Printf("%s\n", scanner.Text())
+			}
+		}()
+	}
 
 	err = subCmd.Start()
 	if err != nil {
