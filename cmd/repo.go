@@ -20,6 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/thylong/ian/backend/command"
 )
 
 // repoCmd represents the repo command
@@ -55,7 +56,7 @@ var listCmd = &cobra.Command{
 		fmt.Println(viper.GetString("repositories_path"))
 		termCmd.Dir = viper.GetString("repositories_path")
 
-		executeCommand(termCmd)
+		command.ExecuteCommand(termCmd)
 	},
 }
 
@@ -70,7 +71,7 @@ var cloneCmd = &cobra.Command{
 			termCmd := exec.Command("git", "clone", "-v", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			executeCommand(termCmd)
+			command.ExecuteCommand(termCmd)
 		}
 	},
 }
@@ -86,7 +87,7 @@ var cleanCmd = &cobra.Command{
 			termCmd := exec.Command("git", "clean", "-dffx", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			executeCommand(termCmd)
+			command.ExecuteCommand(termCmd)
 		}
 	},
 }
@@ -102,7 +103,7 @@ var updateCmd = &cobra.Command{
 			termCmd := exec.Command("git", "fetch", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			executeCommand(termCmd)
+			command.ExecuteCommand(termCmd)
 		}
 	},
 }
@@ -118,7 +119,7 @@ var upgradeCmd = &cobra.Command{
 			termCmd := exec.Command("git", "pull", "--rebase", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			executeCommand(termCmd)
+			command.ExecuteCommand(termCmd)
 		}
 	},
 }
@@ -134,7 +135,7 @@ var removeCmd = &cobra.Command{
 			termCmd := exec.Command("rm", "-rf", arg)
 			termCmd.Dir = viper.GetString("repositories_path")
 
-			executeCommand(termCmd)
+			command.ExecuteCommand(termCmd)
 		}
 	},
 }
@@ -150,7 +151,7 @@ var statusCmd = &cobra.Command{
 			termCmd := exec.Command("git", "status")
 			termCmd.Dir = viper.GetString("repositories_path") + "/" + arg
 
-			executeCommand(termCmd)
+			command.ExecuteCommand(termCmd)
 		}
 	},
 }

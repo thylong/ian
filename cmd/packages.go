@@ -15,19 +15,16 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os/exec"
 	"strings"
 
-	yaml "gopkg.in/yaml.v2"
-
 	log "github.com/Sirupsen/logrus"
+	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/backend/packages"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // packagesCmd represents the packages command
@@ -59,7 +56,7 @@ var listPackagesCmd = &cobra.Command{
     This won't list npm, pip, gem, composer or other kind of packages.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		packagesUsages := `Package Commands:`
-		for packageName, packageMeta := range Config.Packages {
+		for packageName, packageMeta := range config.Config.Packages {
 			packagesUsages += "\n" + `  ` + packageName + ` ` + packageMeta["description"] + ` type:` + packageMeta["type"]
 		}
 		fmt.Println(packagesUsages)
@@ -74,7 +71,7 @@ var installPackagesCmd = &cobra.Command{
     An example would be baily CLI (a nice bot powered by @samueldelesque & Dailymotion)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			results, err := isAvailableOnPackageManagers(arg)
+			results, err := packages.IsAvailableOnPackageManagers(arg)
 			if err != nil {
 				log.Error(err.Error())
 				return
@@ -89,13 +86,13 @@ var installPackagesCmd = &cobra.Command{
 				fmt.Println("\nUse -p option to install,\nian packages --help to print usage.")
 			} else {
 				cmdParams := []string{}
-				installParams := strings.Split(Config.Managers[selectedPackageManager]["install_cmd"], " ")
+				installParams := strings.Split(config.Config.Managers[selectedPackageManager]["install_cmd"], " ")
 				cmdParams = append(installParams, arg)
 
 				termCmd := exec.Command(selectedPackageManager, cmdParams...)
-				executeCommand(termCmd)
+				command.ExecuteCommand(termCmd)
 
-				err := writePackageEntry(selectedPackageManager, arg)
+				err := packages.WritePackageEntry(selectedPackageManager, arg)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
@@ -112,7 +109,7 @@ var searchPackagesCmd = &cobra.Command{
     An example would be baily CLI (a nice bot powered by @samueldelesque & Dailymotion)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			results, err := searchOnPackageManagers(arg)
+			results, err := packages.SearchOnPackageManagers(arg)
 			if err != nil {
 				log.Error(err.Error())
 				return
@@ -128,7 +125,7 @@ var uninstallPackagesCmd = &cobra.Command{
 	Long:  `uninstall an extension.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			results, err := isAvailableOnPackageManagers(arg)
+			results, err := packages.IsAvailableOnPackageManagers(arg)
 			if err != nil {
 				log.Error(err.Error())
 				return
@@ -143,87 +140,18 @@ var uninstallPackagesCmd = &cobra.Command{
 				fmt.Println("\nUse -p option to uninstall,\nian packages --help to print usage.")
 			} else {
 				cmdParams := []string{}
-				installParams := strings.Split(Config.Managers[selectedPackageManager]["uninstall_cmd"], " ")
+				installParams := strings.Split(config.Config.Managers[selectedPackageManager]["uninstall_cmd"], " ")
 				cmdParams = append(installParams, arg)
 				fmt.Println(cmdParams)
 
 				termCmd := exec.Command(selectedPackageManager, cmdParams...)
-				executeCommand(termCmd)
+				command.ExecuteCommand(termCmd)
 
-				err := unwritePackageEntry(selectedPackageManager, arg)
+				err := packages.UnwritePackageEntry(selectedPackageManager, arg)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
 			}
 		}
 	},
-}
-
-func isAvailableOnPackageManagers(packageName string) (map[string]bool, error) {
-	packageManagers := viper.GetStringMap("managers")
-	results := make(map[string]bool)
-
-	for packageManager, packageParams := range packageManagers {
-		baseURL := packageParams.(map[interface{}]interface{})["base_url"].(string)
-		results[packageManager] = isAvailableOnPackageManager(packageManager, baseURL, packageName)
-	}
-	return results, nil
-}
-
-func isAvailableOnPackageManager(packageManager string, baseURL string, packageName string) bool {
-	client := &http.Client{}
-	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if packageManager == "composer" && req.URL.String() != baseURL+packageName+"/" {
-			return errors.New("Fail on redirect...")
-		}
-		return nil
-	}
-
-	resp, err := client.Head(baseURL + packageName)
-	if err != nil || resp.StatusCode != 200 {
-		log.Debug(packageManager + " is not reachable.")
-		return false
-	}
-	return true
-}
-
-func searchOnPackageManagers(packageName string) (results map[string]string, err error) {
-	packageManagers := viper.GetStringMapString("managers")
-
-	for packageManager := range packageManagers {
-		searchOnPackageManager(packageManager, packageName)
-	}
-	return results, nil
-}
-
-func searchOnPackageManager(packageManager string, packageName string) {
-	fmt.Println("=======================")
-	fmt.Println(packageManager, "search", packageName)
-	fmt.Println("=======================")
-	termCmd := exec.Command(packageManager, "search", packageName)
-	executeCommand(termCmd)
-}
-
-func writePackageEntry(selectedPackageManager string, arg string) error {
-	Config.Packages[arg] = map[string]string{
-		"cmd":         arg,
-		"description": arg,
-		"type":        selectedPackageManager,
-	}
-	ymlContent, _ := yaml.Marshal(Config)
-	err := ioutil.WriteFile(ConfigFullPath, ymlContent, 0666)
-	if err != nil {
-		return errors.New("Unable to edit config file.")
-	}
-	return nil
-}
-
-func unwritePackageEntry(selectedPackageManager string, arg string) error {
-	delete(Config.Packages, arg)
-	ymlContent, _ := yaml.Marshal(Config)
-	err := ioutil.WriteFile(ConfigFullPath, ymlContent, 0666)
-	if err != nil {
-		return errors.New("Unable to edit config file.")
-	}
-	return nil
 }

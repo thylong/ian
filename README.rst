@@ -53,15 +53,13 @@ Features
 - Possibility to extend with other packages
 
 # TODO v0.1
-- Make "env" and "packages search" asynchronous
 - "--all" option for repo
-- Support Ubuntu in setup
+- Support APT in setup
 
 # TODO v0.2
 - Specific package management with Ian
 - Add a project set <field_name> <value> to set the config from the terminal
 - Add tests
-- tmux compliance
 
 Contributing
 ============

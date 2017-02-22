@@ -22,6 +22,7 @@ import (
 	"os/exec"
 
 	"github.com/spf13/cobra"
+	"github.com/thylong/ian/backend/command"
 )
 
 // envCmd represents the env command
@@ -35,8 +36,7 @@ Currently implemented : System, Network, Security, current load.`,
 var envInfoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Get infos about the local environment",
-	Long: `Get general or detailes informations about the current environment.
-Currently implemented : System, Network, Security, current load.`,
+	Long:  `Get general or detailes informations about the current environment. Currently implemented : System, Network, Security, current load.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		IPCheckerURL := "http://httpbin.org/ip"
 
@@ -53,15 +53,13 @@ Currently implemented : System, Network, Security, current load.`,
 			fmt.Println("Error : ", err.Error())
 			return
 		}
-		uptimeCmd := exec.Command("uptime")
-		hostinfoCmd := exec.Command("hostinfo")
 
 		fmt.Println("====================")
-		executeCommand(hostinfoCmd)
+		command.ExecuteCommand(exec.Command("hostinfo"))
 		fmt.Println("====================")
 		fmt.Println("external_ip :", jsonContent["origin"])
 		fmt.Println("uptime :")
-		executeCommand(uptimeCmd)
+		command.ExecuteCommand(exec.Command("uptime"))
 	},
 }
 
@@ -71,14 +69,9 @@ var envUpdateCmd = &cobra.Command{
 	Long:  `Update the local environment with infos stored in the local config.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Updating env...")
-		// Upgrade brew & packages
-		executeCommand(exec.Command("/usr/local/bin/brew", "update"))
-		executeCommand(exec.Command("/usr/local/bin/brew", "upgrade"))
-
-		// Cleanup cask
-		executeCommand(exec.Command("/usr/local/bin/brew", "cask", "cleanup"))
-		// Cleanup brew
-		executeCommand(exec.Command("/usr/local/bin/brew", "cleanup"))
+		OSPackageManager.UpdateAll()
+		OSPackageManager.UpgradeAll()
+		OSPackageManager.Cleanup()
 	},
 }
 
