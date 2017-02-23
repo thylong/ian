@@ -51,17 +51,18 @@ Features
 - Manage projects (deploy, rollback, healthcheck, etc).
 - Manage dev environment (update OS package manager packages, Fetch diff on repos, etc).
 - Possibility to extend with other packages
+- Support pip, Npm, Brew\
 
 # TODO v0.1
-- Make "env" and "packages search" asynchronous
-- "--all" option for repo
-- Support Ubuntu in setup
+- ian env save
+- Cyphering / Decyphering of the configuration
+- Safe export functionnality (export only the non sensible infos)
+- Improve CLI architecture (KISS)
 
 # TODO v0.2
 - Specific package management with Ian
 - Add a project set <field_name> <value> to set the config from the terminal
 - Add tests
-- tmux compliance
 
 Contributing
 ============

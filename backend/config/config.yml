@@ -33,7 +33,7 @@ projects:
     repository: thylong/thylong.github.io
     url: http://thylong.com
 setup:
-  brew_packages:
+  cli_packages:
   - httpie
   - fish
   - keybase
@@ -52,7 +52,7 @@ setup:
   - tmux
   - wget
   - reattach-to-user-namespace
-  cask_packages:
+  gui_packages:
   - appcleaner
   - atom
   - caffeine

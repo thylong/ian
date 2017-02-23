@@ -1,71 +1,30 @@
+// Copyright © 2016 Theotime LEVEQUE theotime@protonmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package cmd
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os/exec"
-	"os/user"
-
-	yaml "gopkg.in/yaml.v2"
-
-	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/thylong/ian/backend/config"
+	pm "github.com/thylong/ian/backend/package-managers"
 )
 
-// RootCmd is executed by default (top level).
-var RootCmd = &cobra.Command{
-	Use:   "ian",
-	Short: "Ian is a very simple automation tool for developer with Mac environment",
-	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
-}
-
-// ConfigPath represents the path to config directory.
-var ConfigPath string
-
-// IanConfigPath represents the path to ian config directory.
-var IanConfigPath string
-
-// ConfigFullPath represents the path to config file.
-var ConfigFullPath string
-
-// ConfigYaml is used to marshal/unmarshal config file.
-type ConfigYaml struct {
-	Managers     map[string]map[string]string `json:"managers"`
-	Repositories map[string]string            `json:"repositories"`
-	Projects     map[string]map[string]string `json:"projects"`
-	Setup        map[string][]string          `json:"setup"`
-	Packages     map[string]map[string]string `json:"packages"`
-}
-
-// Config contains the config content.
-var Config ConfigYaml
+// OSPackageManager is the main package manager used by the current OS.
+var OSPackageManager pm.PackageManager
 
 func init() {
-	// Init and keep track of config.
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	ConfigPath = usr.HomeDir + "/.config"
-	IanConfigPath = ConfigPath + "/ian/"
-	ConfigFullPath = IanConfigPath + "config.yml"
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("config")
-	viper.AddConfigPath(IanConfigPath)
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		fmt.Println("Problem with config file: ", err.Error())
-	} else {
-		configContent, _ := ioutil.ReadFile(ConfigFullPath)
-		err = yaml.Unmarshal(configContent, &Config)
-		if err != nil {
-			log.Warning("Unable to parse config file.")
-			return
-		}
-		viper.WatchConfig()
-	}
+	OSPackageManager = pm.GetOSPackageManager()
 
 	RootCmd.SetUsageTemplate(string([]byte(`Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
@@ -91,21 +50,18 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	cobra.AddTemplateFunc("InjectPackagesInTemplate", InjectPackagesInTemplate)
 }
 
-// Execute a command and print output from stdout & stderr.
-func printFromCmdStds(termCmd *exec.Cmd) {
-	subcmdStds, err := termCmd.CombinedOutput()
-
-	if err != nil {
-		log.Info(err)
-	}
-	fmt.Printf("%s", subcmdStds)
+// RootCmd is executed by default (top level).
+var RootCmd = &cobra.Command{
+	Use:   "ian",
+	Short: "Ian is a very simple automation tool for developer with Mac environment",
+	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
 }
 
-// InjectPackagesInTemplate print packages list with usage.
+// InjectPackagesInTemplate prints packages list with usage.
 func InjectPackagesInTemplate() string {
 	packagesUsages := `Package Commands:
 `
-	for packageName, packageMeta := range Config.Packages {
+	for packageName, packageMeta := range config.ConfigMap.Packages {
 		packagesUsages += `  ` + packageName + ` ` + packageMeta["description"] + ` type:` + packageMeta["type"] + "\n"
 	}
 	return packagesUsages

@@ -1,4 +1,4 @@
-// Copyright © 2016 THEOTIME LEVEQUE <theotime.leveque@gmail.com>
+// Copyright © 2016 Theotime LEVEQUE theotime@protonmail.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,19 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os/exec"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/thylong/ian/backend/env"
 )
+
+func init() {
+	RootCmd.AddCommand(envCmd)
+	envCmd.AddCommand(envInfoCmd)
+	envCmd.AddCommand(envUpdateCmd)
+	envCmd.AddCommand(envSaveCmd)
+}
 
 // envCmd represents the env command
 var envCmd = &cobra.Command{
@@ -35,33 +40,9 @@ Currently implemented : System, Network, Security, current load.`,
 var envInfoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Get infos about the local environment",
-	Long: `Get general or detailes informations about the current environment.
-Currently implemented : System, Network, Security, current load.`,
+	Long:  `Get general or detailes informations about the current environment. Currently implemented : System, Network, Security, current load.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		IPCheckerURL := "http://httpbin.org/ip"
-
-		resp, err := http.Get(IPCheckerURL)
-		if err != nil {
-			fmt.Println("Error : ", err.Error())
-		}
-		content, err := ioutil.ReadAll(resp.Body)
-		defer resp.Body.Close()
-
-		var jsonContent map[string]string
-		err = json.Unmarshal(content, &jsonContent)
-		if err != nil {
-			fmt.Println("Error : ", err.Error())
-			return
-		}
-		uptimeCmd := exec.Command("uptime")
-		hostinfoCmd := exec.Command("hostinfo")
-
-		fmt.Println("====================")
-		printFromCmdStds(hostinfoCmd)
-		fmt.Println("====================")
-		fmt.Println("external_ip :", jsonContent["origin"])
-		fmt.Println("uptime :")
-		printFromCmdStds(uptimeCmd)
+		env.GetInfos()
 	},
 }
 
@@ -70,20 +51,27 @@ var envUpdateCmd = &cobra.Command{
 	Short: "Update the local environment",
 	Long:  `Update the local environment with infos stored in the local config.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Updating env...")
-		// Upgrade brew & packages
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "update"))
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "upgrade"))
+		func() {
+			go func() {
+				for {
+					for _, v := range `-\|/` {
+						fmt.Printf("\r Updating env... %c", v)
+						time.Sleep(100 * time.Millisecond)
+					}
+				}
+			}()
+			OSPackageManager.UpdateAll()
+		}()
 
-		// Cleanup cask
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "cask", "cleanup"))
-		// Cleanup brew
-		printFromCmdStds(exec.Command("/usr/local/bin/brew", "cleanup"))
+		OSPackageManager.UpgradeAll()
+		OSPackageManager.Cleanup()
 	},
 }
 
-func init() {
-	RootCmd.AddCommand(envCmd)
-	envCmd.AddCommand(envInfoCmd)
-	envCmd.AddCommand(envUpdateCmd)
+var envSaveCmd = &cobra.Command{
+	Use:   "save",
+	Short: "Save current configuration to distant dotfiles repositories",
+	Long:  `Move current configuration files of the user to a dotfiles sub-directory (if not exists), create symlinks to previous place, then finally create and push the repositories on github`,
+	Run: func(cmd *cobra.Command, args []string) {
+	},
 }

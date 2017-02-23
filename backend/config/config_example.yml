@@ -18,7 +18,7 @@ setup:
     requirements:
         - git
         - gcloud
-    brew_packages:
+    cli_packages:
         - httpie
         - fish
         - keybase
@@ -35,7 +35,7 @@ setup:
         - tree
         - cask
         - wget
-    cask_packages:
+    gui_packages:
         - appcleaner
         - atom
         - caffeine

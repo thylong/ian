@@ -1,4 +1,4 @@
-// Copyright © 2016 THEOTIME LEVEQUE <theotime.leveque@gmail.com>
+// Copyright © 2016 Theotime LEVEQUE theotime@protonmail.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	RootCmd.AddCommand(versionCmd)
+}
+
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version information",
 	Long:  `Print the version information.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ian version: beta")
+		fmt.Print("ian version: pre-alpha")
 	},
-}
-
-func init() {
-	RootCmd.AddCommand(versionCmd)
 }
