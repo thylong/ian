@@ -55,8 +55,8 @@ Features
 
 # TODO v0.1
 - ian env save
-- Cyphering / Decyphering of the configuration
-- Safe export functionnality (export only the non sensible infos)
+- Cyphering / Decyphering of the configuration (--encrypted option to env save)
+- Safe export functionnality (export only the non sensible infos) ("--safe" option to env save)
 - Improve CLI architecture (KISS)
 
 # TODO v0.2
