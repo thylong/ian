@@ -39,6 +39,9 @@ var IanConfigPath string
 // ConfigFullPath represents the path to config file.
 var ConfigFullPath string
 
+// DotfilesDirPath represents the full path to the dotfiles directory.
+var DotfilesDirPath string
+
 // YamlConfigMap is used to marshal/unmarshal config file.
 type YamlConfigMap struct {
 	Managers     map[string]map[string]string `json:"managers"`
@@ -61,6 +64,7 @@ func init() {
 	ConfigPath = usr.HomeDir + "/.config"
 	IanConfigPath = ConfigPath + "/ian/"
 	ConfigFullPath = IanConfigPath + "config.yml"
+	DotfilesDirPath = usr.HomeDir + "/.dotfiles"
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(IanConfigPath)
@@ -122,20 +126,13 @@ func SetupConfigFile() {
 // SetupDotFiles ask for a Github nickname and retrieve the dotfiles repo
 // (the repository has to be public).
 func SetupDotFiles() {
-	reader := bufio.NewReader(os.Stdin)
-	usr, err := user.Current()
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
-	}
-	dotfilesPath := usr.HomeDir + "/.dotfiles"
-
 	fmt.Print("Ian allows you to automatically import your dotfiles from a Github repository,")
 	fmt.Print("leave blank if you don't want to benefit of this feature.")
 	fmt.Print("Github nickname: ")
+	reader := bufio.NewReader(os.Stdin)
 	if nickname, _ := reader.ReadString('\n'); nickname != "\n" {
 		nickname = string(bytes.TrimSuffix([]byte(nickname), []byte("\n")))
-		termCmd := exec.Command("git", "clone", "-v", "https://github.com/"+nickname+"/dotfiles", dotfilesPath)
+		termCmd := exec.Command("git", "clone", "-v", "https://github.com/"+nickname+"/dotfiles", DotfilesDirPath)
 		command.ExecuteCommand(termCmd)
 
 		re := regexp.MustCompile(".git$")

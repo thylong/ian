@@ -51,18 +51,27 @@ Features
 - Manage projects (deploy, rollback, healthcheck, etc).
 - Manage dev environment (update OS package manager packages, Fetch diff on repos, etc).
 - Possibility to extend with other packages
-- Support pip, Npm, Brew\
+- Support pip, Npm, Brew, RubyGems, Cask
 
 # TODO v0.1
 - ian env save
+- list packages to install by package_managers
+- ian repo yaml file
+- ian projects yaml file
 - Cyphering / Decyphering of the configuration (--encrypted option to env save)
 - Safe export functionnality (export only the non sensible infos) ("--safe" option to env save)
 - Improve CLI architecture (KISS)
 
 # TODO v0.2
+- Get started experience (website + form on site to determine the profile)
+- Presets by profiles (backend, frontend, fullstack)
+- Customize presets easily http://getbootstrap.com/customize/ (UI local/remote? Hash copy/paste in CLI ?)
 - Specific package management with Ian
-- Add a project set <field_name> <value> to set the config from the terminal
+
+# TODO v0.3
 - Add tests
+- Add a project set <field_name> <value> to set the config from the terminal
+
 
 Contributing
 ============

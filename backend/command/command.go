@@ -16,6 +16,7 @@ package command
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -34,13 +35,56 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 	}
 
 	for _, cmdReader := range []io.ReadCloser{cmdOutReader, cmdErrReader} {
-		scanner := bufio.NewScanner(cmdReader)
 		go func() {
+			scanner := bufio.NewScanner(cmdReader)
 			for scanner.Scan() {
 				fmt.Printf("%s\n", scanner.Text())
 			}
 		}()
 	}
+
+	err = subCmd.Start()
+	if err != nil {
+		return fmt.Errorf("Error starting Cmd: %v", err)
+	}
+
+	err = subCmd.Wait()
+	if err != nil {
+		return fmt.Errorf("Error waiting for Cmd: %v", err)
+	}
+
+	return nil
+}
+
+// MustExecuteCommand a command and print output from stdout.
+// In case of stderr, return err.
+func MustExecuteCommand(subCmd *exec.Cmd) (err error) {
+	cmdOutReader, err := subCmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("Error creating StdoutPipe for Cmd: %v", err)
+	}
+	cmdErrReader, err := subCmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("Error creating StderrPipe for Cmd: %v", err)
+	}
+
+	scannerOut := bufio.NewScanner(cmdOutReader)
+	go func() {
+		for scannerOut.Scan() {
+			fmt.Printf("%s\n", scannerOut.Text())
+		}
+	}()
+
+	scannerErr := bufio.NewScanner(cmdErrReader)
+
+	failure := make(chan bool)
+	go func() {
+		for scannerErr.Scan() {
+			failure <- true
+			return
+		}
+		failure <- false
+	}()
 
 	err = subCmd.Start()
 	if err != nil {
@@ -52,5 +96,8 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 		return fmt.Errorf("Error waiting for Cmd: %v StdErr: %v", err, os.Stderr)
 	}
 
+	if <-failure == true {
+		return errors.New("Command failed to complete without any error")
+	}
 	return nil
 }

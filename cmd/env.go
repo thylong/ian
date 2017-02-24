@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
 )
 
@@ -73,14 +75,12 @@ var envSaveCmd = &cobra.Command{
 	Short: "Save current configuration to distant dotfiles repositories",
 	Long:  `Move current configuration files of the user to a dotfiles sub-directory (if not exists), create symlinks to previous place, then finally create and push the repositories on github`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// stat ~/.dotfiles
-		// if not exists, create directory + git init
-		// cp .* except .ssh into .dotfiles
-		// Check if repository exists
-		// if not exists, ask permission to create and push
-		// else push
-		// "applicative transaction" start (ensure that whatever happen inside, in the end let the environment proper)
-		// replace .* by content of dotfiles
-		// "applicative transaction" end
+		dotfilesDirPath := config.DotfilesDirPath
+		dotfilesToSave := []string{".testong"}
+
+		env.EnsureDotfilesDir(dotfilesDirPath)
+		env.ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath)
+		env.EnsureDotfilesRepository(viper.GetString("github_username"), dotfilesDirPath)
+		env.PushDotfiles(viper.GetString("default_save_message"), dotfilesDirPath)
 	},
 }
