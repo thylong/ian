@@ -17,12 +17,10 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/backend/env"
 )
 
 func init() {
@@ -46,47 +44,19 @@ var setupCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		config.SetupConfigFile()
-		config.SetupDotFiles()
-
+		config.SetupConfigFiles()
 		OSPackageManager.Setup()
 
-		setupCLIPackages()
-		setupGUIPackages()
+		env.SetupDotFiles(
+			config.Vipers["config"].GetString("github_username"),
+			config.DotfilesDirPath,
+		)
+
+		packages := config.Vipers["env"].GetStringMapStringSlice("env")
+		env.SetupCLIPackages(OSPackageManager, packages["cli_packages"])
+		env.SetupGUIPackages(OSPackageManager, packages["gui_packages"])
 
 		fmt.Println("====================")
 		fmt.Println("Ending setup.")
 	},
-}
-
-func setupCLIPackages() {
-	fmt.Println("Installing CLI packages...")
-	CLIPackages := viper.GetStringMapStringSlice("setup")["cli_packages"]
-
-	if len(CLIPackages) == 0 {
-		fmt.Println("No brew packages to install")
-		return
-	}
-
-	for _, CLIPackage := range CLIPackages {
-		OSPackageManager.Install(CLIPackage)
-	}
-}
-
-func setupGUIPackages() {
-	fmt.Println("Installing GUI packages...")
-	GUIPackages := viper.GetStringMapStringSlice("setup")["gui_packages"]
-
-	if len(GUIPackages) == 0 {
-		fmt.Println("No GUI packages to install")
-		return
-	}
-
-	for _, GUIPackage := range GUIPackages {
-		if OSPackageManager.GetName() == "brew" {
-			command.ExecuteCommand(exec.Command(OSPackageManager.GetExecPath(), "cask", "install", GUIPackage))
-		} else {
-			OSPackageManager.Install(GUIPackage)
-		}
-	}
 }

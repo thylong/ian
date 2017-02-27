@@ -37,12 +37,6 @@ func (b PipPackageManager) Install(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "install", "-U", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = WritePackageEntry(b.Name, packageName)
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
 	}
 	return err
 }
@@ -50,12 +44,6 @@ func (b PipPackageManager) Install(packageName string) (err error) {
 // Uninstall given Pip package.
 func (b PipPackageManager) Uninstall(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", "-U", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = UnwritePackageEntry(b.Name, packageName)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}

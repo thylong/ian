@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/config"
 )
 
 func init() {
@@ -51,11 +51,10 @@ var statusProjectCmd = &cobra.Command{
 	Long:  `Get the health statuses of the projects hosted versions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			projectConfig := viper.GetStringMap("projects")[arg]
-			baseURL := projectConfig.(map[interface{}]interface{})["url"]
-			healthEndpoint := projectConfig.(map[interface{}]interface{})["health"]
+			baseURL := config.Vipers["projects"].GetStringMapString(arg)["url"]
+			healthEndpoint := config.Vipers["projects"].GetStringMapString(arg)["health"]
 
-			url := baseURL.(string) + healthEndpoint.(string)
+			url := baseURL + healthEndpoint
 			resp, err := http.Get(url)
 			if err != nil {
 				fmt.Fprint(os.Stderr, err.Error())
@@ -77,11 +76,11 @@ var statsProjectCmd = &cobra.Command{
 	Long:  `Get the number of stars and forks for projects.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			projectConfig := viper.GetStringMap("projects")[arg]
-			repositoryURL := projectConfig.(map[interface{}]interface{})["repository"]
-			url := "https://api.github.com/repos/" + repositoryURL.(string)
+			repositoryURL := fmt.Sprintf(
+				"https://api.github.com/repos/%s", config.Vipers["projects"].GetStringMapString(arg)["repository"],
+			)
 
-			resp, err := http.Get(url)
+			resp, err := http.Get(repositoryURL)
 			if err != nil {
 				fmt.Printf("Error : %s", err.Error())
 			}
@@ -95,11 +94,11 @@ var statsProjectCmd = &cobra.Command{
 				return
 			}
 
-			fmt.Print(arg + " :")
-			fmt.Printf("- Forks: %v", jsonContent["forks_count"])
-			fmt.Printf("- Stars: %v", jsonContent["stargazers_count"])
-			fmt.Printf("- Open Issues: %v", jsonContent["open_issues_count"])
-			fmt.Printf("- Last update: %v", jsonContent["updated_at"])
+			fmt.Printf("\n%s:", arg)
+			fmt.Printf("\n- Forks: %v", jsonContent["forks_count"])
+			fmt.Printf("\n- Stars: %v", jsonContent["stargazers_count"])
+			fmt.Printf("\n- Open Issues: %v", jsonContent["open_issues_count"])
+			fmt.Printf("\n- Last update: %v", jsonContent["updated_at"])
 		}
 	},
 }
@@ -109,10 +108,7 @@ var configProjectCmd = &cobra.Command{
 	Short: "Gather general config of projects",
 	Long:  `Gather general config of projects.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		projectConfig := viper.GetStringMap("projects")
-		for _, project := range projectConfig {
-			fmt.Print(project)
-		}
+		fmt.Print(config.Vipers["projects"].AllSettings())
 	},
 }
 
@@ -121,11 +117,14 @@ var deployProjectCmd = &cobra.Command{
 	Short: "Deploy a new version of a project",
 	Long:  `Deploy a new version of a project.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		projectConfig := viper.GetStringMap("projects")[args[0]]
-		deployCmd := strings.Split(projectConfig.(map[interface{}]interface{})["deploy_cmd"].(string), " ")
-		termCmd := exec.Command(deployCmd[0], deployCmd[:1]...)
-		termCmd.Dir = viper.GetString("repositories_path")
-		command.ExecuteCommand(termCmd)
+		// deployCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["deploy_cmd"]
+		// deployCmd := strings.Split(deployCmdContent, " ")
+		termCmd := exec.Command("echo", "deploy")
+		// termCmd := exec.Command(deployCmd[0], deployCmd[1:]...)
+		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
+		if err := command.ExecuteCommand(termCmd); err != nil {
+			fmt.Println(err)
+		}
 	},
 }
 
@@ -134,10 +133,10 @@ var rollbackProjectCmd = &cobra.Command{
 	Short: "Rollback to a previous version of a project",
 	Long:  `Rollback a previous version of a project.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		projectConfig := viper.GetStringMap("projects")[args[0]]
-		rollbackCmd := strings.Split(projectConfig.(map[interface{}]interface{})["rollback_cmd"].(string), " ")
+		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["deploy_cmd"]
+		rollbackCmd := strings.Split(rollbackCmdContent, " ")
 		termCmd := exec.Command(rollbackCmd[0], rollbackCmd[:1]...)
-		termCmd.Dir = viper.GetString("repositories_path")
+		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 		command.ExecuteCommand(termCmd)
 	},
 }
@@ -147,8 +146,8 @@ var dbProjectCmd = &cobra.Command{
 	Short: "Connect to the Database of the project",
 	Long:  `Connect to the Database of the project.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		projectConfig := viper.GetStringMap("projects")[args[0]]
-		dbCmd := strings.Split(projectConfig.(map[interface{}]interface{})["db_cmd"].(string), " ")
+		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["db_cmd"]
+		dbCmd := strings.Split(rollbackCmdContent, " ")
 		termCmd := exec.Command(dbCmd[0], dbCmd[:1]...)
 		termCmd.Stdout = os.Stdout
 		termCmd.Stdin = os.Stdin

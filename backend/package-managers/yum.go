@@ -37,12 +37,6 @@ func (b YumPackageManager) Install(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = WritePackageEntry(b.Name, packageName)
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
 	}
 	return err
 }
@@ -50,12 +44,6 @@ func (b YumPackageManager) Install(packageName string) (err error) {
 // Uninstall given Yum package.
 func (b YumPackageManager) Uninstall(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "erase", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = UnwritePackageEntry(b.Name, packageName)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}

@@ -24,7 +24,6 @@ import (
 	"os/user"
 
 	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/lib"
 )
 
 // GetInfos returns env infos
@@ -73,7 +72,7 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
 		src := fmt.Sprintf("%s/%s", usr.HomeDir, dotfileToSave)
 		dst := fmt.Sprintf("%s/%s", dotfilesDirPath, dotfileToSave)
 
-		if err := lib.MoveFile(src, dst); err != nil {
+		if err := MoveFile(src, dst); err != nil {
 			panic(fmt.Sprintf("couldn't move %s !", src))
 		}
 		if err := os.Symlink(dst, src); err != nil {

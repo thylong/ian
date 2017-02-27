@@ -17,14 +17,11 @@ package packagemanagers
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os/exec"
 
-	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // PackageManager handles standard interactions with all Package Managers.
@@ -71,36 +68,10 @@ func GetPackageManager(PackageManagerFlag string) PackageManager {
 	return GetOSPackageManager()
 }
 
-// WritePackageEntry in the local config.yml
-func WritePackageEntry(selectedPackageManager string, arg string) error {
-	config.ConfigMap.Packages[arg] = map[string]string{
-		"cmd":         arg,
-		"description": arg,
-		"type":        selectedPackageManager,
-	}
-	ymlContent, _ := yaml.Marshal(config.ConfigMap)
-	err := ioutil.WriteFile(config.ConfigFullPath, ymlContent, 0666)
-	if err != nil {
-		return errors.New("Unable to edit config file.")
-	}
-	return nil
-}
-
-// UnwritePackageEntry in the local config.yml
-func UnwritePackageEntry(selectedPackageManager string, arg string) error {
-	delete(config.ConfigMap.Packages, arg)
-	ymlContent, _ := yaml.Marshal(config.ConfigMap)
-	err := ioutil.WriteFile(config.ConfigFullPath, ymlContent, 0666)
-	if err != nil {
-		return errors.New("Unable to edit config file.")
-	}
-	return nil
-}
-
 // IsAvailableOnPackageManagers returns true if found in the repositories of
 // one of the available package managers.
 func IsAvailableOnPackageManagers(packageName string) (map[string]bool, error) {
-	packageManagers := viper.GetStringMap("managers")
+	packageManagers := config.Vipers["config"].GetStringMap("managers")
 	results := make(map[string]bool)
 
 	for packageManager, packageParams := range packageManagers {
@@ -132,7 +103,7 @@ func isAvailableOnPackageManager(packageManager string, baseURL string, packageN
 // SearchOnPackageManagers returns infos on packages found in the repositories of
 // one of the available package managers.
 func SearchOnPackageManagers(packageName string) (results map[string]string, err error) {
-	packageManagers := viper.GetStringMapString("managers")
+	packageManagers := config.Vipers["config"].GetStringMapString("managers")
 
 	for packageManager := range packageManagers {
 		SearchOnPackageManager(packageManager, packageName)

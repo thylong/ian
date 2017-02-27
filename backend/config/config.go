@@ -20,27 +20,27 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"os/user"
-	"regexp"
 
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/spf13/viper"
-	"github.com/thylong/ian/backend/command"
 )
 
-// ConfigPath represents the path to config directory.
-var ConfigPath string
+// ConfigDirPath represents the path to config directory.
+var ConfigDirPath string
 
 // IanConfigPath represents the path to ian config directory.
 var IanConfigPath string
 
-// ConfigFullPath represents the path to config file.
-var ConfigFullPath string
-
 // DotfilesDirPath represents the full path to the dotfiles directory.
 var DotfilesDirPath string
+
+// ConfigFilesPathes contains every config file pathes per filename.
+var ConfigFilesPathes map[string]string
+
+// Vipers contains all the initialized Vipers (config, env, projects)
+var Vipers map[string]*viper.Viper
 
 // YamlConfigMap is used to marshal/unmarshal config file.
 type YamlConfigMap struct {
@@ -55,194 +55,101 @@ type YamlConfigMap struct {
 var ConfigMap YamlConfigMap
 
 func init() {
-	// Init and keep track of config.
 	usr, err := user.Current()
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
-	ConfigPath = usr.HomeDir + "/.config"
-	IanConfigPath = ConfigPath + "/ian/"
-	ConfigFullPath = IanConfigPath + "config.yml"
-	DotfilesDirPath = usr.HomeDir + "/.dotfiles"
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("config")
-	viper.AddConfigPath(IanConfigPath)
 
-	err = viper.ReadInConfig()
+	ConfigDirPath = usr.HomeDir + "/.config"
+	IanConfigPath = ConfigDirPath + "/ian/"
+	DotfilesDirPath = usr.HomeDir + "/.dotfiles"
+
+	ConfigFilesPathes = make(map[string]string)
+	Vipers = make(map[string]*viper.Viper)
+	for _, ConfigFileName := range []string{"config", "env", "projects"} {
+		ConfigFilesPathes[ConfigFileName] = IanConfigPath + fmt.Sprintf("%s.yml", ConfigFileName)
+		Vipers[ConfigFileName] = initViper(ConfigFileName)
+	}
+}
+
+func initViper(viperName string) (viperInstance *viper.Viper) {
+	viperInstance = viper.New()
+	viperInstance.SetConfigType("yaml")
+	viperInstance.SetConfigName(viperName)
+	viperInstance.AddConfigPath(IanConfigPath)
+
+	err := viperInstance.ReadInConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Problem with config file: %s", err.Error())
+		fmt.Fprintf(os.Stderr, "Problem with config file: %s Error: %s", viperName, err.Error())
 		os.Exit(1)
 	} else {
-		configContent, _ := ioutil.ReadFile(ConfigFullPath)
+		configContent, _ := ioutil.ReadFile(ConfigFilesPathes[viperName])
 		err = yaml.Unmarshal(configContent, &ConfigMap)
 		if err != nil {
 			fmt.Println("Unable to parse config file.")
-			return
-		}
-		viper.WatchConfig()
-	}
-}
-
-// SetupConfigFile creates a config directory and store the default config file
-// If not exists.
-func SetupConfigFile() {
-	// Create .config dir if missing.
-	_, err := os.Stat(ConfigPath)
-	if err != nil {
-		err = os.Mkdir(ConfigPath, 0766)
-	}
-	// Create .config/ian dir if missing.
-	_, err = os.Stat(IanConfigPath)
-	if err != nil {
-		err = os.Mkdir(IanConfigPath, 0766)
-	}
-
-	// Create config.yml file
-	_, err = os.Stat(ConfigFullPath)
-	if err != nil {
-		configContent := GetConfigDefaultContent()
-
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Ian allows you manage all your Github repositories")
-		fmt.Print("leave blank if you don't want to benefit of this feature.")
-		fmt.Print("Otherwise, set up the fullpath to the parent directory of all your repositories: ")
-		if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
-			repositoriesPathConfigLine := "\nrepositories_path: " + fullPathToRepositories
-			configContent = append(configContent, repositoriesPathConfigLine...)
-		}
-
-		fmt.Printf("Creating %s", ConfigFullPath)
-		err := ioutil.WriteFile(ConfigFullPath, configContent, 0766)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 			os.Exit(1)
 		}
-		return
+		viperInstance.WatchConfig()
 	}
-	fmt.Print("Config file found.")
+	return viperInstance
 }
 
-// SetupDotFiles ask for a Github nickname and retrieve the dotfiles repo
-// (the repository has to be public).
-func SetupDotFiles() {
-	fmt.Print("Ian allows you to automatically import your dotfiles from a Github repository,")
-	fmt.Print("leave blank if you don't want to benefit of this feature.")
-	fmt.Print("Github nickname: ")
-	reader := bufio.NewReader(os.Stdin)
-	if nickname, _ := reader.ReadString('\n'); nickname != "\n" {
-		nickname = string(bytes.TrimSuffix([]byte(nickname), []byte("\n")))
-		termCmd := exec.Command("git", "clone", "-v", "https://github.com/"+nickname+"/dotfiles", DotfilesDirPath)
-		command.ExecuteCommand(termCmd)
-
-		re := regexp.MustCompile(".git$")
-
-		usr, _ := user.Current()
-		files, _ := ioutil.ReadDir(usr.HomeDir + "/.dotfiles")
-		for _, f := range files {
-			if re.MatchString(f.Name()) {
-				continue
-			}
-			if err := os.Symlink(usr.HomeDir+"/.dotfiles/"+f.Name(), usr.HomeDir+"/"+f.Name()); err != nil {
-				fmt.Fprint(os.Stderr, err)
-			}
-		}
-	} else {
-		fmt.Print("Skipping dotfiles configuration.")
+// SetupConfigFiles creates a config directory and the config files if not exists.
+func SetupConfigFiles() {
+	// Create .config dir if missing.
+	if _, err := os.Stat(ConfigDirPath); err != nil {
+		_ = os.Mkdir(ConfigDirPath, 0766)
 	}
+	// Create .config/ian dir if missing.
+	if _, err := os.Stat(IanConfigPath); err != nil {
+		_ = os.Mkdir(IanConfigPath, 0766)
+	}
+
+	for ConfigFileName, ConfigFilePath := range ConfigFilesPathes {
+		if _, err := os.Stat(ConfigFilePath); err != nil {
+			configContent := GetConfigDefaultContent(ConfigFilePath)
+
+			repositoriesPath := generateRepositoriesPath()
+			configContent = append(configContent, repositoriesPath...)
+
+			GithubUsername := generateGithubUsername()
+			configContent = append(configContent, GithubUsername...)
+
+			fmt.Printf("Creating %s", ConfigFileName)
+			if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+				os.Exit(1)
+			}
+			return
+		}
+	}
+	fmt.Print("Config files found.")
 }
 
 // GetConfigDefaultContent returns the content of the default config.yml
-func GetConfigDefaultContent() []byte {
-	return []byte(`managers:
-  pip:
-    base_url: https://pypi.org/project/
-    install_cmd: install
-    uninstall_cmd: uninstall
-  npm:
-    base_url: https://www.npmjs.com/package/
-    install_cmd: install -g
-    uninstall_cmd: uninstall -g
-  gem:
-    base_url: https://rubygems.org/gems/
-    install_cmd: install
-    uninstall_cmd: uninstall
-  composer: # alias packagist
-    base_url: https://packagist.org/packages/
-    install_cmd: global install
-    uninstall_cmd: global remove
-repositories: {}
-projects:
-  cabu:
-    repository: thylong/cabu
-  ian:
-    repository: thylong/ian
-  regexrace:
-    db_cmd: mongo localhost
-    deploy_cmd: bash deploy.sh
-    health: /status
-    repository: thylong/regexrace
-    rollback_cmd: bash rollback.sh
-    url: http://regexrace.org
-  thylong:
-    health: /
-    repository: thylong/thylong.github.io
-    url: http://thylong.com
-setup:
-  cli_packages:
-  - httpie
-  - fish
-  - keybase
-  - mongodb
-  - lynx
-  - node
-  - nmap
-  - python
-  - python3
-  - rsyslog
-  - cmake
-  - ruby
-  - tree
-  - cask
-  - tmux
-  - wget
-  - reattach-to-user-namespace
-  gui_packages:
-  - appcleaner
-  - atom
-  - caffeine
-  - charles
-  - dash
-  - dashlane
-  - docker
-  - filezilla
-  - firefox
-  - google-chrome
-  - iterm2
-  - jadengeller-helium
-  - keka
-  - libreoffice
-  - mediainfo
-  - robomongo
-  - skype
-  - slack
-  - spectacle
-  - spotify
-  - steam
-  - torbrowser
-  - tunnelblick
-  - utorrent
-  - vagrant
-  - virtualbox
-  - vlc
-  - wireshark
-  requirements:
-  - git
-  - gcloud
-packages:
-  baily-cli:
-    cmd: baily-cli
-    description: baily-cli
-    type: npm
-`)
+func GetConfigDefaultContent(fileName string) []byte {
+	return []byte{}
+}
+
+func generateRepositoriesPath() (repositoriesPathConf string) {
+	repositoriesPathConf = "\nrepositories_path: "
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Ian allows you manage all your Github repositories")
+	fmt.Print("Insert up the fullpath to the parent directory of all your repositories, otherwise leave blank: ")
+	if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
+		return repositoriesPathConf + fullPathToRepositories
+	}
+	return repositoriesPathConf
+}
+
+func generateGithubUsername() (GithubUsernameConf string) {
+	GithubUsernameConf = "\ngithub_username: "
+	fmt.Println("Insert your Github nickname: ")
+	reader := bufio.NewReader(os.Stdin)
+	if nickname, _ := reader.ReadString('\n'); nickname != "\n" {
+		Vipers["config"].Set("github_username", string(bytes.TrimSuffix([]byte(nickname), []byte("\n"))))
+		return GithubUsernameConf + string(bytes.TrimSuffix([]byte(nickname), []byte("\n")))
+	}
+	return GithubUsernameConf
 }

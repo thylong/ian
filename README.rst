@@ -29,8 +29,6 @@ Usage
 
     Default Commands:
       env         Get infos about the local environment
-      news        Retrieve last news from Google News
-      packages    packages allows you to manage ian extensions
       project     Interact with listed project
       repo        Manage stored repositories
       setup       Setup ian working environment
@@ -50,27 +48,29 @@ Features
 - Get environment infos.
 - Manage projects (deploy, rollback, healthcheck, etc).
 - Manage dev environment (update OS package manager packages, Fetch diff on repos, etc).
-- Possibility to extend with other packages
-- Support pip, Npm, Brew, RubyGems, Cask
+- Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
-- ian env save
-- list packages to install by package_managers
-- ian repo yaml file
-- ian projects yaml file
-- Cyphering / Decyphering of the configuration (--encrypted option to env save)
-- Safe export functionnality (export only the non sensible infos) ("--safe" option to env save)
-- Improve CLI architecture (KISS)
+- list packages to install by package_managers (NOT CLI AND GUI)
+- ian setup detect OS packagemanager to write accurate config
+- Install homebrew + cask if missing
+- TEST before tag v0.1 avec Ubuntu et Mac OSX
 
 # TODO v0.2
 - Get started experience (website + form on site to determine the profile)
 - Presets by profiles (backend, frontend, fullstack)
 - Customize presets easily http://getbootstrap.com/customize/ (UI local/remote? Hash copy/paste in CLI ?)
-- Specific package management with Ian
 
 # TODO v0.3
 - Add tests
 - Add a project set <field_name> <value> to set the config from the terminal
+
+# TODO v0.4
+- Cyphering / Decyphering of the configuration (--encrypted option to env save)
+- Safe export functionnality (export only the non sensible infos) ("--safe" option to env save)
+
+# TODO v0.5
+- Specific package management with Ian
 
 
 Contributing

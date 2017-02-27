@@ -1,0 +1,15 @@
+cabu:
+    repository: thylong/cabu
+ian:
+    repository: thylong/ian
+regexrace:
+    db_cmd: mongo localhost
+    deploy_cmd: bash deploy.sh
+    health: /status
+    repository: thylong/regexrace
+    rollback_cmd: bash rollback.sh
+    url: http://regexrace.org
+thylong:
+    health: /
+    repository: thylong/thylong.github.io
+    url: http://thylong.com

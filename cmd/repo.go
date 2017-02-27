@@ -21,8 +21,8 @@ import (
 	"os/exec"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/config"
 )
 
 func init() {
@@ -55,8 +55,8 @@ var listCmd = &cobra.Command{
     List all stored repositories in repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		termCmd := exec.Command("ls")
-		fmt.Printf("repositories_path: %s\n", viper.GetString("repositories_path"))
-		termCmd.Dir = viper.GetString("repositories_path")
+		fmt.Printf("repositories_path: %s\n", config.Vipers["config"].GetString("repositories_path"))
+		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 		command.ExecuteCommand(termCmd)
 	},
@@ -71,7 +71,7 @@ var cloneCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
 			termCmd := exec.Command("git", "clone", "-v", arg)
-			termCmd.Dir = viper.GetString("repositories_path")
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 			command.ExecuteCommand(termCmd)
 		}
@@ -87,7 +87,7 @@ var cleanCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
 			termCmd := exec.Command("git", "clean", "-dffx", arg)
-			termCmd.Dir = viper.GetString("repositories_path")
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 			command.ExecuteCommand(termCmd)
 		}
@@ -102,7 +102,7 @@ var updateCmd = &cobra.Command{
     Update stored repositories in the repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			files, err := ioutil.ReadDir(viper.GetString("repositories_path"))
+			files, err := ioutil.ReadDir(config.Vipers["config"].GetString("repositories_path"))
 			if err != nil {
 				fmt.Fprint(os.Stderr, err)
 				os.Exit(1)
@@ -116,7 +116,7 @@ var updateCmd = &cobra.Command{
 
 		for _, arg := range args {
 			termCmd := exec.Command("git", "fetch", arg)
-			termCmd.Dir = viper.GetString("repositories_path")
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 			command.ExecuteCommand(termCmd)
 		}
@@ -131,7 +131,7 @@ var upgradeCmd = &cobra.Command{
     Upgrade stored repositories in the repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			files, err := ioutil.ReadDir(viper.GetString("repositories_path"))
+			files, err := ioutil.ReadDir(config.Vipers["config"].GetString("repositories_path"))
 			if err != nil {
 				fmt.Fprint(os.Stderr, err)
 				os.Exit(1)
@@ -144,7 +144,7 @@ var upgradeCmd = &cobra.Command{
 		}
 		for _, arg := range args {
 			termCmd := exec.Command("git", "pull", "--rebase", arg)
-			termCmd.Dir = viper.GetString("repositories_path")
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 			command.ExecuteCommand(termCmd)
 		}
@@ -166,7 +166,7 @@ var removeCmd = &cobra.Command{
 				fmt.Fprint(os.Stderr, "Cmon man, don't do that...")
 			}
 			termCmd := exec.Command("rm", "-rf", arg)
-			termCmd.Dir = viper.GetString("repositories_path")
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 			command.ExecuteCommand(termCmd)
 		}
@@ -185,7 +185,7 @@ var statusCmd = &cobra.Command{
 		}
 		for _, arg := range args {
 			termCmd := exec.Command("git", "status")
-			termCmd.Dir = viper.GetString("repositories_path") + "/" + arg
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path") + "/" + arg
 
 			command.ExecuteCommand(termCmd)
 		}

@@ -37,12 +37,6 @@ func (b NpmPackageManager) Install(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "install", "-g", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = WritePackageEntry(b.Name, packageName)
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
 	}
 	return err
 }
@@ -50,12 +44,6 @@ func (b NpmPackageManager) Install(packageName string) (err error) {
 // Uninstall given Npm package.
 func (b NpmPackageManager) Uninstall(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", "-g", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = UnwritePackageEntry(b.Name, packageName)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}

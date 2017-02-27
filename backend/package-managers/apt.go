@@ -38,12 +38,6 @@ func (b AptPackageManager) Install(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
-		return
-	}
-
-	err = WritePackageEntry(b.Name, packageName)
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
 	}
 	return err
 }
@@ -51,12 +45,6 @@ func (b AptPackageManager) Install(packageName string) (err error) {
 // Uninstall given Apt package.
 func (b AptPackageManager) Uninstall(packageName string) (err error) {
 	err = command.ExecuteCommand(exec.Command(b.Path, "remove", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
-		return
-	}
-
-	err = UnwritePackageEntry(b.Name, packageName)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}

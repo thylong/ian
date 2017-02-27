@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/thylong/ian/backend/config"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
 
@@ -38,7 +37,6 @@ Examples:
 Default Commands:{{range .Commands}}{{if .IsAvailableCommand}}
   {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}
 
-{{InjectPackagesInTemplate}}
 {{end}}{{ if .HasAvailableLocalFlags}}
 Flags:
 {{.LocalFlags.FlagUsages | trimRightSpace}}{{end}}{{ if .HasAvailableInheritedFlags}}
@@ -47,7 +45,6 @@ Global Flags:
 Additional help topics:{{range .Commands}}{{if .IsHelpCommand}}
   {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasAvailableSubCommands }}
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}`)))
-	cobra.AddTemplateFunc("InjectPackagesInTemplate", InjectPackagesInTemplate)
 }
 
 // RootCmd is executed by default (top level).
@@ -55,14 +52,4 @@ var RootCmd = &cobra.Command{
 	Use:   "ian",
 	Short: "Ian is a very simple automation tool for developer with Mac environment",
 	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
-}
-
-// InjectPackagesInTemplate prints packages list with usage.
-func InjectPackagesInTemplate() string {
-	packagesUsages := `Package Commands:
-`
-	for packageName, packageMeta := range config.ConfigMap.Packages {
-		packagesUsages += `  ` + packageName + ` ` + packageMeta["description"] + ` type:` + packageMeta["type"] + "\n"
-	}
-	return packagesUsages
 }
