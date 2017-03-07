@@ -44,6 +44,7 @@ var supportedPackageManagers = make(map[string]PackageManager)
 
 func init() {
 	supportedPackageManagers["brew"] = Brew
+	supportedPackageManagers["cask"] = Cask
 	supportedPackageManagers["pip"] = Pip
 	supportedPackageManagers["npm"] = Npm
 	supportedPackageManagers["apt"] = Apt
@@ -54,6 +55,11 @@ func init() {
 // GetOSPackageManager returns the main Package Manager of the current OS.
 // As only MacOS is supported for now, it returns a Brew instance.
 func GetOSPackageManager() PackageManager {
+	for name, packageManager := range supportedPackageManagers {
+		if name != "cask" && packageManager.IsInstalled() {
+			return packageManager
+		}
+	}
 	return Brew
 }
 
@@ -62,7 +68,7 @@ func GetOSPackageManager() PackageManager {
 func GetPackageManager(PackageManagerFlag string) PackageManager {
 	packageManager, ok := supportedPackageManagers[PackageManagerFlag]
 
-	if !ok {
+	if ok {
 		return packageManager
 	}
 	return GetOSPackageManager()

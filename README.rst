@@ -51,9 +51,6 @@ Features
 - Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
-- list packages to install by package_managers (NOT CLI AND GUI)
-- ian setup detect OS packagemanager to write accurate config
-- Install homebrew + cask if missing
 - TEST before tag v0.1 avec Ubuntu et Mac OSX
 
 # TODO v0.2

@@ -112,11 +112,11 @@ func (b BrewPackageManager) GetName() string {
 
 // Setup installs Cask
 func (b BrewPackageManager) Setup() (err error) {
-	fmt.Print("Installing cask...")
+	fmt.Println("Installing cask...")
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
 		err = command.ExecuteCommand(exec.Command("brew", "tap", "caskroom/cask"))
 		return err
 	}
-	fmt.Print("cask already installed, skipping...")
+	fmt.Println("cask already installed, skipping...")
 	return nil
 }

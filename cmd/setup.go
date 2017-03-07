@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
+	pm "github.com/thylong/ian/backend/package-managers"
 )
 
 func init() {
@@ -37,7 +38,6 @@ var setupCmd = &cobra.Command{
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Starting setup")
-		fmt.Println("====================")
 
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 			fmt.Println("Missing OS package manager !")
@@ -52,11 +52,13 @@ var setupCmd = &cobra.Command{
 			config.DotfilesDirPath,
 		)
 
-		packages := config.Vipers["env"].GetStringMapStringSlice("env")
-		env.SetupCLIPackages(OSPackageManager, packages["cli_packages"])
-		env.SetupGUIPackages(OSPackageManager, packages["gui_packages"])
+		packageManagerNames := config.Vipers["env"].AllKeys()
+		for _, packageManagerName := range packageManagerNames {
+			packages := config.Vipers["env"].GetStringSlice(packageManagerName)
+			packageManager := pm.GetPackageManager(packageManagerName)
 
-		fmt.Println("====================")
+			env.SetupPackages(packageManager, packages)
+		}
 		fmt.Println("Ending setup.")
 	},
 }

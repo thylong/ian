@@ -124,7 +124,7 @@ func SetupConfigFiles() {
 			return
 		}
 	}
-	fmt.Print("Config files found.")
+	fmt.Println("Config files found.")
 }
 
 // GetConfigDefaultContent returns the content of the default config.yml
