@@ -35,8 +35,8 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 	}
 
 	for _, cmdReader := range []io.ReadCloser{cmdOutReader, cmdErrReader} {
+		scanner := bufio.NewScanner(cmdReader)
 		go func() {
-			scanner := bufio.NewScanner(cmdReader)
 			for scanner.Scan() {
 				fmt.Printf("%s\n", scanner.Text())
 			}
