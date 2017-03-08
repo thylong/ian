@@ -90,7 +90,6 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 			fmt.Println("Unable to parse config file.")
 			os.Exit(1)
 		}
-		viperInstance.WatchConfig()
 	}
 	return viperInstance
 }
@@ -110,11 +109,13 @@ func SetupConfigFiles() {
 		if _, err := os.Stat(ConfigFilePath); err != nil {
 			configContent := GetConfigDefaultContent(ConfigFilePath)
 
+			repositoriesPathPrefix := "\nrepositories_path: "
 			repositoriesPath := GenerateRepositoriesPath()
-			configContent = append(configContent, repositoriesPath...)
+			configContent = append(configContent, fmt.Sprintf("%s%s", repositoriesPathPrefix, repositoriesPath)...)
 
-			dotfilesRepository := GetDotfilesRepositoryConfLine()
-			configContent = append(configContent, dotfilesRepository...)
+			dotfilesRepositoryPrefix := "\ndotfiles_repository: "
+			dotfilesRepository := GetDotfilesRepository()
+			configContent = append(configContent, fmt.Sprintf("%s%s", dotfilesRepositoryPrefix, dotfilesRepository)...)
 
 			fmt.Printf("Creating %s", ConfigFileName)
 			if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
@@ -145,30 +146,29 @@ func AppendToConfig(lines string, confFilename string) {
 }
 
 // GetConfigDefaultContent returns the content of the default config.yml
+// (As nothing is preset for now, this function actually returns an empty string)
 func GetConfigDefaultContent(fileName string) []byte {
 	return []byte{}
 }
 
 // GenerateRepositoriesPath creates conf line containing the user's input.
-func GenerateRepositoriesPath() (repositoriesPathConf string) {
-	repositoriesPathConf = "\nrepositories_path: "
+func GenerateRepositoriesPath() string {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Ian allows you manage all your Github local repositories")
-	fmt.Print("Insert up the fullpath to the parent directory of all your local repositories, otherwise leave blank: ")
+	fmt.Print("Insert the fullpath to the parent directory of all your local repositories, otherwise leave blank: ")
 	if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
-		return repositoriesPathConf + fullPathToRepositories
+		return fullPathToRepositories
 	}
-	return repositoriesPathConf
+	return ""
 }
 
-// GetDotfilesRepositoryConfLine creates conf line containing the user's input.
-func GetDotfilesRepositoryConfLine() (dotfilesRepository string) {
-	dotfilesRepository = "\ndotfiles_repository: "
+// GetDotfilesRepository creates conf line containing the user's input.
+func GetDotfilesRepository() string {
 	fmt.Println("Path to your dotfiles repository: ")
 	reader := bufio.NewReader(os.Stdin)
 	if input, _ := reader.ReadString('\n'); input != "\n" {
 		Vipers["config"].Set("dotfiles_repository", string(bytes.TrimSuffix([]byte(input), []byte("\n"))))
-		return dotfilesRepository + string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
 	}
-	return dotfilesRepository
+	return ""
 }

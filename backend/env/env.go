@@ -86,8 +86,9 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
 // EnsureDotfilesRepository create Dotfiles repository if not exists.
 func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string) {
 	if dotfilesRepository == "" {
-		dotfilesRepositoryLine := config.GetDotfilesRepositoryConfLine()
-		panic("YOLO")
+		dotfilesRepository = config.GetDotfilesRepository()
+		dotfilesRepositoryPrefix := "\ndotfiles_repository: "
+		dotfilesRepositoryLine := fmt.Sprintf("%s%s", dotfilesRepositoryPrefix, dotfilesRepository)
 		config.AppendToConfig(dotfilesRepositoryLine, "config")
 	}
 	repositoryURL := fmt.Sprintf("git@github.com:%s.git", dotfilesRepository)
@@ -114,7 +115,7 @@ func PushDotfiles(message string, dotfilesDirPath string) {
 	commitCmd.Dir = dotfilesDirPath
 	command.ExecuteCommand(commitCmd)
 
-	termCmd := exec.Command("git", "push", "origin", "master")
+	termCmd := exec.Command("git", "push", "--force", "origin", "master")
 	termCmd.Dir = dotfilesDirPath
 	command.ExecuteCommand(termCmd)
 }

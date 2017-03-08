@@ -48,8 +48,7 @@ Features
 - Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
-- Ask for dotfiles repository instead of just Github username
-- TEST before tag v0.1 avec Ubuntu et Mac OSX
+- TESTS before tag v0.1 avec Ubuntu et Mac OSX
 
 # TODO v0.2
 - Get started experience (website + form on site to determine the profile)
