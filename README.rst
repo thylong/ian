@@ -40,7 +40,7 @@ Usage
 Features
 ========
 
-- Self-Setup (import dotfiles, install brew, cask and related packages)
+- Self-Setup (import dotfiles and install related packages)
 - Interact with local git repositories.
 - Get environment infos.
 - Manage projects (deploy, rollback, healthcheck, etc).
@@ -48,7 +48,13 @@ Features
 - Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
-- TESTS before tag v0.1 avec Ubuntu et Mac OSX
+- TESTS
+- Clear relative imports
+- Remove logic from Cobra commands
+- Fix english typos
+- Ensure commands architecture
+- Travis workflow
+- tag v0.1
 
 # TODO v0.2
 - Get started experience (website + form on site to determine the profile)
