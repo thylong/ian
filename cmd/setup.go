@@ -48,7 +48,7 @@ var setupCmd = &cobra.Command{
 		OSPackageManager.Setup()
 
 		env.SetupDotFiles(
-			config.Vipers["config"].GetString("github_username"),
+			config.Vipers["config"].GetString("dotfiles_repository"),
 			config.DotfilesDirPath,
 		)
 

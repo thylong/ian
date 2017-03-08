@@ -79,7 +79,7 @@ var envSaveCmd = &cobra.Command{
 
 		env.EnsureDotfilesDir(dotfilesDirPath)
 		env.ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath)
-		env.EnsureDotfilesRepository(config.Vipers["config"].GetString("github_username"), dotfilesDirPath)
+		env.EnsureDotfilesRepository(config.Vipers["config"].GetString("dotfiles_repository"), dotfilesDirPath)
 		env.PushDotfiles(config.Vipers["config"].GetString("default_save_message"), dotfilesDirPath)
 	},
 }
