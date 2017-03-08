@@ -26,12 +26,11 @@ func SetupPackages(PackageManager pm.PackageManager, packages []string) {
 	}
 }
 
-// SetupDotFiles ask for a Github nickname and retrieve the dotfiles repo
-// (the repository has to be public).
-func SetupDotFiles(nickname string, dotfilesDirPath string) {
+// SetupDotFiles ask and retrieve a dotfiles repository.
+func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 	usr, _ := user.Current()
-	if _, err := os.Stat(usr.HomeDir + "/.dotfiles"); err != nil && nickname != "" {
-		termCmd := exec.Command("git", "clone", "-v", "git@github.com:"+nickname+"/dotfiles.git", dotfilesDirPath)
+	if _, err := os.Stat(usr.HomeDir + "/.dotfiles"); err != nil && dotfilesRepository != "" {
+		termCmd := exec.Command("git", "clone", "-v", "git@github.com:"+dotfilesRepository+".git", dotfilesDirPath)
 		command.ExecuteCommand(termCmd)
 
 		re := regexp.MustCompile(".git$")

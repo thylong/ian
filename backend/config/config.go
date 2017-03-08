@@ -110,11 +110,11 @@ func SetupConfigFiles() {
 		if _, err := os.Stat(ConfigFilePath); err != nil {
 			configContent := GetConfigDefaultContent(ConfigFilePath)
 
-			repositoriesPath := generateRepositoriesPath()
+			repositoriesPath := GenerateRepositoriesPath()
 			configContent = append(configContent, repositoriesPath...)
 
-			GithubUsername := generateGithubUsername()
-			configContent = append(configContent, GithubUsername...)
+			dotfilesRepository := GetDotfilesRepositoryConfLine()
+			configContent = append(configContent, dotfilesRepository...)
 
 			fmt.Printf("Creating %s", ConfigFileName)
 			if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
@@ -127,29 +127,48 @@ func SetupConfigFiles() {
 	fmt.Println("Config files found.")
 }
 
+// AppendToConfig takes a string as an argument
+// and write it as new line(s) in the given conf file.
+func AppendToConfig(lines string, confFilename string) {
+	confPath := ConfigFilesPathes[confFilename]
+	f, err := os.OpenFile(confPath, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(lines); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
 // GetConfigDefaultContent returns the content of the default config.yml
 func GetConfigDefaultContent(fileName string) []byte {
 	return []byte{}
 }
 
-func generateRepositoriesPath() (repositoriesPathConf string) {
+// GenerateRepositoriesPath creates conf line containing the user's input.
+func GenerateRepositoriesPath() (repositoriesPathConf string) {
 	repositoriesPathConf = "\nrepositories_path: "
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Ian allows you manage all your Github repositories")
-	fmt.Print("Insert up the fullpath to the parent directory of all your repositories, otherwise leave blank: ")
+	fmt.Println("Ian allows you manage all your Github local repositories")
+	fmt.Print("Insert up the fullpath to the parent directory of all your local repositories, otherwise leave blank: ")
 	if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
 		return repositoriesPathConf + fullPathToRepositories
 	}
 	return repositoriesPathConf
 }
 
-func generateGithubUsername() (GithubUsernameConf string) {
-	GithubUsernameConf = "\ngithub_username: "
-	fmt.Println("Insert your Github nickname: ")
+// GetDotfilesRepositoryConfLine creates conf line containing the user's input.
+func GetDotfilesRepositoryConfLine() (dotfilesRepository string) {
+	dotfilesRepository = "\ndotfiles_repository: "
+	fmt.Println("Path to your dotfiles repository: ")
 	reader := bufio.NewReader(os.Stdin)
-	if nickname, _ := reader.ReadString('\n'); nickname != "\n" {
-		Vipers["config"].Set("github_username", string(bytes.TrimSuffix([]byte(nickname), []byte("\n"))))
-		return GithubUsernameConf + string(bytes.TrimSuffix([]byte(nickname), []byte("\n")))
+	if input, _ := reader.ReadString('\n'); input != "\n" {
+		Vipers["config"].Set("dotfiles_repository", string(bytes.TrimSuffix([]byte(input), []byte("\n"))))
+		return dotfilesRepository + string(bytes.TrimSuffix([]byte(input), []byte("\n")))
 	}
-	return GithubUsernameConf
+	return dotfilesRepository
 }

@@ -34,9 +34,6 @@ Usage
       setup       Setup ian working environment
       version     Print the version information
 
-    Package Commands:
-      baily-cli baily-cli type:npm
-
 
     Use "ian [command] --help" for more information about a command.
 
@@ -51,6 +48,7 @@ Features
 - Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
+- Ask for dotfiles repository instead of just Github username
 - TEST before tag v0.1 avec Ubuntu et Mac OSX
 
 # TODO v0.2

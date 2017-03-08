@@ -24,6 +24,7 @@ import (
 	"os/user"
 
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/config"
 )
 
 // GetInfos returns env infos
@@ -83,8 +84,13 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
 }
 
 // EnsureDotfilesRepository create Dotfiles repository if not exists.
-func EnsureDotfilesRepository(githubUser string, dotfilesDirPath string) {
-	repositoryURL := fmt.Sprintf("git@github.com:%s/testong.git", githubUser)
+func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string) {
+	if dotfilesRepository == "" {
+		dotfilesRepositoryLine := config.GetDotfilesRepositoryConfLine()
+		panic("YOLO")
+		config.AppendToConfig(dotfilesRepositoryLine, "config")
+	}
+	repositoryURL := fmt.Sprintf("git@github.com:%s.git", dotfilesRepository)
 	termCmd := exec.Command("git", "ls-remote", repositoryURL)
 	termCmd.Dir = dotfilesDirPath
 
