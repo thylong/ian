@@ -17,7 +17,6 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
 )
@@ -34,7 +33,7 @@ type NpmPackageManager struct {
 
 // Install given Npm package.
 func (b NpmPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", "-g", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", "-g", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -43,7 +42,7 @@ func (b NpmPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Npm package.
 func (b NpmPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", "-g", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", "-g", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -52,7 +51,7 @@ func (b NpmPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup the npm cache.
 func (b NpmPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cache", "clean"))
+	err = command.ExecuteCommand(execCommand(b.Path, "cache", "clean"))
 	return err
 }
 
@@ -60,13 +59,13 @@ func (b NpmPackageManager) Cleanup() (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b NpmPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "update", packageName))
 	return err
 }
 
 // UpgradeOne Npm packages to the last known versions.
 func (b NpmPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 	return err
 }
 
@@ -77,7 +76,7 @@ func (b NpmPackageManager) UpdateAll() (err error) {
 
 // UpgradeAll Npm packages to the last known versions.
 func (b NpmPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update", "-g"))
+	err = command.ExecuteCommand(execCommand(b.Path, "update", "-g"))
 	return err
 }
 

@@ -48,8 +48,7 @@ Features
 - Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
-- TESTS
-- Clear relative imports
+- TESTS (env, projects, setup)
 - Remove logic from Cobra commands
 - Fix english typos
 - Ensure commands architecture

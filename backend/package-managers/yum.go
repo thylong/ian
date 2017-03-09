@@ -17,7 +17,6 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
 )
@@ -34,7 +33,7 @@ type YumPackageManager struct {
 
 // Install given Yum package.
 func (b YumPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -43,7 +42,7 @@ func (b YumPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Yum package.
 func (b YumPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "erase", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "erase", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -52,7 +51,7 @@ func (b YumPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup all the local archives and previous versions.
 func (b YumPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "autoremove"))
+	err = command.ExecuteCommand(execCommand(b.Path, "autoremove"))
 	return err
 }
 
@@ -60,13 +59,13 @@ func (b YumPackageManager) Cleanup() (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b YumPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "update", packageName))
 	return err
 }
 
 // UpgradeOne Yum packages to the last known versions.
 func (b YumPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 	return err
 }
 
@@ -74,19 +73,19 @@ func (b YumPackageManager) UpgradeOne(packageName string) (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b YumPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update"))
+	err = command.ExecuteCommand(execCommand(b.Path, "update"))
 	return err
 }
 
 // UpgradeAll Yum packages to the last known versions.
 func (b YumPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade"))
+	err = command.ExecuteCommand(execCommand(b.Path, "upgrade"))
 	return err
 }
 
 // IsInstalled returns true if Yum executable is found.
 func (b YumPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(b.Path); err != nil {
+	if fileInfo, err := os.Stat(b.Path); err != nil || fileInfo.Mode() == os.ModeSymlink {
 		return false
 	}
 	return true

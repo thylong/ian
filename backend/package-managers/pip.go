@@ -15,15 +15,18 @@
 package packagemanagers
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Pip immutable instance.
 var Pip = PipPackageManager{Path: "/usr/local/bin/pip", Name: "pip"}
+
+// ErrPipMissingFeature is returned when triggering an unsupported feature.
+var ErrPipMissingFeature = errors.New("pip is not designed to support this feature")
 
 // PipPackageManager is a (widely used) unofficial Mac OS package manager.
 // (more: https://pip.sh/)
@@ -34,7 +37,7 @@ type PipPackageManager struct {
 
 // Install given Pip package.
 func (b PipPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", "-U", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", "-U", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -43,7 +46,7 @@ func (b PipPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Pip package.
 func (b PipPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", "-U", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", "-U", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}

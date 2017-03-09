@@ -15,9 +15,7 @@
 package packagemanagers
 
 import (
-	"errors"
 	"fmt"
-	"net/http"
 	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
@@ -40,70 +38,42 @@ type PackageManager interface {
 	Setup() (err error)
 }
 
-var supportedPackageManagers = make(map[string]PackageManager)
+// SupportedPackageManagers contains all the currently supported package managers.
+var SupportedPackageManagers = make(map[string]PackageManager)
+
+var execCommand = exec.Command
 
 func init() {
-	supportedPackageManagers["brew"] = Brew
-	supportedPackageManagers["cask"] = Cask
-	supportedPackageManagers["pip"] = Pip
-	supportedPackageManagers["npm"] = Npm
-	supportedPackageManagers["apt"] = Apt
-	supportedPackageManagers["yum"] = Yum
-	supportedPackageManagers["rubygems"] = RubyGems
+	SupportedPackageManagers["brew"] = Brew
+	SupportedPackageManagers["cask"] = Cask
+	SupportedPackageManagers["pip"] = Pip
+	SupportedPackageManagers["npm"] = Npm
+	SupportedPackageManagers["apt"] = Apt
+	SupportedPackageManagers["yum"] = Yum
+	SupportedPackageManagers["rubygems"] = RubyGems
 }
 
 // GetOSPackageManager returns the main Package Manager of the current OS.
 // As only MacOS is supported for now, it returns a Brew instance.
 func GetOSPackageManager() PackageManager {
-	for name, packageManager := range supportedPackageManagers {
-		if name != "cask" && packageManager.IsInstalled() {
+	for name, packageManager := range SupportedPackageManagers {
+		if name != "cask" && packageManager.IsOSPackageManager() {
 			return packageManager
 		}
 	}
+	fmt.Println("OS not supported yet.")
 	return Brew
 }
 
 // GetPackageManager returns the corresponding PackageManager otherwise default
 // to OS package manager.
 func GetPackageManager(PackageManagerFlag string) PackageManager {
-	packageManager, ok := supportedPackageManagers[PackageManagerFlag]
+	packageManager, ok := SupportedPackageManagers[PackageManagerFlag]
 
 	if ok {
 		return packageManager
 	}
 	return GetOSPackageManager()
-}
-
-// IsAvailableOnPackageManagers returns true if found in the repositories of
-// one of the available package managers.
-func IsAvailableOnPackageManagers(packageName string) (map[string]bool, error) {
-	packageManagers := config.Vipers["config"].GetStringMap("managers")
-	results := make(map[string]bool)
-
-	for packageManager, packageParams := range packageManagers {
-		baseURL := packageParams.(map[interface{}]interface{})["base_url"].(string)
-		results[packageManager] = isAvailableOnPackageManager(packageManager, baseURL, packageName)
-	}
-	return results, nil
-}
-
-// IsAvailableOnPackageManagers returns true if found in the repositories of
-// the given package manager.
-func isAvailableOnPackageManager(packageManager string, baseURL string, packageName string) bool {
-	client := &http.Client{}
-	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if packageManager == "composer" && req.URL.String() != baseURL+packageName+"/" {
-			return errors.New("Fail on redirect...")
-		}
-		return nil
-	}
-
-	resp, err := client.Head(baseURL + packageName)
-	if err != nil || resp.StatusCode != 200 {
-		fmt.Printf("%s is not reachable.", packageManager)
-		return false
-	}
-	return true
 }
 
 // SearchOnPackageManagers returns infos on packages found in the repositories of
@@ -120,9 +90,8 @@ func SearchOnPackageManagers(packageName string) (results map[string]string, err
 // SearchOnPackageManager returns infos on packages found in the repositories of
 // the given package manager.
 func SearchOnPackageManager(packageManager string, packageName string) {
-	fmt.Print("=======================")
-	fmt.Printf("%s search %s", packageManager, packageName)
-	fmt.Print("=======================")
+	fmt.Println("=======================")
+	fmt.Printf("\n%s search %s", packageManager, packageName)
 	termCmd := exec.Command(packageManager, "search", packageName)
 	command.ExecuteCommand(termCmd)
 }

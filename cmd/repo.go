@@ -162,7 +162,7 @@ var removeCmd = &cobra.Command{
 			fmt.Fprint(os.Stderr, "At least one repository path should be provided.")
 		}
 		for _, arg := range args {
-			if arg == "/*" {
+			if arg == "/*" || arg == "/" {
 				fmt.Fprint(os.Stderr, "Cmon man, don't do that...")
 			}
 			termCmd := exec.Command("rm", "-rf", arg)

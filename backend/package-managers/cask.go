@@ -17,7 +17,6 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
 )
@@ -34,7 +33,7 @@ type CaskPackageManager struct {
 
 // Install given Cask package.
 func (b CaskPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "install", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "install", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -43,7 +42,7 @@ func (b CaskPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Cask package.
 func (b CaskPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "uninstall", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "uninstall", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -53,9 +52,9 @@ func (b CaskPackageManager) Uninstall(packageName string) (err error) {
 // Cleanup all the local archives and previous versions.
 func (b CaskPackageManager) Cleanup() (err error) {
 	// Cleanup brew
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "cleanup"))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "cleanup"))
 	// Cleanup cask
-	command.ExecuteCommand(exec.Command("/usr/local/bin/brew", "cask", "cleanup"))
+	command.ExecuteCommand(execCommand("/usr/local/bin/brew", "cask", "cleanup"))
 	return err
 }
 
@@ -63,13 +62,13 @@ func (b CaskPackageManager) Cleanup() (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b CaskPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "update"))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "update"))
 	return err
 }
 
 // UpgradeOne Cask packages to the last known versions.
 func (b CaskPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "upgrade", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "upgrade", packageName))
 	return err
 }
 
@@ -77,13 +76,13 @@ func (b CaskPackageManager) UpgradeOne(packageName string) (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b CaskPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "update"))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "update"))
 	return err
 }
 
 // UpgradeAll Cask packages to the last known versions.
 func (b CaskPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cask", "upgrade"))
+	err = command.ExecuteCommand(execCommand(b.Path, "cask", "upgrade"))
 	return err
 }
 
@@ -114,7 +113,7 @@ func (b CaskPackageManager) GetName() string {
 func (b CaskPackageManager) Setup() (err error) {
 	fmt.Print("Installing cask...")
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
-		err = command.ExecuteCommand(exec.Command("brew", "tap", "caskroom/cask"))
+		err = command.ExecuteCommand(execCommand("brew", "tap", "caskroom/cask"))
 		return err
 	}
 	fmt.Print("cask already installed, skipping...")

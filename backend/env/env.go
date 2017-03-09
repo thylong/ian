@@ -51,6 +51,14 @@ func GetInfos() {
 	command.ExecuteCommand(exec.Command("uptime"))
 }
 
+// Save persists the dotfiles in distant repository.
+func Save(dotfilesDirPath string, dotfilesToSave []string) {
+	EnsureDotfilesDir(dotfilesDirPath)
+	ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath)
+	EnsureDotfilesRepository(config.Vipers["config"].GetString("dotfiles_repository"), dotfilesDirPath)
+	PushDotfiles(config.Vipers["config"].GetString("default_save_message"), dotfilesDirPath)
+}
+
 // EnsureDotfilesDir create the ~/.dotfiles directory if not exists.
 func EnsureDotfilesDir(dotfilesDirPath string) {
 	if _, err := os.Stat(dotfilesDirPath); err != nil {
