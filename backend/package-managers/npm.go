@@ -15,6 +15,7 @@
 package packagemanagers
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -23,6 +24,9 @@ import (
 
 // Npm immutable instance.
 var Npm = NpmPackageManager{Path: "/usr/local/bin/npm", Name: "npm"}
+
+// ErrNPMMissingFeature is returned when triggering an unsupported feature.
+var ErrNPMMissingFeature = errors.New("npm is not designed to support this feature")
 
 // NpmPackageManager is a (widely used) unofficial Mac OS package manager.
 // (more: https://npm.sh/)
@@ -50,34 +54,30 @@ func (b NpmPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup the npm cache.
-func (b NpmPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cache", "clean"))
-	return err
+func (b NpmPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(b.Path, "cache", "clean"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b NpmPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update", packageName))
-	return err
+func (b NpmPackageManager) UpdateOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (b NpmPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
-	return err
+func (b NpmPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll does nothing (out of making NPM satisfying PackageManager interface).
-func (b NpmPackageManager) UpdateAll() (err error) {
-	return nil
+func (b NpmPackageManager) UpdateAll() error {
+	return ErrNPMMissingFeature
 }
 
 // UpgradeAll Npm packages to the last known versions.
-func (b NpmPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update", "-g"))
-	return err
+func (b NpmPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update", "-g"))
 }
 
 // IsInstalled returns true if Npm executable is found.

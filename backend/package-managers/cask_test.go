@@ -55,6 +55,7 @@ func TestCaskCmdWithoutArgs(t *testing.T) {
 	}{
 		{cask.Cleanup, nil},
 		{cask.UpdateAll, nil},
+		{cask.UpgradeAll, nil},
 	}
 
 	for _, tc := range cases {
@@ -62,5 +63,14 @@ func TestCaskCmdWithoutArgs(t *testing.T) {
 		if err != tc.ExpectedErr {
 			t.Errorf("Expected nil error, got %#v", err)
 		}
+	}
+}
+
+func TestCaskGetExecPath(t *testing.T) {
+	PackageManager := GetPackageManager("cask").(CaskPackageManager)
+
+	if PackageManager.Path != PackageManager.GetExecPath() {
+		t.Errorf("GetExecPath returned wrong Path: got %v want %v",
+			PackageManager.GetExecPath(), PackageManager.Path)
 	}
 }

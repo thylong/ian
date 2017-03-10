@@ -50,40 +50,32 @@ func (b CaskPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup all the local archives and previous versions.
-func (b CaskPackageManager) Cleanup() (err error) {
-	// Cleanup brew
-	err = command.ExecuteCommand(execCommand(b.Path, "cask", "cleanup"))
-	// Cleanup cask
-	command.ExecuteCommand(execCommand("/usr/local/bin/brew", "cask", "cleanup"))
-	return err
+func (b CaskPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(b.Path, "cask", "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b CaskPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cask", "update"))
-	return err
+func (b CaskPackageManager) UpdateOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "cask", "update"))
 }
 
 // UpgradeOne Cask packages to the last known versions.
-func (b CaskPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cask", "upgrade", packageName))
-	return err
+func (b CaskPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "cask", "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b CaskPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cask", "update"))
-	return err
+func (b CaskPackageManager) UpdateAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "cask", "update"))
 }
 
 // UpgradeAll Cask packages to the last known versions.
-func (b CaskPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cask", "upgrade"))
-	return err
+func (b CaskPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "cask", "upgrade"))
 }
 
 // IsInstalled returns true if Cask executable is found.

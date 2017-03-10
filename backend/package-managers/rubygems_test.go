@@ -55,6 +55,7 @@ func TestRubyGemsCmdWithoutArgs(t *testing.T) {
 	}{
 		{rubygems.Cleanup, nil},
 		{rubygems.UpdateAll, ErrRubyGemsMissingFeature},
+		{rubygems.UpgradeAll, nil},
 	}
 
 	for _, tc := range cases {
@@ -62,5 +63,14 @@ func TestRubyGemsCmdWithoutArgs(t *testing.T) {
 		if err != tc.ExpectedErr {
 			t.Errorf("Expected nil error, got %#v", err)
 		}
+	}
+}
+
+func TestRubyGemsGetExecPath(t *testing.T) {
+	PackageManager := GetPackageManager("rubygems").(RubyGemsPackageManager)
+
+	if PackageManager.Path != PackageManager.GetExecPath() {
+		t.Errorf("GetExecPath returned wrong Path: got %v want %v",
+			PackageManager.GetExecPath(), PackageManager.Path)
 	}
 }

@@ -52,9 +52,7 @@ func (b BrewPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup all the local archives and previous versions.
 func (b BrewPackageManager) Cleanup() (err error) {
-	// Cleanup brew
 	err = command.ExecuteCommand(execCommand(b.Path, "cleanup"))
-	// Cleanup cask
 	command.ExecuteCommand(execCommand(b.Path, "cask", "cleanup"))
 	return err
 }
@@ -62,29 +60,25 @@ func (b BrewPackageManager) Cleanup() (err error) {
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b BrewPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update"))
-	return err
+func (b BrewPackageManager) UpdateOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeOne Brew packages to the last known versions.
-func (b BrewPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
-	return err
+func (b BrewPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b BrewPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update"))
-	return err
+func (b BrewPackageManager) UpdateAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeAll Brew packages to the last known versions.
-func (b BrewPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "upgrade"))
-	return err
+func (b BrewPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade"))
 }
 
 // IsInstalled returns true if Brew executable is found.

@@ -56,20 +56,19 @@ func (b PipPackageManager) Uninstall(packageName string) (err error) {
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
 func (b PipPackageManager) Cleanup() (err error) {
-	return nil
+	return ErrPipMissingFeature
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b PipPackageManager) UpdateOne(packageName string) (err error) {
-	return nil
+	return ErrPipMissingFeature
 }
 
 // UpgradeOne Pip packages to the last known versions.
-func (b PipPackageManager) UpgradeOne(packageName string) (err error) {
-	err = b.Install(packageName)
-	return err
+func (b PipPackageManager) UpgradeOne(packageName string) error {
+	return b.Install(packageName)
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
@@ -77,13 +76,13 @@ func (b PipPackageManager) UpgradeOne(packageName string) (err error) {
 // with upgradeAll command.
 func (b PipPackageManager) UpdateAll() (err error) {
 	// TODO: Implementation
-	return err
+	return ErrPipMissingFeature
 }
 
 // UpgradeAll Pip packages to the last known versions.
 func (b PipPackageManager) UpgradeAll() (err error) {
 	// TODO: Implementation
-	return err
+	return ErrPipMissingFeature
 }
 
 // IsInstalled returns true if Pip executable is found.

@@ -24,18 +24,18 @@ import (
 
 // PackageManager handles standard interactions with all Package Managers.
 type PackageManager interface {
-	Install(packageName string) (err error)
-	Uninstall(packageName string) (err error)
-	Cleanup() (err error)
-	UpdateOne(string) (err error)
-	UpgradeOne(string) (err error)
-	UpdateAll() (err error)
-	UpgradeAll() (err error)
+	Install(packageName string) error
+	Uninstall(packageName string) error
+	Cleanup() error
+	UpdateOne(string) error
+	UpgradeOne(string) error
+	UpdateAll() error
+	UpgradeAll() error
 	IsInstalled() bool
 	IsOSPackageManager() bool
 	GetExecPath() string
 	GetName() string
-	Setup() (err error)
+	Setup() error
 }
 
 // SupportedPackageManagers contains all the currently supported package managers.

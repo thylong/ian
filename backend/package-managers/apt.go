@@ -56,7 +56,6 @@ func (b AptPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup all the local archives and previous versions.
 func (b AptPackageManager) Cleanup() (err error) {
-	// Cleanup apt
 	err = command.ExecuteCommand(execCommand(b.Path, "autoremove"))
 	return err
 }
@@ -69,23 +68,20 @@ func (b AptPackageManager) UpdateOne(packageName string) (err error) {
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (b AptPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
-	return err
+func (b AptPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b AptPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update"))
-	return err
+func (b AptPackageManager) UpdateAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeAll Apt packages to the last known versions.
-func (b AptPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "full-upgrade"))
-	return err
+func (b AptPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "full-upgrade"))
 }
 
 // IsInstalled returns true if Apt executable is found.

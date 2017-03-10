@@ -55,9 +55,8 @@ func (b RubyGemsPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
-func (b RubyGemsPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cleanup"))
-	return err
+func (b RubyGemsPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(b.Path, "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
@@ -68,22 +67,20 @@ func (b RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
 }
 
 // UpgradeOne RubyGems packages to the last known versions.
-func (b RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update", packageName))
-	return err
+func (b RubyGemsPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b RubyGemsPackageManager) UpdateAll() (err error) {
+func (b RubyGemsPackageManager) UpdateAll() error {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeAll RubyGems packages to the last known versions.
-func (b RubyGemsPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update"))
-	return err
+func (b RubyGemsPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // IsInstalled returns true if RubyGems executable is found.

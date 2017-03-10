@@ -50,37 +50,32 @@ func (b YumPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup all the local archives and previous versions.
-func (b YumPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "autoremove"))
-	return err
+func (b YumPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(b.Path, "autoremove"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b YumPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update", packageName))
-	return err
+func (b YumPackageManager) UpdateOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
 }
 
 // UpgradeOne Yum packages to the last known versions.
-func (b YumPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
-	return err
+func (b YumPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b YumPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "update"))
-	return err
+func (b YumPackageManager) UpdateAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeAll Yum packages to the last known versions.
-func (b YumPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "upgrade"))
-	return err
+func (b YumPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade"))
 }
 
 // IsInstalled returns true if Yum executable is found.

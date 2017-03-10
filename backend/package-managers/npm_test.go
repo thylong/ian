@@ -54,7 +54,8 @@ func TestNPMCmdWithoutArgs(t *testing.T) {
 		ExpectedErr error
 	}{
 		{npm.Cleanup, nil},
-		{npm.UpdateAll, nil},
+		{npm.UpdateAll, ErrNPMMissingFeature},
+		{npm.UpgradeAll, nil},
 	}
 
 	for _, tc := range cases {
@@ -62,5 +63,14 @@ func TestNPMCmdWithoutArgs(t *testing.T) {
 		if err != tc.ExpectedErr {
 			t.Errorf("Expected nil error, got %#v", err)
 		}
+	}
+}
+
+func TestNPMGetExecPath(t *testing.T) {
+	PackageManager := GetPackageManager("npm").(NpmPackageManager)
+
+	if PackageManager.Path != PackageManager.GetExecPath() {
+		t.Errorf("GetExecPath returned wrong Path: got %v want %v",
+			PackageManager.GetExecPath(), PackageManager.Path)
 	}
 }
