@@ -16,13 +16,10 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
-	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/backend/repo"
 )
 
 func init() {
@@ -54,11 +51,7 @@ var listCmd = &cobra.Command{
 
     List all stored repositories in repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		termCmd := exec.Command("ls")
-		fmt.Printf("repositories_path: %s\n", config.Vipers["config"].GetString("repositories_path"))
-		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-
-		command.ExecuteCommand(termCmd)
+		repo.List()
 	},
 }
 
@@ -70,10 +63,7 @@ var cloneCmd = &cobra.Command{
     Clone new repositories in repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			termCmd := exec.Command("git", "clone", "-v", arg)
-			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-
-			command.ExecuteCommand(termCmd)
+			repo.Clone(arg)
 		}
 	},
 }
@@ -86,10 +76,7 @@ var cleanCmd = &cobra.Command{
     Clean stored repositories in the repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, arg := range args {
-			termCmd := exec.Command("git", "clean", "-dffx", arg)
-			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-
-			command.ExecuteCommand(termCmd)
+			repo.Clean(arg)
 		}
 	},
 }
@@ -102,23 +89,10 @@ var updateCmd = &cobra.Command{
     Update stored repositories in the repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			files, err := ioutil.ReadDir(config.Vipers["config"].GetString("repositories_path"))
-			if err != nil {
-				fmt.Fprint(os.Stderr, err)
-				os.Exit(1)
-			}
-			for _, file := range files {
-				if file.IsDir() {
-					args = append(args, file.Name())
-				}
-			}
+			repo.UpdateAll()
 		}
-
 		for _, arg := range args {
-			termCmd := exec.Command("git", "fetch", arg)
-			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-
-			command.ExecuteCommand(termCmd)
+			repo.UpdateOne(arg)
 		}
 	},
 }
@@ -131,22 +105,10 @@ var upgradeCmd = &cobra.Command{
     Upgrade stored repositories in the repositories_path path.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			files, err := ioutil.ReadDir(config.Vipers["config"].GetString("repositories_path"))
-			if err != nil {
-				fmt.Fprint(os.Stderr, err)
-				os.Exit(1)
-			}
-			for _, file := range files {
-				if file.IsDir() {
-					args = append(args, file.Name())
-				}
-			}
+			repo.UpgradeAll()
 		}
 		for _, arg := range args {
-			termCmd := exec.Command("git", "pull", "--rebase", arg)
-			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-
-			command.ExecuteCommand(termCmd)
+			repo.UpgradeOne(arg)
 		}
 	},
 }
@@ -162,13 +124,7 @@ var removeCmd = &cobra.Command{
 			fmt.Fprint(os.Stderr, "At least one repository path should be provided.")
 		}
 		for _, arg := range args {
-			if arg == "/*" || arg == "/" {
-				fmt.Fprint(os.Stderr, "Cmon man, don't do that...")
-			}
-			termCmd := exec.Command("rm", "-rf", arg)
-			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-
-			command.ExecuteCommand(termCmd)
+			repo.Remove(arg)
 		}
 	},
 }
@@ -184,10 +140,7 @@ var statusCmd = &cobra.Command{
 			fmt.Fprint(os.Stderr, "At least one repository path should be provided.")
 		}
 		for _, arg := range args {
-			termCmd := exec.Command("git", "status")
-			termCmd.Dir = config.Vipers["config"].GetString("repositories_path") + "/" + arg
-
-			command.ExecuteCommand(termCmd)
+			repo.Status(arg)
 		}
 	},
 }
