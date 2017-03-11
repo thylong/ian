@@ -1,19 +1,30 @@
 Ian
 ===
 
-Ian is CLI interface to interact with you Mac environment.
+Ian is a CLI interface to setup, manage and save your dev environment.
 
 
 Installing
 ==========
 
-(Required) To work properly, Ian requires Homebrew and Golang to be installed
-with a valid $GOPATH.
+Ian comes as a binary. Once in your $GOPATH, you're good to go !
+
+Linux
+--------
 
 .. code-block:: console
 
     $ go get github.com/thylong/ian
-    $ ian setup
+
+
+Mac OS X
+--------
+
+Ian requires Homebrew_.
+
+.. code-block:: console
+
+    $ go get github.com/thylong/ian
 
 
 Usage
@@ -22,7 +33,7 @@ Usage
 .. code-block:: console
 
     $ ian
-    Ian is a very simple automation tool for developer with Mac environment.
+    Ian is a very simple automation tool for developer with dev environment.
 
     Usage:
       ian [command]
@@ -40,36 +51,11 @@ Usage
 Features
 ========
 
-- Self-Setup (import dotfiles and install related packages)
-- Interact with local git repositories.
-- Get environment infos.
-- Manage projects (deploy, rollback, healthcheck, etc).
 - Manage dev environment (update OS package manager packages, Fetch diff on repos, etc).
-- Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
-
-# TODO v0.1
-- TESTS (env, projects, setup)
-- Fix english typos
-- Rewrite README
-- Create static HUGO website to present it
-- Tag v0.1
-- Travis workflow
-
-# TODO v0.2
-- Get started experience (website + form on site to determine the profile)
-- Presets by profiles (backend, frontend, fullstack)
-- Customize presets easily http://getbootstrap.com/customize/ (UI local/remote? Hash copy/paste in CLI ?)
-
-# TODO v0.3
-- Add tests
-- Add a project set <field_name> <value> to set the config from the terminal
-
-# TODO v0.4
-- Cyphering / Decyphering of the configuration (--encrypted option to env save)
-- Safe export functionnality (export only the non sensible infos) ("--safe" option to env save)
-
-# TODO v0.5
-- Specific package management with Ian
+- Interact with git repositories.
+- Manage projects (deploy, rollback, healthcheck, etc).
+- Self-Setup (import dotfiles and install related packages)
+- Support pip_, npm_, Homebrew_, RubyGems_, Cask_, apt_, yum_
 
 
 Contributing
@@ -82,5 +68,15 @@ Contributing
 - Create new Pull Request
 
 .. _`template`: https://github.com/thylong/ian/blob/master/config/config_example.yml
-.. _Brew: http://brew.sh
+.. _Homebrew: http://brew.sh
 .. _Cask: https://caskroom.github.io
+.. _RubyGems: https://rubygems.org/
+.. _pip: https://packaging.python.org/
+.. _npm: https://www.npmjs.com/
+.. _apt: https://wiki.debian.org/Apt
+.. _yum: https://fedoraproject.org/wiki/Yum
+
+Special thanks
+==============
+- Devin Willmot
+- Trisha Batchoo
