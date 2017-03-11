@@ -15,15 +15,18 @@
 package packagemanagers
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Pip immutable instance.
 var Pip = PipPackageManager{Path: "/usr/local/bin/pip", Name: "pip"}
+
+// ErrPipMissingFeature is returned when triggering an unsupported feature.
+var ErrPipMissingFeature = errors.New("pip is not designed to support this feature")
 
 // PipPackageManager is a (widely used) unofficial Mac OS package manager.
 // (more: https://pip.sh/)
@@ -34,7 +37,7 @@ type PipPackageManager struct {
 
 // Install given Pip package.
 func (b PipPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", "-U", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", "-U", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -43,7 +46,7 @@ func (b PipPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Pip package.
 func (b PipPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", "-U", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", "-U", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -53,20 +56,19 @@ func (b PipPackageManager) Uninstall(packageName string) (err error) {
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
 func (b PipPackageManager) Cleanup() (err error) {
-	return nil
+	return ErrPipMissingFeature
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b PipPackageManager) UpdateOne(packageName string) (err error) {
-	return nil
+	return ErrPipMissingFeature
 }
 
 // UpgradeOne Pip packages to the last known versions.
-func (b PipPackageManager) UpgradeOne(packageName string) (err error) {
-	err = b.Install(packageName)
-	return err
+func (b PipPackageManager) UpgradeOne(packageName string) error {
+	return b.Install(packageName)
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
@@ -74,13 +76,13 @@ func (b PipPackageManager) UpgradeOne(packageName string) (err error) {
 // with upgradeAll command.
 func (b PipPackageManager) UpdateAll() (err error) {
 	// TODO: Implementation
-	return err
+	return ErrPipMissingFeature
 }
 
 // UpgradeAll Pip packages to the last known versions.
 func (b PipPackageManager) UpgradeAll() (err error) {
 	// TODO: Implementation
-	return err
+	return ErrPipMissingFeature
 }
 
 // IsInstalled returns true if Pip executable is found.

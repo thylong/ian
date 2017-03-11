@@ -18,13 +18,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
+	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Apt immutable instance.
-var Apt = AptPackageManager{Path: "/usr/bin/apt", Name: "apt"}
+var Apt = AptPackageManager{Path: "/usr/bin/apt-get", Name: "apt"}
+
+// ErrAptMissingFeature is returned when triggering an unsupported feature.
+var ErrAptMissingFeature = errors.New("apt is not designed to support this feature")
 
 // AptPackageManager is the official Debian (and associated distributions) package manager.
 // (more: https://wiki.debian.org/Apt)
@@ -35,7 +38,7 @@ type AptPackageManager struct {
 
 // Install given Apt package.
 func (b AptPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 	}
@@ -44,7 +47,7 @@ func (b AptPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Apt package.
 func (b AptPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "remove", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "remove", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -53,8 +56,7 @@ func (b AptPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup all the local archives and previous versions.
 func (b AptPackageManager) Cleanup() (err error) {
-	// Cleanup apt
-	err = command.ExecuteCommand(exec.Command(b.Path, "autoremove"))
+	err = command.ExecuteCommand(execCommand(b.Path, "autoremove"))
 	return err
 }
 
@@ -62,27 +64,24 @@ func (b AptPackageManager) Cleanup() (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b AptPackageManager) UpdateOne(packageName string) (err error) {
-	return errors.New("apt is not designed to update only one package")
+	return ErrAptMissingFeature
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (b AptPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade", packageName))
-	return err
+func (b AptPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b AptPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update"))
-	return err
+func (b AptPackageManager) UpdateAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeAll Apt packages to the last known versions.
-func (b AptPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "full-upgrade"))
-	return err
+func (b AptPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "full-upgrade"))
 }
 
 // IsInstalled returns true if Apt executable is found.
@@ -95,7 +94,7 @@ func (b AptPackageManager) IsInstalled() bool {
 
 // IsOSPackageManager returns true for Mac OS.
 func (b AptPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled()
+	return b.IsInstalled() && runtime.GOOS == "linux`"
 }
 
 // GetExecPath return immutable path to Apt executable.

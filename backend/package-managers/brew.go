@@ -17,7 +17,7 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
-	"os/exec"
+	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
@@ -34,7 +34,7 @@ type BrewPackageManager struct {
 
 // Install given Brew package.
 func (b BrewPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -43,7 +43,7 @@ func (b BrewPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given Brew package.
 func (b BrewPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -52,39 +52,33 @@ func (b BrewPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup all the local archives and previous versions.
 func (b BrewPackageManager) Cleanup() (err error) {
-	// Cleanup brew
-	err = command.ExecuteCommand(exec.Command(b.Path, "cleanup"))
-	// Cleanup cask
-	command.ExecuteCommand(exec.Command("/usr/local/bin/brew", "cask", "cleanup"))
+	err = command.ExecuteCommand(execCommand(b.Path, "cleanup"))
+	command.ExecuteCommand(execCommand(b.Path, "cask", "cleanup"))
 	return err
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b BrewPackageManager) UpdateOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update"))
-	return err
+func (b BrewPackageManager) UpdateOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeOne Brew packages to the last known versions.
-func (b BrewPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade", packageName))
-	return err
+func (b BrewPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b BrewPackageManager) UpdateAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update"))
-	return err
+func (b BrewPackageManager) UpdateAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // UpgradeAll Brew packages to the last known versions.
-func (b BrewPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "upgrade"))
-	return err
+func (b BrewPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "upgrade"))
 }
 
 // IsInstalled returns true if Brew executable is found.
@@ -97,7 +91,7 @@ func (b BrewPackageManager) IsInstalled() bool {
 
 // IsOSPackageManager returns true for Mac OS.
 func (b BrewPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled()
+	return b.IsInstalled() && runtime.GOOS == "darwin"
 }
 
 // GetExecPath return immutable path to Brew executable.
@@ -114,7 +108,7 @@ func (b BrewPackageManager) GetName() string {
 func (b BrewPackageManager) Setup() (err error) {
 	fmt.Println("Installing cask...")
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
-		err = command.ExecuteCommand(exec.Command("brew", "tap", "caskroom/cask"))
+		err = command.ExecuteCommand(execCommand("brew", "tap", "caskroom/cask"))
 		return err
 	}
 	fmt.Println("cask already installed, skipping...")

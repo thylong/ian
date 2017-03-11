@@ -51,6 +51,14 @@ func GetInfos() {
 	command.ExecuteCommand(exec.Command("uptime"))
 }
 
+// Save persists the dotfiles in distant repository.
+func Save(dotfilesDirPath string, dotfilesToSave []string) {
+	EnsureDotfilesDir(dotfilesDirPath)
+	ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath)
+	EnsureDotfilesRepository(config.Vipers["config"].GetString("dotfiles_repository"), dotfilesDirPath)
+	PushDotfiles(config.Vipers["config"].GetString("default_save_message"), dotfilesDirPath)
+}
+
 // EnsureDotfilesDir create the ~/.dotfiles directory if not exists.
 func EnsureDotfilesDir(dotfilesDirPath string) {
 	if _, err := os.Stat(dotfilesDirPath); err != nil {
@@ -74,10 +82,12 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
 		dst := fmt.Sprintf("%s/%s", dotfilesDirPath, dotfileToSave)
 
 		if err := MoveFile(src, dst); err != nil {
-			panic(fmt.Sprintf("couldn't move %s !", src))
+			fmt.Fprintf(os.Stderr, "couldn't move %s !", src)
+			os.Exit(1)
 		}
 		if err := os.Symlink(dst, src); err != nil {
-			panic(fmt.Sprintf("couldn't symlink %s !", src))
+			fmt.Fprintf(os.Stderr, "couldn't symlink %s !", src)
+			os.Exit(1)
 		}
 	}
 	fmt.Printf("Moved dotfiles in %s directory.\n", dotfilesDirPath)
@@ -96,26 +106,33 @@ func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string)
 	termCmd.Dir = dotfilesDirPath
 
 	if err := command.MustExecuteCommand(termCmd); err != nil {
-		fmt.Printf("%s repository doesn't exists or is not reachable.", repositoryURL)
+		fmt.Fprintf(os.Stderr, "%s repository doesn't exists or is not reachable.", repositoryURL)
 		os.Exit(1)
 	}
 }
 
 // PushDotfiles local dotfiles to remote.
 func PushDotfiles(message string, dotfilesDirPath string) {
+	var err error
 	if message == "" {
 		message = "Update dotfiles"
 	}
 
 	addCmd := exec.Command("git", "add", "-A")
 	addCmd.Dir = dotfilesDirPath
-	command.ExecuteCommand(addCmd)
+	if err = command.MustExecuteCommand(addCmd); err != nil {
+		fmt.Fprint(os.Stderr, "Cannot interact with Git")
+	}
 
 	commitCmd := exec.Command("git", "commit", "-m", message)
 	commitCmd.Dir = dotfilesDirPath
-	command.ExecuteCommand(commitCmd)
+	if err = command.MustExecuteCommand(commitCmd); err != nil {
+		fmt.Fprint(os.Stderr, "Cannot create a commit")
+	}
 
 	termCmd := exec.Command("git", "push", "--force", "origin", "master")
 	termCmd.Dir = dotfilesDirPath
-	command.ExecuteCommand(termCmd)
+	if err = command.MustExecuteCommand(termCmd); err != nil {
+		fmt.Fprint(os.Stderr, "Cannot push to repository")
+	}
 }

@@ -48,13 +48,12 @@ Features
 - Support pip, Npm, Brew, RubyGems, Cask, Apt, Yum
 
 # TODO v0.1
-- TESTS
-- Clear relative imports
-- Remove logic from Cobra commands
+- TESTS (env, projects, setup)
 - Fix english typos
-- Ensure commands architecture
+- Rewrite README
+- Create static HUGO website to present it
+- Tag v0.1
 - Travis workflow
-- tag v0.1
 
 # TODO v0.2
 - Get started experience (website + form on site to determine the profile)

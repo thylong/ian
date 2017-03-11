@@ -18,13 +18,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // RubyGems immutable instance.
-var RubyGems = RubyGemsPackageManager{Path: "/usr/local/bin/pip", Name: "pip"}
+var RubyGems = RubyGemsPackageManager{Path: "/usr/local/bin/gem", Name: "rubygems"}
+
+// ErrRubyGemsMissingFeature is returned when triggering an unsupported feature.
+var ErrRubyGemsMissingFeature = errors.New("gems is not designed to support this feature")
 
 // RubyGemsPackageManager is a (widely used) unofficial Mac OS package manager.
 // (more: https://pip.sh/)
@@ -35,7 +37,7 @@ type RubyGemsPackageManager struct {
 
 // Install given RubyGems package.
 func (b RubyGemsPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "install", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -44,7 +46,7 @@ func (b RubyGemsPackageManager) Install(packageName string) (err error) {
 
 // Uninstall given RubyGems package.
 func (b RubyGemsPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "uninstall", packageName))
+	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 	}
@@ -53,35 +55,32 @@ func (b RubyGemsPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
-func (b RubyGemsPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "cleanup"))
-	return err
+func (b RubyGemsPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(b.Path, "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (b RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
-	return errors.New("RubyGems doesn't provide such mechanism")
+	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeOne RubyGems packages to the last known versions.
-func (b RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update", packageName))
-	return err
+func (b RubyGemsPackageManager) UpgradeOne(packageName string) error {
+	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b RubyGemsPackageManager) UpdateAll() (err error) {
-	return errors.New("RubyGems doesn't provide such mechanism")
+func (b RubyGemsPackageManager) UpdateAll() error {
+	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeAll RubyGems packages to the last known versions.
-func (b RubyGemsPackageManager) UpgradeAll() (err error) {
-	err = command.ExecuteCommand(exec.Command(b.Path, "update"))
-	return err
+func (b RubyGemsPackageManager) UpgradeAll() error {
+	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
 // IsInstalled returns true if RubyGems executable is found.
