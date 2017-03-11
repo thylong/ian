@@ -74,6 +74,11 @@ var envSaveCmd = &cobra.Command{
 	Short: "Save current configuration to distant dotfiles repositories",
 	Long:  `Move current configuration files of the user to a dotfiles sub-directory (if not exists), create symlinks to previous place, then finally create and push the repositories on github`,
 	Run: func(cmd *cobra.Command, args []string) {
-		env.Save(config.DotfilesDirPath, []string{".testong"})
+		env.Save(
+			config.DotfilesDirPath,
+			config.Vipers["config"].GetString("dotfiles_repository"),
+			config.Vipers["config"].GetString("default_save_message"),
+			[]string{".testong"},
+		)
 	},
 }

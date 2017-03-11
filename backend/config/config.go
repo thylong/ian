@@ -15,8 +15,6 @@
 package config
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,6 +23,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/spf13/viper"
+	"github.com/thylong/ian/backend/env"
 )
 
 // ConfigDirPath represents the path to config directory.
@@ -65,6 +64,13 @@ func init() {
 	IanConfigPath = ConfigDirPath + "/ian/"
 	DotfilesDirPath = usr.HomeDir + "/.dotfiles"
 
+	if _, err := os.Stat(ConfigDirPath); err != nil {
+		_ = os.Mkdir(ConfigDirPath, 0766)
+	}
+	if _, err := os.Stat(IanConfigPath); err != nil {
+		_ = os.Mkdir(IanConfigPath, 0766)
+	}
+
 	ConfigFilesPathes = make(map[string]string)
 	Vipers = make(map[string]*viper.Viper)
 	for _, ConfigFileName := range []string{"config", "env", "projects"} {
@@ -78,6 +84,10 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 	viperInstance.SetConfigType("yaml")
 	viperInstance.SetConfigName(viperName)
 	viperInstance.AddConfigPath(IanConfigPath)
+
+	if _, err := os.Stat(fmt.Sprintf("%s/%s.yml", IanConfigPath, viperName)); err != nil {
+		SetupConfigFile(viperName)
+	}
 
 	err := viperInstance.ReadInConfig()
 	if err != nil {
@@ -94,38 +104,37 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 	return viperInstance
 }
 
-// SetupConfigFiles creates a config directory and the config files if not exists.
-func SetupConfigFiles() {
-	// Create .config dir if missing.
-	if _, err := os.Stat(ConfigDirPath); err != nil {
-		_ = os.Mkdir(ConfigDirPath, 0766)
-	}
-	// Create .config/ian dir if missing.
-	if _, err := os.Stat(IanConfigPath); err != nil {
-		_ = os.Mkdir(IanConfigPath, 0766)
-	}
+// SetupConfigFile creates a config directory and the config file if not exists.
+func SetupConfigFile(ConfigFileName string) {
+	ConfigFilePath := ConfigFilesPathes[ConfigFileName]
+	if _, err := os.Stat(ConfigFilePath); err != nil {
+		configContent := GetConfigDefaultContent(ConfigFilePath)
 
-	for ConfigFileName, ConfigFilePath := range ConfigFilesPathes {
-		if _, err := os.Stat(ConfigFilePath); err != nil {
-			configContent := GetConfigDefaultContent(ConfigFilePath)
-
+		if ConfigFileName == "config" {
 			repositoriesPathPrefix := "\nrepositories_path: "
-			repositoriesPath := GenerateRepositoriesPath()
+			repositoriesPath := env.GenerateRepositoriesPath()
 			configContent = append(configContent, fmt.Sprintf("%s%s", repositoriesPathPrefix, repositoriesPath)...)
 
 			dotfilesRepositoryPrefix := "\ndotfiles_repository: "
-			dotfilesRepository := GetDotfilesRepository()
+			dotfilesRepository := env.GetDotfilesRepository()
 			configContent = append(configContent, fmt.Sprintf("%s%s", dotfilesRepositoryPrefix, dotfilesRepository)...)
-
-			fmt.Printf("Creating %s", ConfigFileName)
-			if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
-				fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
-				os.Exit(1)
-			}
-			return
 		}
+
+		fmt.Printf("Creating %s\n", ConfigFileName)
+		if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+			os.Exit(1)
+		}
+		return
 	}
-	fmt.Println("Config files found.")
+	fmt.Printf("Existing %s.yml found.\n", ConfigFileName)
+}
+
+// SetupConfigFiles creates a config directory and the config files if not exists.
+func SetupConfigFiles() {
+	for ConfigFileName := range ConfigFilesPathes {
+		SetupConfigFile(ConfigFileName)
+	}
 }
 
 // AppendToConfig takes a string as an argument
@@ -149,26 +158,4 @@ func AppendToConfig(lines string, confFilename string) {
 // (As nothing is preset for now, this function actually returns an empty string)
 func GetConfigDefaultContent(fileName string) []byte {
 	return []byte{}
-}
-
-// GenerateRepositoriesPath creates conf line containing the user's input.
-func GenerateRepositoriesPath() string {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Ian allows you manage all your Github local repositories")
-	fmt.Print("Insert the fullpath to the parent directory of all your local repositories, otherwise leave blank: ")
-	if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
-		return fullPathToRepositories
-	}
-	return ""
-}
-
-// GetDotfilesRepository creates conf line containing the user's input.
-func GetDotfilesRepository() string {
-	fmt.Println("Path to your dotfiles repository: ")
-	reader := bufio.NewReader(os.Stdin)
-	if input, _ := reader.ReadString('\n'); input != "\n" {
-		Vipers["config"].Set("dotfiles_repository", string(bytes.TrimSuffix([]byte(input), []byte("\n"))))
-		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
-	}
-	return ""
 }

@@ -14,13 +14,7 @@
 
 package packagemanagers
 
-import (
-	"fmt"
-	"os/exec"
-
-	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/config"
-)
+import "os/exec"
 
 // PackageManager handles standard interactions with all Package Managers.
 type PackageManager interface {
@@ -61,7 +55,6 @@ func GetOSPackageManager() PackageManager {
 			return packageManager
 		}
 	}
-	fmt.Println("OS not supported yet.")
 	return Brew
 }
 
@@ -74,24 +67,4 @@ func GetPackageManager(PackageManagerFlag string) PackageManager {
 		return packageManager
 	}
 	return GetOSPackageManager()
-}
-
-// SearchOnPackageManagers returns infos on packages found in the repositories of
-// one of the available package managers.
-func SearchOnPackageManagers(packageName string) (results map[string]string, err error) {
-	packageManagers := config.Vipers["config"].GetStringMapString("managers")
-
-	for packageManager := range packageManagers {
-		SearchOnPackageManager(packageManager, packageName)
-	}
-	return results, nil
-}
-
-// SearchOnPackageManager returns infos on packages found in the repositories of
-// the given package manager.
-func SearchOnPackageManager(packageManager string, packageName string) {
-	fmt.Println("=======================")
-	fmt.Printf("\n%s search %s", packageManager, packageName)
-	termCmd := exec.Command(packageManager, "search", packageName)
-	command.ExecuteCommand(termCmd)
 }

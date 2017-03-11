@@ -16,6 +16,8 @@ package packagemanagers
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"runtime"
 
@@ -104,13 +106,21 @@ func (b BrewPackageManager) GetName() string {
 	return b.Name
 }
 
-// Setup installs Cask
+// Setup installs Brew
 func (b BrewPackageManager) Setup() (err error) {
-	fmt.Println("Installing cask...")
-	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
-		err = command.ExecuteCommand(execCommand("brew", "tap", "caskroom/cask"))
-		return err
+	resp, err := http.Get(
+		"https://raw.githubusercontent.com/Homebrew/install/master/install",
+	)
+	if err != nil {
+		fmt.Printf("Error : %s", err)
 	}
-	fmt.Println("cask already installed, skipping...")
-	return nil
+
+	installScript, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	installCmd := execCommand("/usr/bin/ruby", "-e", string(installScript))
+	installCmd.Stdout = os.Stdout
+	installCmd.Stdin = os.Stdin
+	installCmd.Stderr = os.Stderr
+	return installCmd.Run()
 }

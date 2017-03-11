@@ -37,15 +37,16 @@ var setupCmd = &cobra.Command{
     With projects subcommand being one of the core function of Ian, setup will
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Starting setup")
+		fmt.Println("Starting setup...")
 
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
-			fmt.Println("Missing OS package manager !")
-			os.Exit(1)
+			fmt.Println("Installing OS package manager...")
+			err = OSPackageManager.Setup()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Missing OS package manager !")
+				os.Exit(1)
+			}
 		}
-
-		config.SetupConfigFiles()
-		OSPackageManager.Setup()
 
 		env.SetupDotFiles(
 			config.Vipers["config"].GetString("dotfiles_repository"),

@@ -15,6 +15,8 @@
 package env
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -22,9 +24,10 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"regexp"
 
 	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/config"
+	pm "github.com/thylong/ian/backend/package-managers"
 )
 
 // GetInfos returns env infos
@@ -52,11 +55,11 @@ func GetInfos() {
 }
 
 // Save persists the dotfiles in distant repository.
-func Save(dotfilesDirPath string, dotfilesToSave []string) {
+func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage string, dotfilesToSave []string) {
 	EnsureDotfilesDir(dotfilesDirPath)
 	ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath)
-	EnsureDotfilesRepository(config.Vipers["config"].GetString("dotfiles_repository"), dotfilesDirPath)
-	PushDotfiles(config.Vipers["config"].GetString("default_save_message"), dotfilesDirPath)
+	EnsureDotfilesRepository(dotfilesRepository, dotfilesDirPath)
+	PushDotfiles(defaultSaveMessage, dotfilesDirPath)
 }
 
 // EnsureDotfilesDir create the ~/.dotfiles directory if not exists.
@@ -96,10 +99,7 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
 // EnsureDotfilesRepository create Dotfiles repository if not exists.
 func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string) {
 	if dotfilesRepository == "" {
-		dotfilesRepository = config.GetDotfilesRepository()
-		dotfilesRepositoryPrefix := "\ndotfiles_repository: "
-		dotfilesRepositoryLine := fmt.Sprintf("%s%s", dotfilesRepositoryPrefix, dotfilesRepository)
-		config.AppendToConfig(dotfilesRepositoryLine, "config")
+		dotfilesRepository = GetDotfilesRepository()
 	}
 	repositoryURL := fmt.Sprintf("git@github.com:%s.git", dotfilesRepository)
 	termCmd := exec.Command("git", "ls-remote", repositoryURL)
@@ -135,4 +135,70 @@ func PushDotfiles(message string, dotfilesDirPath string) {
 	if err = command.MustExecuteCommand(termCmd); err != nil {
 		fmt.Fprint(os.Stderr, "Cannot push to repository")
 	}
+}
+
+// SetupPackages installs listed CLI packages.
+func SetupPackages(PackageManager pm.PackageManager, packages []string) {
+	fmt.Println("Installing packages...")
+
+	if len(packages) == 0 {
+		fmt.Println("No packages to install")
+		return
+	}
+
+	for _, packageToInstall := range packages {
+		PackageManager.Install(packageToInstall)
+	}
+}
+
+// SetupDotFiles ask and retrieve a dotfiles repository.
+func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
+	usr, _ := user.Current()
+	if _, err := os.Stat(usr.HomeDir + "/.dotfiles"); err != nil && dotfilesRepository != "" {
+		termCmd := exec.Command("git", "clone", "-v", "https://github.com/"+dotfilesRepository+".git", dotfilesDirPath)
+		termCmd.Stdout = os.Stdout
+		termCmd.Stdin = os.Stdin
+		termCmd.Stderr = os.Stderr
+		termCmd.Run()
+
+		re := regexp.MustCompile(".git$")
+
+		files, _ := ioutil.ReadDir(usr.HomeDir + "/.dotfiles")
+		for _, f := range files {
+			if re.MatchString(f.Name()) {
+				continue
+			}
+
+			if _, err := os.Stat(usr.HomeDir + "/" + f.Name()); err != nil {
+				err := os.Symlink(usr.HomeDir+"/.dotfiles/"+f.Name(), usr.HomeDir+"/"+f.Name())
+				if err != nil {
+					fmt.Fprint(os.Stderr, err)
+				}
+			}
+		}
+	} else {
+		fmt.Println("Skipping dotfiles configuration.")
+	}
+}
+
+// GenerateRepositoriesPath creates conf line containing the user's input.
+func GenerateRepositoriesPath() string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Ian allows you manage all your Github local repositories")
+	fmt.Print("Insert the full path to the parent directory of your repositories, otherwise leave blank: ")
+	if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
+		return fullPathToRepositories
+	}
+	return ""
+}
+
+// GetDotfilesRepository creates conf line containing the user's input.
+func GetDotfilesRepository() string {
+	fmt.Println("Path to your dotfiles repository: ")
+	reader := bufio.NewReader(os.Stdin)
+	if input, _ := reader.ReadString('\n'); input != "\n" {
+		// Vipers["config"].Set("dotfiles_repository", string(bytes.TrimSuffix([]byte(input), []byte("\n"))))
+		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+	}
+	return ""
 }
