@@ -94,7 +94,7 @@ func (b AptPackageManager) IsInstalled() bool {
 
 // IsOSPackageManager returns true for Mac OS.
 func (b AptPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled() && runtime.GOOS == "linux`"
+	return b.IsInstalled() && runtime.GOOS == "linux"
 }
 
 // GetExecPath return immutable path to Apt executable.

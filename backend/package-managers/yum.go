@@ -17,6 +17,7 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
@@ -88,7 +89,7 @@ func (b YumPackageManager) IsInstalled() bool {
 
 // IsOSPackageManager returns true for Mac OS.
 func (b YumPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled()
+	return b.IsInstalled() && runtime.GOOS == "linux"
 }
 
 // GetExecPath return immutable path to Yum executable.
