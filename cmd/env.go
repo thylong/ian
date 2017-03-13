@@ -27,6 +27,7 @@ func init() {
 	RootCmd.AddCommand(envCmd)
 	envCmd.AddCommand(envInfoCmd)
 	envCmd.AddCommand(envUpdateCmd)
+	envCmd.AddCommand(envUpgradeCmd)
 	envCmd.AddCommand(envSaveCmd)
 }
 
@@ -63,8 +64,26 @@ var envUpdateCmd = &cobra.Command{
 			}()
 			OSPackageManager.UpdateAll()
 		}()
+	},
+}
 
-		OSPackageManager.UpgradeAll()
+var envUpgradeCmd = &cobra.Command{
+	Use:   "upgrade",
+	Short: "Upgrade the local environment",
+	Long:  `Upgrade the local environment with infos stored in the local config.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		func() {
+			go func() {
+				for {
+					for _, v := range `-\|/` {
+						fmt.Printf("\r Upgrading env... %c", v)
+						time.Sleep(100 * time.Millisecond)
+					}
+				}
+			}()
+			OSPackageManager.UpgradeAll()
+		}()
+		fmt.Println("Cleaning up...")
 		OSPackageManager.Cleanup()
 	},
 }
