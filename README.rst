@@ -45,7 +45,6 @@ Usage
       setup       Setup ian working environment
       version     Print the version information
 
-
     Use "ian [command] --help" for more information about a command.
 
 Features
@@ -67,6 +66,11 @@ Contributing
 - Push to the branch (git push origin my-new-feature)
 - Create new Pull Request
 
+Special thanks
+==============
+- `Devin Wilmot`_
+- `Trisha Batchoo`_
+
 .. _`template`: https://github.com/thylong/ian/blob/master/config/config_example.yml
 .. _Homebrew: http://brew.sh
 .. _Cask: https://caskroom.github.io
@@ -75,8 +79,5 @@ Contributing
 .. _npm: https://www.npmjs.com/
 .. _apt: https://wiki.debian.org/Apt
 .. _yum: https://fedoraproject.org/wiki/Yum
-
-Special thanks
-==============
-- Devin Willmot
-- Trisha Batchoo
+.. _`Devin Wilmot`: mailto:devwilmot@gmail.com
+.. _`Trisha Batchoo`: https://github.com/tbat

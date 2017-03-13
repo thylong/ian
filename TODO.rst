@@ -6,15 +6,14 @@ This files represents the milestones to achieve for the incoming versions.
 **TODO v0.1**
 - Rewrite README
 - Fix english typos (docstring, README)
-- Test with Ubuntu, Debian and CentOS
-- Travis workflow
+- Presets by profiles (backend, frontend, fullstack)
+- Cross compile: Mac OSX, Ubuntu, Debian and CentOS
 
 **TODO v0.2**
 - Get started experience (website + form on site to determine the profile)
 - Improve env infos (Display content of config files)
-- Presets by profiles (backend, frontend, fullstack)
 - Publish
-
+- Travis workflow
 
 **TODO v0.3**
 - Handle APM (Atom package manager)
