@@ -35,7 +35,7 @@ var envCmd = &cobra.Command{
 	Use:   "env",
 	Short: "Get infos about the local environment",
 	Long: `Get general or detailes informations about the current environment.
-Currently implemented : System, Network, Security, current load.`,
+Currently implemented: System, Network, Security, current load.`,
 }
 
 var envInfoCmd = &cobra.Command{

@@ -43,14 +43,14 @@ func Status(project string, baseURL string, healthEndpoint string) {
 func Stats(project string, repositoryURL string) {
 	resp, err := http.Get(repositoryURL)
 	if err != nil {
-		fmt.Printf("Error : %s", err.Error())
+		fmt.Printf("Error: %s", err.Error())
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
 	var jsonContent map[string]interface{}
 	if err = json.Unmarshal(content, &jsonContent); err != nil {
-		fmt.Printf("Error : %s", err.Error())
+		fmt.Printf("Error: %s", err.Error())
 		return
 	}
 

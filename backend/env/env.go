@@ -36,7 +36,7 @@ func GetInfos() {
 
 	resp, err := http.Get(IPCheckerURL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error : %s", err.Error())
+		fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -44,13 +44,13 @@ func GetInfos() {
 	var jsonContent map[string]string
 	err = json.Unmarshal(content, &jsonContent)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error : %s", err.Error())
+		fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 		return
 	}
 
 	command.ExecuteCommand(exec.Command("hostinfo"))
-	fmt.Println("external_ip :", jsonContent["origin"])
-	fmt.Print("uptime :")
+	fmt.Printf("\nExternal IP: %s\n\n", jsonContent["origin"])
+	fmt.Print("Uptime: ")
 	command.ExecuteCommand(exec.Command("uptime"))
 }
 
@@ -67,7 +67,7 @@ func EnsureDotfilesDir(dotfilesDirPath string) {
 	if _, err := os.Stat(dotfilesDirPath); err != nil {
 		err = os.Mkdir(dotfilesDirPath, 0766)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error : %s", err.Error())
+			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 		}
 
 		command.ExecuteCommand(exec.Command("git", "init"))

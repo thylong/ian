@@ -112,7 +112,7 @@ func (b BrewPackageManager) Setup() (err error) {
 		"https://raw.githubusercontent.com/Homebrew/install/master/install",
 	)
 	if err != nil {
-		fmt.Printf("Error : %s", err)
+		fmt.Printf("Error: %s", err)
 	}
 
 	installScript, err := ioutil.ReadAll(resp.Body)
