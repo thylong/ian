@@ -16,26 +16,23 @@ package packagemanagers
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
 
-// Brew immutable instance.
-var Brew = BrewPackageManager{Path: "/usr/local/bin/brew", Name: "brew"}
+// Apm immutable instance.
+var Apm = ApmPackageManager{Path: "/usr/local/bin/apm", Name: "apm"}
 
-// BrewPackageManager is a (widely used) unofficial Mac OS package manager.
-// (more: https://brew.sh/)
-type BrewPackageManager struct {
+// ApmPackageManager is the package manager for Atom text editor.
+// (more: https://github.com/atom/apm)
+type ApmPackageManager struct {
 	Path string
 	Name string
 }
 
-// Install given Brew package.
-func (b BrewPackageManager) Install(packageName string) (err error) {
+// Install given Apm package.
+func (b ApmPackageManager) Install(packageName string) (err error) {
 	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
@@ -43,8 +40,8 @@ func (b BrewPackageManager) Install(packageName string) (err error) {
 	return err
 }
 
-// Uninstall given Brew package.
-func (b BrewPackageManager) Uninstall(packageName string) (err error) {
+// Uninstall given Apm package.
+func (b ApmPackageManager) Uninstall(packageName string) (err error) {
 	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", packageName))
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
@@ -53,38 +50,36 @@ func (b BrewPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup all the local archives and previous versions.
-func (b BrewPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "cleanup"))
-	command.ExecuteCommand(execCommand(b.Path, "cask", "cleanup"))
-	return err
+func (b ApmPackageManager) Cleanup() (err error) {
+	return command.ExecuteCommand(execCommand(b.Path, "clean"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b BrewPackageManager) UpdateOne(packageName string) error {
+func (b ApmPackageManager) UpdateOne(packageName string) error {
 	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
-// UpgradeOne Brew packages to the last known versions.
-func (b BrewPackageManager) UpgradeOne(packageName string) error {
+// UpgradeOne Apm packages to the last known versions.
+func (b ApmPackageManager) UpgradeOne(packageName string) error {
 	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
 }
 
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b BrewPackageManager) UpdateAll() error {
+func (b ApmPackageManager) UpdateAll() error {
 	return command.ExecuteCommand(execCommand(b.Path, "update"))
 }
 
-// UpgradeAll Brew packages to the last known versions.
-func (b BrewPackageManager) UpgradeAll() error {
+// UpgradeAll Apm packages to the last known versions.
+func (b ApmPackageManager) UpgradeAll() error {
 	return command.ExecuteCommand(execCommand(b.Path, "upgrade"))
 }
 
-// IsInstalled returns true if Brew executable is found.
-func (b BrewPackageManager) IsInstalled() bool {
+// IsInstalled returns true if Apm executable is found.
+func (b ApmPackageManager) IsInstalled() bool {
 	if _, err := os.Stat(b.Path); err != nil {
 		return false
 	}
@@ -92,34 +87,21 @@ func (b BrewPackageManager) IsInstalled() bool {
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (b BrewPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled() && runtime.GOOS == "darwin"
+func (b ApmPackageManager) IsOSPackageManager() bool {
+	return false
 }
 
-// GetExecPath return immutable path to Brew executable.
-func (b BrewPackageManager) GetExecPath() string {
+// GetExecPath return immutable path to Apm executable.
+func (b ApmPackageManager) GetExecPath() string {
 	return b.Path
 }
 
 // GetName return the name of the package manager.
-func (b BrewPackageManager) GetName() string {
+func (b ApmPackageManager) GetName() string {
 	return b.Name
 }
 
-// Setup installs Brew
-func (b BrewPackageManager) Setup() (err error) {
-	resp, err := http.Get(
-		"https://raw.githubusercontent.com/Homebrew/install/master/install",
-	)
-	if err != nil {
-		fmt.Printf("Error: %s", err)
-	}
-
-	installScript, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-
-	command.ExecuteInteractiveCommand(
-		execCommand("/usr/bin/ruby", "-e", string(installScript)),
-	)
+// Setup installs Apm
+func (b ApmPackageManager) Setup() (err error) {
 	return nil
 }

@@ -15,8 +15,8 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 
@@ -34,6 +34,10 @@ func init() {
 	projectCmd.AddCommand(deployProjectCmd)
 	projectCmd.AddCommand(rollbackProjectCmd)
 	projectCmd.AddCommand(dbProjectCmd)
+	projectCmd.AddCommand(newProjectCmd)
+	projectCmd.AddCommand(deleteProjectCmd)
+	projectCmd.AddCommand(setProjectCmd)
+	projectCmd.AddCommand(unsetProjectCmd)
 }
 
 // projectCmd represents the project command
@@ -76,7 +80,11 @@ var configProjectCmd = &cobra.Command{
 	Short: "Gather general config of projects",
 	Long:  `Gather general config of projects.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(config.Vipers["projects"].AllSettings())
+		for _, project := range args {
+			settings := config.Vipers["projects"].GetStringMap(project)
+			prettySettings, _ := json.MarshalIndent(settings, "", "  ")
+			fmt.Printf("%s configuration:\n%s\n}", project, prettySettings)
+		}
 	},
 }
 
@@ -89,7 +97,7 @@ var deployProjectCmd = &cobra.Command{
 		deployCmd := strings.Split(deployCmdContent, " ")
 		termCmd := exec.Command(deployCmd[0], deployCmd[1:]...)
 		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-		command.ExecuteCommand(termCmd)
+		command.ExecuteInteractiveCommand(termCmd)
 	},
 }
 
@@ -102,7 +110,7 @@ var rollbackProjectCmd = &cobra.Command{
 		rollbackCmd := strings.Split(rollbackCmdContent, " ")
 		termCmd := exec.Command(rollbackCmd[0], rollbackCmd[:1]...)
 		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-		command.ExecuteCommand(termCmd)
+		command.ExecuteInteractiveCommand(termCmd)
 	},
 }
 
@@ -114,9 +122,48 @@ var dbProjectCmd = &cobra.Command{
 		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["db_cmd"]
 		dbCmd := strings.Split(rollbackCmdContent, " ")
 		termCmd := exec.Command(dbCmd[0], dbCmd[:1]...)
-		termCmd.Stdout = os.Stdout
-		termCmd.Stdin = os.Stdin
-		termCmd.Stderr = os.Stderr
-		termCmd.Run()
+		command.ExecuteInteractiveCommand(termCmd)
+	},
+}
+
+var newProjectCmd = &cobra.Command{
+	Use:   "new",
+	Short: "Set up a new project",
+	Long:  `Set up a new project to manage.`,
+	Run: func(cmd *cobra.Command, args []string) {
+	},
+}
+
+var deleteProjectCmd = &cobra.Command{
+	Use:   "delete",
+	Short: "Delete a project configuration",
+	Long:  `Delete a project configuration.`,
+	Run: func(cmd *cobra.Command, args []string) {
+	},
+}
+
+var setProjectCmd = &cobra.Command{
+	Use:   "set",
+	Short: "Set a project command",
+	Long:  `Set a default or a custom project command.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		// if len(args) < 2 {
+		// 	return
+		// }
+		// projectContent := config.Vipers["projects"].GetStringMapString(args[0])
+		// projectContent["set_cmd"] = strings.Join(args[1:], " ")
+		//
+		// out, err := yaml.Marshal(&projectContent)
+		// if err != nil {
+		// 	return
+		// }
+	},
+}
+
+var unsetProjectCmd = &cobra.Command{
+	Use:   "unset",
+	Short: "Unset a project command",
+	Long:  `Unset a default or a custom project command.`,
+	Run: func(cmd *cobra.Command, args []string) {
 	},
 }

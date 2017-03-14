@@ -159,3 +159,8 @@ func AppendToConfig(lines string, confFilename string) {
 func GetConfigDefaultContent(fileName string) []byte {
 	return []byte{}
 }
+
+// GetPreset returns the content of the preset env.yml
+func GetPreset(presetName string) []byte {
+	return []byte{}
+}

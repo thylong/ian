@@ -1,0 +1,29 @@
+brew:
+- cask
+- cmake
+- composer
+- httpie
+- mongodb
+- node
+- nmap
+- php71
+- python
+- python3
+- ruby
+- tree
+- watch
+- wget
+cask:
+- appcleaner
+- atom
+- caffeine
+- charles
+- dash
+- docker
+- filezilla
+- google-chrome
+- iterm2
+- slack
+- spectacle
+- virtualbox
+- vlc

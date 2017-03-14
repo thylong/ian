@@ -45,6 +45,7 @@ func init() {
 	SupportedPackageManagers["apt"] = Apt
 	SupportedPackageManagers["yum"] = Yum
 	SupportedPackageManagers["rubygems"] = RubyGems
+	SupportedPackageManagers["apm"] = Apm
 }
 
 // GetOSPackageManager returns the main Package Manager of the current OS.

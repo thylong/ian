@@ -6,8 +6,9 @@ This files represents the milestones to achieve for the incoming versions.
 **TODO v0.1**
 - Rewrite README
 - Fix english typos (docstring, README)
+- Better setup process
+- Add a project set cmd <field_name> <value> to set the config from the terminal
 - Presets by profiles (backend, frontend, fullstack)
-- Cross compile: Mac OSX, Ubuntu, Debian and CentOS
 
 **TODO v0.2**
 - Get started experience (website + form on site to determine the profile)
@@ -16,13 +17,11 @@ This files represents the milestones to achieve for the incoming versions.
 - Travis workflow
 
 **TODO v0.3**
-- Handle APM (Atom package manager)
 - Improve stdout formatting (color, tab, yes/no steps)
 - Customize presets easily http://getbootstrap.com/customize/ (UI local/remote? Hash copy/paste in CLI ?)
 
 **TODO v0.4**
 - Safe export functionnality (export only the non sensible infos) ("--safe" option to env save)
-- Add a project set cmd <field_name> <value> to set the config from the terminal
 - Improve tests
 
 **TODO v0.5**
