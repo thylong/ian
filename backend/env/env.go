@@ -138,8 +138,7 @@ func PushDotfiles(message string, dotfilesDirPath string) {
 // GenerateRepositoriesPath creates conf line containing the user's input.
 func GenerateRepositoriesPath() string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Ian allows you manage all your Github local repositories")
-	fmt.Print("Insert the full path to the parent directory of your repositories, otherwise leave blank: ")
+	fmt.Print("Enter the full path to the parent directory of your repositories\n(leave blank to skip): ")
 	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return input
 	}
@@ -148,7 +147,7 @@ func GenerateRepositoriesPath() string {
 
 // GetDotfilesRepository creates conf line containing the user's input.
 func GetDotfilesRepository() string {
-	fmt.Print("Path to your dotfiles repository: ")
+	fmt.Print("Enter the full path to your dotfiles Github repository\n(leave blank to skip): ")
 	reader := bufio.NewReader(os.Stdin)
 	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))

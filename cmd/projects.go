@@ -46,6 +46,16 @@ var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Interact with local projects",
 	Long:  `Interact with a project using predefined commands, or define custom commands.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(config.Vipers["projects"].AllSettings()) == 0 {
+			fmt.Println("/!\\ You currently have no projects set up.")
+			in := config.GetUserInput("Would you like to add one using 'ian project new'? (Y/n)")
+			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
+				return
+			}
+			addProjectCmd.Execute()
+		}
+	},
 }
 
 var statusProjectCmd = &cobra.Command{
@@ -133,15 +143,15 @@ var addProjectCmd = &cobra.Command{
 	Long:  `Add a new project configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		NewP := make(map[string]string)
-		NewP["repository"] = projects.GetUserInput("Enter the project repository: ")
-		NewP["health"] = projects.GetUserInput("Enter the health check URL: ")
-		NewP["db_cmd"] = projects.GetUserInput("Enter the db connection command: ")
-		NewP["deploy_cmd"] = projects.GetUserInput("Enter the deploy repository: ")
-		NewP["rollback_cmd"] = projects.GetUserInput("Enter the rollback repository: ")
+		NewP["repository"] = config.GetUserInput("Enter the project repository: ")
+		NewP["health"] = config.GetUserInput("Enter the health check URL: ")
+		NewP["db_cmd"] = config.GetUserInput("Enter the db connection command: ")
+		NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy repository: ")
+		NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback repository: ")
 
 		projectsContent := config.Vipers["projects"].AllSettings()
 		projectsContent[args[0]] = NewP
-		projects.UpdateYamlFile(
+		config.UpdateYamlFile(
 			config.ConfigFilesPathes["projects"],
 			projectsContent,
 		)
@@ -156,7 +166,7 @@ var deleteProjectCmd = &cobra.Command{
 		editContent := config.Vipers["projects"].AllSettings()
 		delete(editContent, args[0])
 
-		projects.UpdateYamlFile(
+		config.UpdateYamlFile(
 			config.ConfigFilesPathes["projects"],
 			config.Vipers["projects"].AllSettings(),
 		)
@@ -178,7 +188,7 @@ var setProjectCmd = &cobra.Command{
 		config.Vipers["projects"].Set(args[0], editContent)
 
 		projectsContent := config.Vipers["projects"].AllSettings()
-		projects.UpdateYamlFile(
+		config.UpdateYamlFile(
 			config.ConfigFilesPathes["projects"],
 			projectsContent,
 		)
@@ -198,7 +208,7 @@ var unsetProjectCmd = &cobra.Command{
 		editContent := config.Vipers["projects"].GetStringMapString(args[0])
 		delete(editContent, fmt.Sprintf("%s_cmd", args[1]))
 
-		projects.UpdateYamlFile(
+		config.UpdateYamlFile(
 			config.ConfigFilesPathes["projects"],
 			config.Vipers["projects"].AllSettings(),
 		)

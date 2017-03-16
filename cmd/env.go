@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -86,6 +87,13 @@ var envSaveCmd = &cobra.Command{
 	Short: "Save current configuration files to the dotfiles repository",
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(config.Vipers["projects"].AllSettings()) == 0 {
+			fmt.Println("/!\\ You currently have no defined path to your parent repositories directory.")
+			in := config.GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
+			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
+				return
+			}
+		}
 		env.Save(
 			config.DotfilesDirPath,
 			config.Vipers["config"].GetString("dotfiles_repository"),

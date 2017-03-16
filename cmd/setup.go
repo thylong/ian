@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
@@ -37,8 +38,23 @@ var setupCmd = &cobra.Command{
     With projects subcommand being one of the core function of Ian, setup will
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Starting setup...")
+		fmt.Print([]byte(`Welcome to Ian!
+Ian is a simple tool to manage your development environment, repositories,
+and projects.
 
+Learn more about Ian at http://goian.io
+
+To benefit from all of Ian’s feature’s, you’ll need to provide:
+    - A working OS Package Manager (will set up if missing)
+    - The full path of your repositories (example: /Users/thylong/repositories)
+    - The path of your dotfiles Github repository (example: thylong/dotfiles)
+
+`))
+		setupBool := config.GetUserInput("Do you want to set up Ian now? (Y/n): ")
+		if strings.ToLower(setupBool) != "y" && strings.ToLower(setupBool) != "yes" && strings.ToLower(setupBool) != "" {
+			fmt.Println("You're ready to start using Ian. Note that if you try to use some of Ian's\nfeatures you'll be prompted for these details again.")
+			os.Exit(1)
+		}
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 			fmt.Println("Installing OS package manager...")
 			err = OSPackageManager.Setup()
@@ -60,6 +76,6 @@ var setupCmd = &cobra.Command{
 
 			env.SetupPackages(packageManager, packages)
 		}
-		fmt.Println("Ending setup.")
+		fmt.Println("Great! You're ready to start using Ian.")
 	},
 }

@@ -44,9 +44,9 @@ var repoCmd = &cobra.Command{
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List stored repositories",
-	Long: `List stored repositories.
-
-    List all stored repositories in repositories_path path.`,
+	Long: `Manage local repositories.
+It's currently possible to update remote, reset current branch to master, clean,
+and delete.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		repo.List()
 	},

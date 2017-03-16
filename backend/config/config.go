@@ -15,6 +15,8 @@
 package config
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -163,4 +165,27 @@ func GetConfigDefaultContent(fileName string) []byte {
 // GetPreset returns the content of the preset env.yml
 func GetPreset(presetName string) []byte {
 	return []byte{}
+}
+
+// UpdateYamlFile write a Viper content to a yaml file.
+func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
+	out, err := yaml.Marshal(&fileContent)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile(fileFullPath, out, 0766); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		os.Exit(1)
+	}
+}
+
+// GetUserInput ask question and return user input.
+func GetUserInput(question string) string {
+	fmt.Printf("%s: ", question)
+	reader := bufio.NewReader(os.Stdin)
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
+		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+	}
+	return ""
 }
