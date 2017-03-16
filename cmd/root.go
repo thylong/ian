@@ -15,6 +15,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
@@ -23,7 +26,11 @@ import (
 var OSPackageManager pm.PackageManager
 
 func init() {
-	OSPackageManager = pm.GetOSPackageManager()
+	var err error
+	if OSPackageManager, err = pm.GetOSPackageManager(); err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	RootCmd.SetUsageTemplate(string([]byte(`Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}

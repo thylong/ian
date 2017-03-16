@@ -29,7 +29,8 @@ func TestGetOSPackageManager(t *testing.T) {
 		t.Skip("Windows is not supported yet.")
 	}
 
-	OSPackageManagerName := GetOSPackageManager().GetName()
+	OSPackageManager, _ := GetOSPackageManager()
+	OSPackageManagerName := OSPackageManager.GetName()
 
 	if OS == "darwin" && OSPackageManagerName != "brew" {
 		t.Errorf("OS returned wrong OS package manager: got %v want %v",
@@ -38,11 +39,11 @@ func TestGetOSPackageManager(t *testing.T) {
 
 	if OS == "linux" {
 		if fileContent, err := ioutil.ReadFile("/etc/issue"); err == nil {
-			if strings.Contains("Ubuntu", string(fileContent)) && GetOSPackageManager().GetName() != "apt" {
+			if strings.Contains("Ubuntu", string(fileContent)) && OSPackageManagerName != "apt" {
 				t.Errorf("OS returned wrong OS package manager: got %v want %v",
 					OSPackageManagerName, "apt")
 			}
-			if strings.Contains("CentOS", string(fileContent)) && GetOSPackageManager().GetName() != "yum" {
+			if strings.Contains("CentOS", string(fileContent)) && OSPackageManagerName != "yum" {
 				t.Errorf("OS returned wrong OS package manager: got %v want %v",
 					OSPackageManagerName, "yum")
 			}

@@ -52,7 +52,6 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 	if err != nil {
 		return fmt.Errorf("Error waiting for Cmd: %v", err)
 	}
-
 	return nil
 }
 

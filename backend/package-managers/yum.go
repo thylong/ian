@@ -33,76 +33,86 @@ type YumPackageManager struct {
 }
 
 // Install given Yum package.
-func (b YumPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm YumPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Uninstall given Yum package.
-func (b YumPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "erase", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm YumPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "erase", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s erase %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Cleanup all the local archives and previous versions.
-func (b YumPackageManager) Cleanup() error {
-	return command.ExecuteCommand(execCommand(b.Path, "autoremove"))
+func (pm YumPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(pm.Path, "autoremove"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b YumPackageManager) UpdateOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
+func (pm YumPackageManager) UpdateOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpgradeOne Yum packages to the last known versions.
-func (b YumPackageManager) UpgradeOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
+func (pm YumPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s upgrade %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b YumPackageManager) UpdateAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "update"))
+func (pm YumPackageManager) UpdateAll() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update")); err != nil {
+		return fmt.Errorf("Cannot %s update: %s", pm.Name, err)
+	}
+	return err
 }
 
 // UpgradeAll Yum packages to the last known versions.
-func (b YumPackageManager) UpgradeAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "upgrade"))
+func (pm YumPackageManager) UpgradeAll() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade")); err != nil {
+		return fmt.Errorf("Cannot %s upgrade: %s", pm.Name, err)
+	}
+	return err
 }
 
 // IsInstalled returns true if Yum executable is found.
-func (b YumPackageManager) IsInstalled() bool {
-	if fileInfo, err := os.Stat(b.Path); err != nil || fileInfo.Mode() == os.ModeSymlink {
+func (pm YumPackageManager) IsInstalled() bool {
+	if fileInfo, err := os.Stat(pm.Path); err != nil || fileInfo.Mode() == os.ModeSymlink {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (b YumPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled() && runtime.GOOS == "linux"
+func (pm YumPackageManager) IsOSPackageManager() bool {
+	return pm.IsInstalled() && runtime.GOOS == "linux"
 }
 
 // GetExecPath return immutable path to Yum executable.
-func (b YumPackageManager) GetExecPath() string {
-	return b.Path
+func (pm YumPackageManager) GetExecPath() string {
+	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (b YumPackageManager) GetName() string {
-	return b.Name
+func (pm YumPackageManager) GetName() string {
+	return pm.Name
 }
 
 // Setup does nothing (yum comes by default in Linux distributions)
-func (b YumPackageManager) Setup() (err error) {
+func (pm YumPackageManager) Setup() (err error) {
 	return nil
 }

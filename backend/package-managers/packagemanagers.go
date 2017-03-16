@@ -14,7 +14,10 @@
 
 package packagemanagers
 
-import "os/exec"
+import (
+	"errors"
+	"os/exec"
+)
 
 // PackageManager handles standard interactions with all Package Managers.
 type PackageManager interface {
@@ -50,22 +53,23 @@ func init() {
 
 // GetOSPackageManager returns the main Package Manager of the current OS.
 // As only MacOS is supported for now, it returns a Brew instance.
-func GetOSPackageManager() PackageManager {
+func GetOSPackageManager() (PackageManager, error) {
 	for name, packageManager := range SupportedPackageManagers {
 		if name != "cask" && packageManager.IsOSPackageManager() {
-			return packageManager
+			return packageManager, nil
 		}
 	}
-	return Brew
+	return Brew, errors.New("No OS Package Manager found.")
 }
 
 // GetPackageManager returns the corresponding PackageManager otherwise default
 // to OS package manager.
 func GetPackageManager(PackageManagerFlag string) PackageManager {
 	packageManager, ok := SupportedPackageManagers[PackageManagerFlag]
-
 	if ok {
 		return packageManager
 	}
-	return GetOSPackageManager()
+
+	OSPackageManager, _ := GetOSPackageManager()
+	return OSPackageManager
 }

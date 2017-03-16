@@ -32,76 +32,89 @@ type ApmPackageManager struct {
 }
 
 // Install given Apm package.
-func (b ApmPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm ApmPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Uninstall given Apm package.
-func (b ApmPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm ApmPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Cleanup all the local archives and previous versions.
-func (b ApmPackageManager) Cleanup() (err error) {
-	return command.ExecuteCommand(execCommand(b.Path, "clean"))
+func (pm ApmPackageManager) Cleanup() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "clean")); err != nil {
+		return fmt.Errorf("Cannot %s clean: %s", pm.Name, err)
+	}
+	return err
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b ApmPackageManager) UpdateOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "update"))
+func (pm ApmPackageManager) UpdateOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update")); err != nil {
+		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpgradeOne Apm packages to the last known versions.
-func (b ApmPackageManager) UpgradeOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
+func (pm ApmPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s upgrade %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b ApmPackageManager) UpdateAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "update"))
+func (pm ApmPackageManager) UpdateAll() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update")); err != nil {
+		return fmt.Errorf("Cannot %s update: %s", pm.Name, err)
+	}
+	return err
 }
 
 // UpgradeAll Apm packages to the last known versions.
-func (b ApmPackageManager) UpgradeAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "upgrade"))
+func (pm ApmPackageManager) UpgradeAll() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade")); err != nil {
+		return fmt.Errorf("Cannot %s upgrade: %s", pm.Name, err)
+	}
+	return err
 }
 
 // IsInstalled returns true if Apm executable is found.
-func (b ApmPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(b.Path); err != nil {
+func (pm ApmPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (b ApmPackageManager) IsOSPackageManager() bool {
+func (pm ApmPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to Apm executable.
-func (b ApmPackageManager) GetExecPath() string {
-	return b.Path
+func (pm ApmPackageManager) GetExecPath() string {
+	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (b ApmPackageManager) GetName() string {
-	return b.Name
+func (pm ApmPackageManager) GetName() string {
+	return pm.Name
 }
 
 // Setup installs Apm
-func (b ApmPackageManager) Setup() (err error) {
+func (pm ApmPackageManager) Setup() (err error) {
 	return nil
 }

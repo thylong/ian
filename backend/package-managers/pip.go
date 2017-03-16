@@ -36,79 +36,77 @@ type PipPackageManager struct {
 }
 
 // Install given Pip package.
-func (b PipPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "install", "-U", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm PipPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "install", "-U", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Uninstall given Pip package.
-func (b PipPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", "-U", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm PipPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", "-U", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
-func (b PipPackageManager) Cleanup() (err error) {
+func (pm PipPackageManager) Cleanup() error {
 	return ErrPipMissingFeature
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b PipPackageManager) UpdateOne(packageName string) (err error) {
+func (pm PipPackageManager) UpdateOne(packageName string) (err error) {
 	return ErrPipMissingFeature
 }
 
 // UpgradeOne Pip packages to the last known versions.
-func (b PipPackageManager) UpgradeOne(packageName string) error {
-	return b.Install(packageName)
+func (pm PipPackageManager) UpgradeOne(packageName string) (err error) {
+	return pm.Install(packageName)
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b PipPackageManager) UpdateAll() (err error) {
+func (pm PipPackageManager) UpdateAll() (err error) {
 	// TODO: Implementation
 	return ErrPipMissingFeature
 }
 
 // UpgradeAll Pip packages to the last known versions.
-func (b PipPackageManager) UpgradeAll() (err error) {
+func (pm PipPackageManager) UpgradeAll() (err error) {
 	// TODO: Implementation
 	return ErrPipMissingFeature
 }
 
 // IsInstalled returns true if Pip executable is found.
-func (b PipPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(b.Path); err != nil {
+func (pm PipPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns false because pip is never the main OS Package Manager.
-func (b PipPackageManager) IsOSPackageManager() bool {
+func (pm PipPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to Pip executable.
-func (b PipPackageManager) GetExecPath() string {
-	return b.Path
+func (pm PipPackageManager) GetExecPath() string {
+	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (b PipPackageManager) GetName() string {
-	return b.Name
+func (pm PipPackageManager) GetName() string {
+	return pm.Name
 }
 
 // Setup installs Cask
-func (b PipPackageManager) Setup() (err error) {
+func (pm PipPackageManager) Setup() (err error) {
 	return nil
 }

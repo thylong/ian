@@ -63,6 +63,8 @@ func SetupPackages(PackageManager pm.PackageManager, packages []string) {
 	}
 
 	for _, packageToInstall := range packages {
-		PackageManager.Install(packageToInstall)
+		if err := PackageManager.Install(packageToInstall); err != nil {
+			fmt.Fprint(os.Stderr, err)
+		}
 	}
 }

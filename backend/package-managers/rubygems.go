@@ -36,77 +36,78 @@ type RubyGemsPackageManager struct {
 }
 
 // Install given RubyGems package.
-func (b RubyGemsPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm RubyGemsPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Uninstall given RubyGems package.
-func (b RubyGemsPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm RubyGemsPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
-func (b RubyGemsPackageManager) Cleanup() error {
-	return command.ExecuteCommand(execCommand(b.Path, "cleanup"))
+func (pm RubyGemsPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(pm.Path, "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
+func (pm RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeOne RubyGems packages to the last known versions.
-func (b RubyGemsPackageManager) UpgradeOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
+func (pm RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b RubyGemsPackageManager) UpdateAll() error {
+func (pm RubyGemsPackageManager) UpdateAll() (err error) {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeAll RubyGems packages to the last known versions.
-func (b RubyGemsPackageManager) UpgradeAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "update"))
+func (pm RubyGemsPackageManager) UpgradeAll() (err error) {
+	return command.ExecuteCommand(execCommand(pm.Path, "update"))
 }
 
 // IsInstalled returns true if RubyGems executable is found.
-func (b RubyGemsPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(b.Path); err != nil {
+func (pm RubyGemsPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns false because pip is never the main OS Package Manager.
-func (b RubyGemsPackageManager) IsOSPackageManager() bool {
+func (pm RubyGemsPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to RubyGems executable.
-func (b RubyGemsPackageManager) GetExecPath() string {
-	return b.Path
+func (pm RubyGemsPackageManager) GetExecPath() string {
+	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (b RubyGemsPackageManager) GetName() string {
-	return b.Name
+func (pm RubyGemsPackageManager) GetName() string {
+	return pm.Name
 }
 
 // Setup installs Cask
-func (b RubyGemsPackageManager) Setup() (err error) {
+func (pm RubyGemsPackageManager) Setup() (err error) {
 	return nil
 }

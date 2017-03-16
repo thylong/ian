@@ -1,10 +1,7 @@
 TODO
-=====
+====
 
 This files represents the milestones to achieve for the incoming versions.
-
-**TODO v0.1**
-- Errors checking (+ check all the possible edge cases)
 
 **TODO v0.2**
 - Get started experience (website + form on site to determine the profile)

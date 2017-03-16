@@ -36,74 +36,81 @@ type NpmPackageManager struct {
 }
 
 // Install given Npm package.
-func (b NpmPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "install", "-g", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm NpmPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "install", "-g", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Uninstall given Npm package.
-func (b NpmPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "uninstall", "-g", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm NpmPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", "-g", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
 	return err
 }
 
 // Cleanup the npm cache.
-func (b NpmPackageManager) Cleanup() error {
-	return command.ExecuteCommand(execCommand(b.Path, "cache", "clean"))
+func (pm NpmPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(pm.Path, "cache", "clean"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b NpmPackageManager) UpdateOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "update", packageName))
+func (pm NpmPackageManager) UpdateOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (b NpmPackageManager) UpgradeOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
+func (pm NpmPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s upgrade %s: %s", pm.Name, packageName, err)
+	}
+	return err
 }
 
 // UpdateAll does nothing (out of making NPM satisfying PackageManager interface).
-func (b NpmPackageManager) UpdateAll() error {
+func (pm NpmPackageManager) UpdateAll() error {
 	return ErrNPMMissingFeature
 }
 
 // UpgradeAll Npm packages to the last known versions.
-func (b NpmPackageManager) UpgradeAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "update", "-g"))
+func (pm NpmPackageManager) UpgradeAll() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "update", "-g")); err != nil {
+		return fmt.Errorf("Cannot %s update: %s", pm.Name, err)
+	}
+	return err
 }
 
 // IsInstalled returns true if Npm executable is found.
-func (b NpmPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(b.Path); err != nil {
+func (pm NpmPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns false because npm is never the main OS Package Manager.
-func (b NpmPackageManager) IsOSPackageManager() bool {
+func (pm NpmPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to Npm executable.
-func (b NpmPackageManager) GetExecPath() string {
-	return b.Path
+func (pm NpmPackageManager) GetExecPath() string {
+	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (b NpmPackageManager) GetName() string {
-	return b.Name
+func (pm NpmPackageManager) GetName() string {
+	return pm.Name
 }
 
 // Setup installs Cask
-func (b NpmPackageManager) Setup() (err error) {
+func (pm NpmPackageManager) Setup() (err error) {
 	return nil
 }
