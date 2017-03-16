@@ -25,7 +25,7 @@ import (
 
 func init() {
 	RootCmd.AddCommand(envCmd)
-	envCmd.AddCommand(envInfoCmd)
+	envCmd.AddCommand(envDescribeCmd)
 	envCmd.AddCommand(envUpdateCmd)
 	envCmd.AddCommand(envUpgradeCmd)
 	envCmd.AddCommand(envSaveCmd)
@@ -34,64 +34,57 @@ func init() {
 // envCmd represents the env command
 var envCmd = &cobra.Command{
 	Use:   "env",
-	Short: "Get infos about the local environment",
-	Long: `Get general or detailes informations about the current environment.
-Currently implemented: System, Network, Security, current load.`,
+	Short: "Manage development environment",
+	Long:  `Show details, update and save your development environment.`,
 }
 
-var envInfoCmd = &cobra.Command{
-	Use:   "info",
-	Short: "Get infos about the local environment",
-	Long:  `Get general or detailes informations about the current environment. Currently implemented : System, Network, Security, current load.`,
+var envDescribeCmd = &cobra.Command{
+	Use:   "describe",
+	Short: "Show details of the current development environment",
+	Long:  `Show details of the current development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		env.GetInfos()
+		env.Describe()
 	},
 }
 
 var envUpdateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update the local environment",
-	Long:  `Update the local environment with infos stored in the local config.`,
+	Short: "Update the development environment",
+	Long:  `Update the development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		func() {
-			go func() {
-				for {
-					for _, v := range `-\|/` {
-						fmt.Printf("\r Updating env... %c", v)
-						time.Sleep(100 * time.Millisecond)
-					}
+		go func() {
+			for {
+				for _, v := range `-\|/` {
+					fmt.Printf("\r Updating env... %c", v)
+					time.Sleep(100 * time.Millisecond)
 				}
-			}()
-			OSPackageManager.UpdateAll()
+			}
 		}()
+		OSPackageManager.UpdateAll()
 	},
 }
 
 var envUpgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "Upgrade the local environment",
-	Long:  `Upgrade the local environment with infos stored in the local config.`,
+	Short: "Upgrade the development environment",
+	Long:  `Upgrade the development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		func() {
-			go func() {
-				for {
-					for _, v := range `-\|/` {
-						fmt.Printf("\r Upgrading env... %c", v)
-						time.Sleep(100 * time.Millisecond)
-					}
+		go func() {
+			for {
+				for _, v := range `-\|/` {
+					fmt.Printf("\r Upgrading env... %c", v)
+					time.Sleep(100 * time.Millisecond)
 				}
-			}()
-			OSPackageManager.UpgradeAll()
+			}
 		}()
-		fmt.Println("Cleaning up...")
-		OSPackageManager.Cleanup()
+		OSPackageManager.UpgradeAll()
 	},
 }
 
 var envSaveCmd = &cobra.Command{
 	Use:   "save",
-	Short: "Save current configuration to distant dotfiles repositories",
-	Long:  `Move current configuration files of the user to a dotfiles sub-directory (if not exists), create symlinks to previous place, then finally create and push the repositories on github`,
+	Short: "Save current configuration files to the dotfiles repository",
+	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		env.Save(
 			config.DotfilesDirPath,

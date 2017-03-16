@@ -52,6 +52,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.
 // RootCmd is executed by default (top level).
 var RootCmd = &cobra.Command{
 	Use:   "ian",
-	Short: "Ian is a very simple automation tool for developer with Mac environment",
-	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
+	Short: "Ian is a simple tool to manage your development environment",
+	Long: `Ian is a simple tool to manage your development environment, repositories,
+and projects..`,
 }

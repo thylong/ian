@@ -28,8 +28,8 @@ import (
 	"github.com/thylong/ian/backend/command"
 )
 
-// GetInfos returns env infos
-func GetInfos() {
+// Describe returns env description.
+func Describe() {
 	IPCheckerURL := "http://httpbin.org/ip"
 
 	resp, err := http.Get(IPCheckerURL)

@@ -34,7 +34,7 @@ func init() {
 	projectCmd.AddCommand(deployProjectCmd)
 	projectCmd.AddCommand(rollbackProjectCmd)
 	projectCmd.AddCommand(dbProjectCmd)
-	projectCmd.AddCommand(newProjectCmd)
+	projectCmd.AddCommand(addProjectCmd)
 	projectCmd.AddCommand(deleteProjectCmd)
 	projectCmd.AddCommand(setProjectCmd)
 	projectCmd.AddCommand(unsetProjectCmd)
@@ -43,14 +43,14 @@ func init() {
 // projectCmd represents the project command
 var projectCmd = &cobra.Command{
 	Use:   "project",
-	Short: "Interact with listed project",
-	Long:  `Get health statuses, general and detailed config about the listed projects.`,
+	Short: "Interact with local projects",
+	Long:  `Interact with a project using predefined commands, or define custom commands.`,
 }
 
 var statusProjectCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Get the health statuses of projects",
-	Long:  `Get the health statuses of the projects hosted versions.`,
+	Short: "Display health status",
+	Long:  `Display health status.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, project := range args {
 			baseURL := config.Vipers["projects"].GetStringMapString(project)["url"]
@@ -62,8 +62,8 @@ var statusProjectCmd = &cobra.Command{
 
 var statsProjectCmd = &cobra.Command{
 	Use:   "stats",
-	Short: "Get the number of stars and forks for projects",
-	Long:  `Get the number of stars and forks for projects.`,
+	Short: "Display Github stat's for a project",
+	Long:  `Display Github stat's for a project.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, project := range args {
 			repositoryURL := fmt.Sprintf(
@@ -77,8 +77,8 @@ var statsProjectCmd = &cobra.Command{
 
 var configProjectCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Gather general config of projects",
-	Long:  `Gather general config of projects.`,
+	Short: "Display a project's configuration",
+	Long:  `Display a project's configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, project := range args {
 			settings := config.Vipers["projects"].GetStringMap(project)
@@ -104,7 +104,7 @@ var deployProjectCmd = &cobra.Command{
 var rollbackProjectCmd = &cobra.Command{
 	Use:   "rollback",
 	Short: "Rollback to a previous version of a project",
-	Long:  `Rollback a previous version of a project.`,
+	Long:  `Rollback to a previous version of a project.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["deploy_cmd"]
 		rollbackCmd := strings.Split(rollbackCmdContent, " ")
@@ -116,8 +116,8 @@ var rollbackProjectCmd = &cobra.Command{
 
 var dbProjectCmd = &cobra.Command{
 	Use:   "db",
-	Short: "Connect to the Database of the project",
-	Long:  `Connect to the Database of the project.`,
+	Short: "Connect to the project's database",
+	Long:  `Connect to the project's database.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["db_cmd"]
 		dbCmd := strings.Split(rollbackCmdContent, " ")
@@ -126,10 +126,10 @@ var dbProjectCmd = &cobra.Command{
 	},
 }
 
-var newProjectCmd = &cobra.Command{
-	Use:   "new",
-	Short: "Set up a new project",
-	Long:  `Set up a new project to manage.`,
+var addProjectCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Add a new project configuration",
+	Long:  `Add a new project configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
 	},
 }
@@ -144,8 +144,8 @@ var deleteProjectCmd = &cobra.Command{
 
 var setProjectCmd = &cobra.Command{
 	Use:   "set",
-	Short: "Set a project command",
-	Long:  `Set a default or a custom project command.`,
+	Short: "Define a subcommand",
+	Long:  `Define a subcommand.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// if len(args) < 2 {
 		// 	return
@@ -162,8 +162,8 @@ var setProjectCmd = &cobra.Command{
 
 var unsetProjectCmd = &cobra.Command{
 	Use:   "unset",
-	Short: "Unset a project command",
-	Long:  `Unset a default or a custom project command.`,
+	Short: "Remove a subcommand",
+	Long:  `Remove a subcommand.`,
 	Run: func(cmd *cobra.Command, args []string) {
 	},
 }

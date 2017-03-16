@@ -31,7 +31,7 @@ func init() {
 // setupCmd represents the setup command
 var setupCmd = &cobra.Command{
 	Use:   "setup",
-	Short: "Setup ian working environment",
+	Short: "Set up ian configuration",
 	Long: `Ian requires you to be able to interact with Github through Git CLI.
 
     With projects subcommand being one of the core function of Ian, setup will
