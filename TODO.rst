@@ -4,7 +4,6 @@ TODO
 This files represents the milestones to achieve for the incoming versions.
 
 **TODO v0.1**
-- Presets by profiles (backend, frontend, fullstack)
 - Errors checking (+ check all the possible edge cases)
 
 **TODO v0.2**

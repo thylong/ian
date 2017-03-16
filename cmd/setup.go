@@ -17,7 +17,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
@@ -38,23 +37,6 @@ var setupCmd = &cobra.Command{
     With projects subcommand being one of the core function of Ian, setup will
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Print([]byte(`Welcome to Ian!
-Ian is a simple tool to manage your development environment, repositories,
-and projects.
-
-Learn more about Ian at http://goian.io
-
-To benefit from all of Ian’s feature’s, you’ll need to provide:
-    - A working OS Package Manager (will set up if missing)
-    - The full path of your repositories (example: /Users/thylong/repositories)
-    - The path of your dotfiles Github repository (example: thylong/dotfiles)
-
-`))
-		setupBool := config.GetUserInput("Do you want to set up Ian now? (Y/n): ")
-		if strings.ToLower(setupBool) != "y" && strings.ToLower(setupBool) != "yes" && strings.ToLower(setupBool) != "" {
-			fmt.Println("You're ready to start using Ian. Note that if you try to use some of Ian's\nfeatures you'll be prompted for these details again.")
-			os.Exit(1)
-		}
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 			fmt.Println("Installing OS package manager...")
 			err = OSPackageManager.Setup()
@@ -68,6 +50,12 @@ To benefit from all of Ian’s feature’s, you’ll need to provide:
 			config.Vipers["config"].GetString("dotfiles_repository"),
 			config.DotfilesDirPath,
 		)
+
+		fmt.Printf("You don't have any packages to be installed in your current ian configuration.")
+		if config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
+			in := config.GetUserInput("Which preset would you like to use:\n1) Software engineer (generalist preset)\n2) Backend developer\n3) Frontend developer\n4) Ops\nEnter your choice:")
+			config.SetupEnvFileWithPreset(in)
+		}
 
 		packageManagerNames := config.Vipers["env"].AllKeys()
 		for _, packageManagerName := range packageManagerNames {
