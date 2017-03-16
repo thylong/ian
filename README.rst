@@ -7,7 +7,7 @@ Ian is a CLI interface to setup, manage and save your dev environment.
 Installing
 ==========
 
-Ian comes as a binary. Once in your $GOPATH, you're good to go !
+Ian comes as a binary. Once in your $PATH, you're good to go !
 
 Linux
 --------
