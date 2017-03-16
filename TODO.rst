@@ -4,10 +4,7 @@ TODO
 This files represents the milestones to achieve for the incoming versions.
 
 **TODO v0.1**
-- Rewrite README
-- Fix english typos (docstring, README)
 - Better setup process
-- Add a project set cmd <field_name> <value> to set the config from the terminal
 - Presets by profiles (backend, frontend, fullstack)
 
 **TODO v0.2**

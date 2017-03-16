@@ -17,6 +17,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -131,6 +132,19 @@ var addProjectCmd = &cobra.Command{
 	Short: "Add a new project configuration",
 	Long:  `Add a new project configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		NewP := make(map[string]string)
+		NewP["repository"] = projects.GetUserInput("Enter the project repository: ")
+		NewP["health"] = projects.GetUserInput("Enter the health check URL: ")
+		NewP["db_cmd"] = projects.GetUserInput("Enter the db connection command: ")
+		NewP["deploy_cmd"] = projects.GetUserInput("Enter the deploy repository: ")
+		NewP["rollback_cmd"] = projects.GetUserInput("Enter the rollback repository: ")
+
+		projectsContent := config.Vipers["projects"].AllSettings()
+		projectsContent[args[0]] = NewP
+		projects.UpdateYamlFile(
+			config.ConfigFilesPathes["projects"],
+			projectsContent,
+		)
 	},
 }
 
@@ -139,6 +153,13 @@ var deleteProjectCmd = &cobra.Command{
 	Short: "Delete a project configuration",
 	Long:  `Delete a project configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		editContent := config.Vipers["projects"].AllSettings()
+		delete(editContent, args[0])
+
+		projects.UpdateYamlFile(
+			config.ConfigFilesPathes["projects"],
+			config.Vipers["projects"].AllSettings(),
+		)
 	},
 }
 
@@ -147,16 +168,20 @@ var setProjectCmd = &cobra.Command{
 	Short: "Define a subcommand",
 	Long:  `Define a subcommand.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// if len(args) < 2 {
-		// 	return
-		// }
-		// projectContent := config.Vipers["projects"].GetStringMapString(args[0])
-		// projectContent["set_cmd"] = strings.Join(args[1:], " ")
-		//
-		// out, err := yaml.Marshal(&projectContent)
-		// if err != nil {
-		// 	return
-		// }
+		if len(args) < 3 {
+			fmt.Fprint(os.Stderr, "Not enough argument.\n")
+			os.Exit(1)
+		}
+
+		editContent := config.Vipers["projects"].GetStringMapString(args[0])
+		editContent[fmt.Sprintf("%s_cmd", args[1])] = strings.Join(args[2:], " ")
+		config.Vipers["projects"].Set(args[0], editContent)
+
+		projectsContent := config.Vipers["projects"].AllSettings()
+		projects.UpdateYamlFile(
+			config.ConfigFilesPathes["projects"],
+			projectsContent,
+		)
 	},
 }
 
@@ -165,5 +190,17 @@ var unsetProjectCmd = &cobra.Command{
 	Short: "Remove a subcommand",
 	Long:  `Remove a subcommand.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			fmt.Fprint(os.Stderr, "Not enough argument.\n")
+			os.Exit(1)
+		}
+
+		editContent := config.Vipers["projects"].GetStringMapString(args[0])
+		delete(editContent, fmt.Sprintf("%s_cmd", args[1]))
+
+		projects.UpdateYamlFile(
+			config.ConfigFilesPathes["projects"],
+			config.Vipers["projects"].AllSettings(),
+		)
 	},
 }

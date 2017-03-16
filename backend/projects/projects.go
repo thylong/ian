@@ -15,11 +15,15 @@
 package projects
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Status makes a GET HTTP query and returns OK if response status is 200
@@ -59,4 +63,27 @@ func Stats(project string, repositoryURL string) {
 	fmt.Printf("\n- Stars: %v", jsonContent["stargazers_count"])
 	fmt.Printf("\n- Open Issues: %v", jsonContent["open_issues_count"])
 	fmt.Printf("\n- Last update: %v", jsonContent["updated_at"])
+}
+
+// UpdateYamlFile write a Viper content to a yaml file.
+func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
+	out, err := yaml.Marshal(&fileContent)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile(fileFullPath, out, 0766); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		os.Exit(1)
+	}
+}
+
+// GetUserInput ask question and return user input.
+func GetUserInput(question string) string {
+	fmt.Printf("%s: ", question)
+	reader := bufio.NewReader(os.Stdin)
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
+		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+	}
+	return ""
 }
