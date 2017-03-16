@@ -15,6 +15,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
@@ -23,7 +26,11 @@ import (
 var OSPackageManager pm.PackageManager
 
 func init() {
-	OSPackageManager = pm.GetOSPackageManager()
+	var err error
+	if OSPackageManager, err = pm.GetOSPackageManager(); err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	RootCmd.SetUsageTemplate(string([]byte(`Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
@@ -43,8 +50,7 @@ Flags:
 Global Flags:
 {{.InheritedFlags.FlagUsages | trimRightSpace}}{{end}}{{if .HasHelpSubCommands}}
 Additional help topics:{{range .Commands}}{{if .IsHelpCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}
-{{ if .HasAvailableSubCommands }}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasAvailableSubCommands }}
 Use "{{.CommandPath}} [command] --help" for more information about a command.
 {{end}}`)))
 }
@@ -52,6 +58,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.
 // RootCmd is executed by default (top level).
 var RootCmd = &cobra.Command{
 	Use:   "ian",
-	Short: "Ian is a very simple automation tool for developer with Mac environment",
-	Long:  `Ian is a very simple automation tool for developer with Mac environment.`,
+	Short: "Ian is a simple tool to manage your development environment",
+	Long: `Ian is a simple tool to manage your development environment, repositories,
+and projects..`,
 }

@@ -52,7 +52,6 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 	if err != nil {
 		return fmt.Errorf("Error waiting for Cmd: %v", err)
 	}
-
 	return nil
 }
 
@@ -100,4 +99,13 @@ func MustExecuteCommand(subCmd *exec.Cmd) (err error) {
 		return errors.New("Command failed to complete without any error")
 	}
 	return nil
+}
+
+// ExecuteInteractiveCommand a command and print concurrently output from stdout
+// & stderr.
+func ExecuteInteractiveCommand(subCmd *exec.Cmd) {
+	subCmd.Stdout = os.Stdout
+	subCmd.Stdin = os.Stdin
+	subCmd.Stderr = os.Stderr
+	subCmd.Run()
 }

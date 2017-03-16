@@ -24,14 +24,12 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
-	"regexp"
 
 	"github.com/thylong/ian/backend/command"
-	pm "github.com/thylong/ian/backend/package-managers"
 )
 
-// GetInfos returns env infos
-func GetInfos() {
+// Describe returns env description.
+func Describe() {
 	IPCheckerURL := "http://httpbin.org/ip"
 
 	resp, err := http.Get(IPCheckerURL)
@@ -137,67 +135,21 @@ func PushDotfiles(message string, dotfilesDirPath string) {
 	}
 }
 
-// SetupPackages installs listed CLI packages.
-func SetupPackages(PackageManager pm.PackageManager, packages []string) {
-	fmt.Println("Installing packages...")
-
-	if len(packages) == 0 {
-		fmt.Println("No packages to install")
-		return
-	}
-
-	for _, packageToInstall := range packages {
-		PackageManager.Install(packageToInstall)
-	}
-}
-
-// SetupDotFiles ask and retrieve a dotfiles repository.
-func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
-	usr, _ := user.Current()
-	if _, err := os.Stat(usr.HomeDir + "/.dotfiles"); err != nil && dotfilesRepository != "" {
-		termCmd := exec.Command("git", "clone", "-v", "https://github.com/"+dotfilesRepository+".git", dotfilesDirPath)
-		termCmd.Stdout = os.Stdout
-		termCmd.Stdin = os.Stdin
-		termCmd.Stderr = os.Stderr
-		termCmd.Run()
-
-		re := regexp.MustCompile(".git$")
-
-		files, _ := ioutil.ReadDir(usr.HomeDir + "/.dotfiles")
-		for _, f := range files {
-			if re.MatchString(f.Name()) {
-				continue
-			}
-
-			if _, err := os.Stat(usr.HomeDir + "/" + f.Name()); err != nil {
-				err := os.Symlink(usr.HomeDir+"/.dotfiles/"+f.Name(), usr.HomeDir+"/"+f.Name())
-				if err != nil {
-					fmt.Fprint(os.Stderr, err)
-				}
-			}
-		}
-	} else {
-		fmt.Println("Skipping dotfiles configuration.")
-	}
-}
-
 // GenerateRepositoriesPath creates conf line containing the user's input.
 func GenerateRepositoriesPath() string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Ian allows you manage all your Github local repositories")
-	fmt.Print("Insert the full path to the parent directory of your repositories, otherwise leave blank: ")
-	if fullPathToRepositories, _ := reader.ReadString('\n'); fullPathToRepositories != "\n" {
-		return fullPathToRepositories
+	fmt.Print("Enter the full path to the parent directory of your repositories\n(leave blank to skip): ")
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
+		return input
 	}
 	return ""
 }
 
 // GetDotfilesRepository creates conf line containing the user's input.
 func GetDotfilesRepository() string {
-	fmt.Println("Path to your dotfiles repository: ")
+	fmt.Print("Enter the full path to your dotfiles Github repository\n(leave blank to skip): ")
 	reader := bufio.NewReader(os.Stdin)
-	if input, _ := reader.ReadString('\n'); input != "\n" {
-		// Vipers["config"].Set("dotfiles_repository", string(bytes.TrimSuffix([]byte(input), []byte("\n"))))
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
 	}
 	return ""

@@ -31,14 +31,12 @@ func init() {
 // setupCmd represents the setup command
 var setupCmd = &cobra.Command{
 	Use:   "setup",
-	Short: "Setup ian working environment",
+	Short: "Set up ian configuration",
 	Long: `Ian requires you to be able to interact with Github through Git CLI.
 
     With projects subcommand being one of the core function of Ian, setup will
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Starting setup...")
-
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 			fmt.Println("Installing OS package manager...")
 			err = OSPackageManager.Setup()
@@ -53,6 +51,12 @@ var setupCmd = &cobra.Command{
 			config.DotfilesDirPath,
 		)
 
+		fmt.Printf("You don't have any packages to be installed in your current ian configuration.")
+		if config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
+			in := config.GetUserInput("Which preset would you like to use:\n1) Software engineer (generalist preset)\n2) Backend developer\n3) Frontend developer\n4) Ops\nEnter your choice:")
+			config.SetupEnvFileWithPreset(in)
+		}
+
 		packageManagerNames := config.Vipers["env"].AllKeys()
 		for _, packageManagerName := range packageManagerNames {
 			packages := config.Vipers["env"].GetStringSlice(packageManagerName)
@@ -60,6 +64,6 @@ var setupCmd = &cobra.Command{
 
 			env.SetupPackages(packageManager, packages)
 		}
-		fmt.Println("Ending setup.")
+		fmt.Println("Great! You're ready to start using Ian.")
 	},
 }

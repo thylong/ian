@@ -1,7 +1,7 @@
 Ian
 ===
 
-Ian is a CLI interface to setup, manage and save your dev environment.
+Ian is a simple tool to manage your development environment, repositories, and projects.
 
 
 Installing
@@ -33,17 +33,18 @@ Usage
 .. code-block:: console
 
     $ ian
-    Ian is a very simple automation tool for developer with dev environment.
+    Ian is a simple tool to manage your development environment, repositories, and projects.
+
+    Learn more about Ian at http://goian.io
 
     Usage:
       ian [command]
 
     Default Commands:
-      env         Get infos about the local environment
-      project     Interact with listed project
-      repo        Manage stored repositories
-      setup       Setup ian working environment
-      version     Print the version information
+      env         Manage development environment
+      project     Interact with local projects
+      repo        Manage local repositories
+      setup       Set up ian configuration
 
     Use "ian [command] --help" for more information about a command.
 

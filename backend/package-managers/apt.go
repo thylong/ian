@@ -37,77 +37,80 @@ type AptPackageManager struct {
 }
 
 // Install given Apt package.
-func (b AptPackageManager) Install(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "install", packageName))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+func (pm AptPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install: %s", pm.Name, err)
 	}
 	return err
 }
 
 // Uninstall given Apt package.
-func (b AptPackageManager) Uninstall(packageName string) (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "remove", packageName))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+func (pm AptPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "remove", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s remove: %s", pm.Name, err)
 	}
 	return err
 }
 
 // Cleanup all the local archives and previous versions.
-func (b AptPackageManager) Cleanup() (err error) {
-	err = command.ExecuteCommand(execCommand(b.Path, "autoremove"))
+func (pm AptPackageManager) Cleanup() (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "autoremove")); err != nil {
+		return fmt.Errorf("Cannot %s autoremove: %s", pm.Name, err)
+	}
 	return err
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b AptPackageManager) UpdateOne(packageName string) (err error) {
+func (pm AptPackageManager) UpdateOne(packageName string) (err error) {
 	return ErrAptMissingFeature
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (b AptPackageManager) UpgradeOne(packageName string) error {
-	return command.ExecuteCommand(execCommand(b.Path, "upgrade", packageName))
+func (pm AptPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s upgrade: %s", pm.Name, err)
+	}
+	return err
 }
 
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (b AptPackageManager) UpdateAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "update"))
+func (pm AptPackageManager) UpdateAll() (err error) {
+	return command.ExecuteCommand(execCommand(pm.Path, "update"))
 }
 
 // UpgradeAll Apt packages to the last known versions.
-func (b AptPackageManager) UpgradeAll() error {
-	return command.ExecuteCommand(execCommand(b.Path, "full-upgrade"))
+func (pm AptPackageManager) UpgradeAll() (err error) {
+	return command.ExecuteCommand(execCommand(pm.Path, "full-upgrade"))
 }
 
 // IsInstalled returns true if Apt executable is found.
-func (b AptPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(b.Path); err != nil {
+func (pm AptPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (b AptPackageManager) IsOSPackageManager() bool {
-	return b.IsInstalled() && runtime.GOOS == "linux"
+func (pm AptPackageManager) IsOSPackageManager() bool {
+	return pm.IsInstalled() && runtime.GOOS == "linux"
 }
 
 // GetExecPath return immutable path to Apt executable.
-func (b AptPackageManager) GetExecPath() string {
-	return b.Path
+func (pm AptPackageManager) GetExecPath() string {
+	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (b AptPackageManager) GetName() string {
-	return b.Name
+func (pm AptPackageManager) GetName() string {
+	return pm.Name
 }
 
 // Setup does nothing (apt comes by default in Linux distributions)
-func (b AptPackageManager) Setup() (err error) {
+func (pm AptPackageManager) Setup() (err error) {
 	return nil
 }

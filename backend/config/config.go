@@ -15,10 +15,13 @@
 package config
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -69,21 +72,47 @@ func init() {
 	}
 	if _, err := os.Stat(IanConfigPath); err != nil {
 		_ = os.Mkdir(IanConfigPath, 0766)
-	}
+		fmt.Printf("%s", []byte(`Welcome to Ian!
+Ian is a simple tool to manage your development environment, repositories,
+and projects.
 
+Learn more about Ian at http://goian.io
+
+To benefit from all of Ian’s feature’s, you’ll need to provide:
+    - A working OS Package Manager (will set up if missing)
+    - The full path of your repositories (example: /Users/thylong/repositories)
+    - The path of your dotfiles Github repository (example: thylong/dotfiles)
+
+`))
+		if GetBoolUserInput("Do you want to set up Ian now? (Y/n)") == true {
+			initVipers(false)
+		} else {
+			fmt.Println("You're ready to start using Ian. Note that if you try to use some of Ian's\nfeatures you'll be prompted for these details again.")
+		}
+	}
+	initVipers(true)
+}
+
+// initVipers return Vipers corresponding to Yaml config files.
+// The soft argument determine if unexisting files should be written or not.
+func initVipers(soft bool) {
 	ConfigFilesPathes = make(map[string]string)
 	Vipers = make(map[string]*viper.Viper)
 	for _, ConfigFileName := range []string{"config", "env", "projects"} {
 		ConfigFilesPathes[ConfigFileName] = IanConfigPath + fmt.Sprintf("%s.yml", ConfigFileName)
-		Vipers[ConfigFileName] = initViper(ConfigFileName)
+		Vipers[ConfigFileName] = initViper(ConfigFileName, soft)
 	}
 }
 
-func initViper(viperName string) (viperInstance *viper.Viper) {
+func initViper(viperName string, soft bool) (viperInstance *viper.Viper) {
 	viperInstance = viper.New()
 	viperInstance.SetConfigType("yaml")
 	viperInstance.SetConfigName(viperName)
 	viperInstance.AddConfigPath(IanConfigPath)
+
+	if soft {
+		return viperInstance
+	}
 
 	if _, err := os.Stat(fmt.Sprintf("%s/%s.yml", IanConfigPath, viperName)); err != nil {
 		SetupConfigFile(viperName)
@@ -158,4 +187,72 @@ func AppendToConfig(lines string, confFilename string) {
 // (As nothing is preset for now, this function actually returns an empty string)
 func GetConfigDefaultContent(fileName string) []byte {
 	return []byte{}
+}
+
+// GetPreset returns the content of the preset env.yml
+func GetPreset(presetName string) []byte {
+	return []byte{}
+}
+
+// UpdateYamlFile write a Viper content to a yaml file.
+func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
+	out, err := yaml.Marshal(&fileContent)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile(fileFullPath, out, 0766); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		os.Exit(1)
+	}
+}
+
+// GetUserInput ask question and return user input.
+func GetUserInput(question string) string {
+	fmt.Printf("%s: ", question)
+	reader := bufio.NewReader(os.Stdin)
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
+		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+	}
+	return ""
+}
+
+// GetBoolUserInput ask question and return true if the user agreed otherwise false.
+func GetBoolUserInput(question string) bool {
+	in := GetUserInput(question)
+	if strings.ToLower(in) == "y" && strings.ToLower(in) == "yes" && strings.ToLower(in) == "" {
+		return true
+	}
+	return false
+}
+
+// SetupEnvFileWithPreset write an env file with the selected preset.
+func SetupEnvFileWithPreset(preset string) {
+	var Envcontent string
+	switch preset {
+	default:
+		fmt.Fprint(os.Stderr, "Cannot find preset.")
+		return
+	case "1":
+		Envcontent = GetSoftwareEngineerPreset()
+	case "2":
+		Envcontent = GetBackendDeveloperPreset()
+	case "3":
+		Envcontent = GetFrontendDeveloperPreset()
+	case "4":
+		Envcontent = GetOpsPreset()
+	}
+
+	confPath := ConfigFilesPathes["env"]
+	f, err := os.OpenFile(confPath, os.O_CREATE|os.O_WRONLY, 0655)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(Envcontent); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
