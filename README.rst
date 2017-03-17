@@ -7,7 +7,7 @@ Ian is a simple tool to manage your development environment, repositories, and p
 Installing
 ==========
 
-Ian comes as a binary. Once in your $GOPATH, you're good to go !
+Ian comes as a binary. Once in your $PATH, you're good to go !
 
 Linux
 --------

@@ -4,14 +4,11 @@ TODO
 This files represents the milestones to achieve for the incoming versions.
 
 **TODO v0.2**
+
 - Get started experience (website + form on site to determine the profile)
 - Improve env infos (Display content of config files)
 - Open source Ian ! (╯°□°）╯︵ ┻━┻
 - Travis workflow
-
-**TODO v0.3**
-- Improve stdout formatting (color, tab, yes/no steps)
-- Customize presets easily http://getbootstrap.com/customize/ (UI local/remote? Hash copy/paste in CLI ?)
 
 **Backlog**
 - Improve tests
@@ -19,3 +16,10 @@ This files represents the milestones to achieve for the incoming versions.
 - Cyphering / Decyphering of the configuration (--encrypted option to env save)
 - Specific package management with Ian
 - Enable color output
+- Switch PMs to pointer receivers
+- Improve env infos (Display content of config files)
+- Improve stdout formatting (color, tab, yes/no steps)
+- Customize presets easily (UI local/remote? Hash copy/paste in CLI ?)
+- Use spf13/afero instead of os built-in package
+- PackageManager: Add Chocolatey support
+- Better env update/upgrade (if exist: upgrade apm, cask aswell)
