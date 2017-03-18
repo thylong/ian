@@ -38,9 +38,11 @@ func init() {
 		projectCmd.AddCommand(pCmd)
 
 		deleteProjectCmd := deleteProjectCmd()
-		deleteProjectCmd.Flags().BoolVar(&softDeleteCmdParam, "soft", false, "Delete only ian configuration but keeps history")
 		setProjectCmd := setProjectCmd()
+
+		deleteProjectCmd.Flags().BoolVar(&softDeleteCmdParam, "soft", false, "Delete only ian configuration but keeps history")
 		setProjectCmd.Flags().StringVarP(&customCmdDescription, "description", "d", "", "Description of the custom project command (40 characters maximum)")
+
 		pCmd.AddCommand(
 			statusProjectCmd(),
 			statsProjectCmd(),
@@ -51,11 +53,12 @@ func init() {
 			addProjectCmd(),
 			deleteProjectCmd,
 			unsetProjectCmd(),
+			cloneCmd(),
 			setProjectCmd,
 		)
 
 		for _, customCmd := range config.GetCustomCmds(pName) {
-			projectCmd.AddCommand(customCmd)
+			pCmd.AddCommand(customCmd)
 		}
 	}
 }
@@ -87,6 +90,7 @@ func statusProjectCmd() *cobra.Command {
 			baseURL := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["url"]
 			healthEndpoint := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["health"]
 			projects.Status(cmd.Parent().Use, baseURL, healthEndpoint)
+			repo.Status(cmd.Parent().Use)
 		},
 	}
 }
@@ -226,7 +230,7 @@ func setProjectCmd() *cobra.Command {
 			}
 
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
-			editContent[fmt.Sprintf("%s_cmd", args[0])] = fmt.Sprintf("%s=%s", customCmdDescription, strings.Join(args[1:], " "))
+			editContent[fmt.Sprintf("%s_custom_cmd", args[0])] = fmt.Sprintf("%s=%s", customCmdDescription, strings.Join(args[1:], " "))
 			config.Vipers["projects"].Set(cmd.Parent().Use, editContent)
 
 			projectsContent := config.Vipers["projects"].AllSettings()
@@ -234,6 +238,22 @@ func setProjectCmd() *cobra.Command {
 				config.ConfigFilesPathes["projects"],
 				projectsContent,
 			)
+		},
+	}
+}
+
+func cloneCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "clone",
+		Short: "Clone project repository",
+		Long: `Clone the project repository.
+
+        Clone the project repository in repositories_path path.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
+			if projectRepository, ok := editContent["repository"]; ok {
+				repo.Clone(projectRepository)
+			}
 		},
 	}
 }
