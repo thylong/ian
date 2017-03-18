@@ -271,7 +271,8 @@ func GetCustomCmds(project string) (customCmds []*cobra.Command) {
 				Short: customCmdArgs[0],
 				Long:  customCmdArgs[0],
 				Run: func(cmd *cobra.Command, args []string) {
-					termCmd := exec.Command(customCmdArgs[1])
+					subCmdArgs := strings.SplitN(customCmdArgs[1], " ", 2)
+					termCmd := exec.Command(subCmdArgs[0], subCmdArgs[1])
 					command.ExecuteInteractiveCommand(termCmd)
 				},
 			})
