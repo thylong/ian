@@ -27,18 +27,33 @@ import (
 	"github.com/thylong/ian/backend/projects"
 )
 
+var customCmdDescription string
+
 func init() {
 	RootCmd.AddCommand(projectCmd)
-	projectCmd.AddCommand(statusProjectCmd)
-	projectCmd.AddCommand(statsProjectCmd)
-	projectCmd.AddCommand(configProjectCmd)
-	projectCmd.AddCommand(deployProjectCmd)
-	projectCmd.AddCommand(rollbackProjectCmd)
-	projectCmd.AddCommand(dbProjectCmd)
-	projectCmd.AddCommand(addProjectCmd)
-	projectCmd.AddCommand(deleteProjectCmd)
-	projectCmd.AddCommand(setProjectCmd)
-	projectCmd.AddCommand(unsetProjectCmd)
+
+	for pName, pCmd := range config.GetProjects() {
+		projectCmd.AddCommand(pCmd)
+
+		setProjectCmd := setProjectCmd()
+		setProjectCmd.Flags().StringVarP(&customCmdDescription, "description", "d", "", "Description of the custom project command (40 characters maximum)")
+		pCmd.AddCommand(
+			statusProjectCmd(),
+			statsProjectCmd(),
+			configProjectCmd(),
+			deployProjectCmd(),
+			rollbackProjectCmd(),
+			dbProjectCmd(),
+			addProjectCmd(),
+			deleteProjectCmd(),
+			unsetProjectCmd(),
+			setProjectCmd,
+		)
+
+		for _, customCmd := range config.GetCustomCmds(pName) {
+			projectCmd.AddCommand(customCmd)
+		}
+	}
 }
 
 // projectCmd represents the project command
@@ -53,164 +68,187 @@ var projectCmd = &cobra.Command{
 			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
 				return
 			}
-			addProjectCmd.Execute()
+			addProjectCmd().Execute()
 		}
+		cmd.Usage()
 	},
 }
 
-var statusProjectCmd = &cobra.Command{
-	Use:   "status",
-	Short: "Display health status",
-	Long:  `Display health status.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		for _, project := range args {
-			baseURL := config.Vipers["projects"].GetStringMapString(project)["url"]
-			healthEndpoint := config.Vipers["projects"].GetStringMapString(project)["health"]
-			projects.Status(project, baseURL, healthEndpoint)
-		}
-	},
+func statusProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "status",
+		Short: "Display health status",
+		Long:  `Display health status.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			baseURL := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["url"]
+			healthEndpoint := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["health"]
+			projects.Status(cmd.Parent().Use, baseURL, healthEndpoint)
+		},
+	}
 }
 
-var statsProjectCmd = &cobra.Command{
-	Use:   "stats",
-	Short: "Display Github stat's for a project",
-	Long:  `Display Github stat's for a project.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		for _, project := range args {
+func statsProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "stats",
+		Short: "Display Github stat's for a project",
+		Long:  `Display Github stat's for a project.`,
+		Run: func(cmd *cobra.Command, args []string) {
 			repositoryURL := fmt.Sprintf(
 				"https://api.github.com/repos/%s",
-				config.Vipers["projects"].GetStringMapString(project)["repository"],
+				config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["repository"],
 			)
-			projects.Stats(project, repositoryURL)
-		}
-	},
+			projects.Stats(cmd.Parent().Use, repositoryURL)
+		},
+	}
 }
 
-var configProjectCmd = &cobra.Command{
-	Use:   "config",
-	Short: "Display a project's configuration",
-	Long:  `Display a project's configuration.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		for _, project := range args {
-			settings := config.Vipers["projects"].GetStringMap(project)
+func configProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "config",
+		Short: "Display a project's configuration",
+		Long:  `Display a project's configuration.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			settings := config.Vipers["projects"].GetStringMap(cmd.Parent().Use)
 			prettySettings, _ := json.MarshalIndent(settings, "", "  ")
-			fmt.Printf("%s configuration:\n%s\n}", project, prettySettings)
-		}
-	},
+			fmt.Printf("%s configuration:\n%s\n}", cmd.Parent().Use, prettySettings)
+		},
+	}
 }
 
-var deployProjectCmd = &cobra.Command{
-	Use:   "deploy",
-	Short: "Deploy a new version of a project",
-	Long:  `Deploy a new version of a project.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		deployCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["deploy_cmd"]
-		deployCmd := strings.Split(deployCmdContent, " ")
-		termCmd := exec.Command(deployCmd[0], deployCmd[1:]...)
-		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-		command.ExecuteInteractiveCommand(termCmd)
-	},
+func deployProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "deploy",
+		Short: "Deploy a new version of a project",
+		Long:  `Deploy a new version of a project.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			deployCmdContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["deploy_cmd"]
+			deployCmd := strings.Split(deployCmdContent, " ")
+			termCmd := exec.Command(deployCmd[0], deployCmd[1:]...)
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
+			command.ExecuteInteractiveCommand(termCmd)
+		},
+	}
 }
 
-var rollbackProjectCmd = &cobra.Command{
-	Use:   "rollback",
-	Short: "Rollback to a previous version of a project",
-	Long:  `Rollback to a previous version of a project.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["deploy_cmd"]
-		rollbackCmd := strings.Split(rollbackCmdContent, " ")
-		termCmd := exec.Command(rollbackCmd[0], rollbackCmd[:1]...)
-		termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
-		command.ExecuteInteractiveCommand(termCmd)
-	},
+func rollbackProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "rollback",
+		Short: "Rollback to a previous version of a project",
+		Long:  `Rollback to a previous version of a project.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			rollbackCmdContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["rollback_cmd"]
+			rollbackCmd := strings.Split(rollbackCmdContent, " ")
+			termCmd := exec.Command(rollbackCmd[0], rollbackCmd[:1]...)
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
+			command.ExecuteInteractiveCommand(termCmd)
+		},
+	}
 }
 
-var dbProjectCmd = &cobra.Command{
-	Use:   "db",
-	Short: "Connect to the project's database",
-	Long:  `Connect to the project's database.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		rollbackCmdContent := config.Vipers["projects"].GetStringMapString(args[0])["db_cmd"]
-		dbCmd := strings.Split(rollbackCmdContent, " ")
-		termCmd := exec.Command(dbCmd[0], dbCmd[:1]...)
-		command.ExecuteInteractiveCommand(termCmd)
-	},
+func dbProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "db",
+		Short: "Connect to the project's database",
+		Long:  `Connect to the project's database.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			rollbackCmdContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["db_cmd"]
+			dbCmd := strings.Split(rollbackCmdContent, " ")
+			termCmd := exec.Command(dbCmd[0], dbCmd[:1]...)
+			command.ExecuteInteractiveCommand(termCmd)
+		},
+	}
 }
 
-var addProjectCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add a new project configuration",
-	Long:  `Add a new project configuration.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		NewP := make(map[string]string)
-		NewP["repository"] = config.GetUserInput("Enter the project repository: ")
-		NewP["health"] = config.GetUserInput("Enter the health check URL: ")
-		NewP["db_cmd"] = config.GetUserInput("Enter the db connection command: ")
-		NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy repository: ")
-		NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback repository: ")
+func addProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "add",
+		Short: "Add a new project configuration",
+		Long:  `Add a new project configuration.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			NewP := make(map[string]string)
+			NewP["description"] = config.GetUserInput("Enter the project description: ")
+			NewP["repository"] = config.GetUserInput("Enter the project repository: ")
+			NewP["health"] = config.GetUserInput("Enter the health check URL: ")
+			NewP["db_cmd"] = config.GetUserInput("Enter the db connection command: ")
+			NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy repository: ")
+			NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback repository: ")
 
-		projectsContent := config.Vipers["projects"].AllSettings()
-		projectsContent[args[0]] = NewP
-		config.UpdateYamlFile(
-			config.ConfigFilesPathes["projects"],
-			projectsContent,
-		)
-	},
+			projectsContent := config.Vipers["projects"].AllSettings()
+			projectsContent[args[0]] = NewP
+			config.UpdateYamlFile(
+				config.ConfigFilesPathes["projects"],
+				projectsContent,
+			)
+		},
+	}
 }
 
-var deleteProjectCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "Delete a project configuration",
-	Long:  `Delete a project configuration.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		editContent := config.Vipers["projects"].AllSettings()
-		delete(editContent, args[0])
+func deleteProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete",
+		Short: "Delete a project configuration",
+		Long:  `Delete a project configuration.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			editContent := config.Vipers["projects"].AllSettings()
+			delete(editContent, cmd.Parent().Use)
 
-		config.UpdateYamlFile(
-			config.ConfigFilesPathes["projects"],
-			config.Vipers["projects"].AllSettings(),
-		)
-	},
+			config.UpdateYamlFile(
+				config.ConfigFilesPathes["projects"],
+				config.Vipers["projects"].AllSettings(),
+			)
+		},
+	}
 }
 
-var setProjectCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Define a subcommand",
-	Long:  `Define a subcommand.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 3 {
-			fmt.Fprint(os.Stderr, "Not enough argument.\n")
-			os.Exit(1)
-		}
+func setProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "set",
+		Short: "Define a subcommand",
+		Long:  `Define a subcommand.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) < 2 {
+				fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
+				cmd.Usage()
+				os.Exit(1)
+			}
+			if 5 < len(customCmdDescription) && len(customCmdDescription) < 40 {
+				fmt.Fprint(os.Stderr, "Description must be between 5 and 40 alphanumeric characters.\n\n")
+				cmd.Usage()
+				os.Exit(1)
+			}
 
-		editContent := config.Vipers["projects"].GetStringMapString(args[0])
-		editContent[fmt.Sprintf("%s_cmd", args[1])] = strings.Join(args[2:], " ")
-		config.Vipers["projects"].Set(args[0], editContent)
+			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
+			editContent[fmt.Sprintf("%s_cmd", args[0])] = fmt.Sprintf("%s=%s", customCmdDescription, strings.Join(args[1:], " "))
+			config.Vipers["projects"].Set(cmd.Parent().Use, editContent)
 
-		projectsContent := config.Vipers["projects"].AllSettings()
-		config.UpdateYamlFile(
-			config.ConfigFilesPathes["projects"],
-			projectsContent,
-		)
-	},
+			projectsContent := config.Vipers["projects"].AllSettings()
+			config.UpdateYamlFile(
+				config.ConfigFilesPathes["projects"],
+				projectsContent,
+			)
+		},
+	}
 }
 
-var unsetProjectCmd = &cobra.Command{
-	Use:   "unset",
-	Short: "Remove a subcommand",
-	Long:  `Remove a subcommand.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 2 {
-			fmt.Fprint(os.Stderr, "Not enough argument.\n")
-			os.Exit(1)
-		}
+func unsetProjectCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "unset",
+		Short: "Remove a subcommand",
+		Long:  `Remove a subcommand.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) < 1 {
+				fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
+				cmd.Usage()
+				os.Exit(1)
+			}
 
-		editContent := config.Vipers["projects"].GetStringMapString(args[0])
-		delete(editContent, fmt.Sprintf("%s_cmd", args[1]))
+			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
+			delete(editContent, fmt.Sprintf("%s_cmd", args[0]))
 
-		config.UpdateYamlFile(
-			config.ConfigFilesPathes["projects"],
-			config.Vipers["projects"].AllSettings(),
-		)
-	},
+			config.UpdateYamlFile(
+				config.ConfigFilesPathes["projects"],
+				config.Vipers["projects"].AllSettings(),
+			)
+		},
+	}
 }

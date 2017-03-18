@@ -1,15 +1,19 @@
 cabu:
+    description: First open source project
     repository: thylong/cabu
 ian:
+    description: Second open source project
     repository: thylong/ian
 regexrace:
-    db_cmd: mongo localhost
+    description: Train your regex skills
     deploy_cmd: bash deploy.sh
     health: /status
     repository: thylong/regexrace
     rollback_cmd: bash rollback.sh
     url: http://regexrace.org
+    dummy_custom_cmd: this command is really dummy=mongo localhost
 thylong:
+    description: Personal blog
     health: /
     repository: thylong/thylong.github.io
     url: http://thylong.com

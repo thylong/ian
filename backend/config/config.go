@@ -20,12 +20,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"os/user"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/env"
 )
 
@@ -88,9 +91,10 @@ To benefit from all of Ian’s feature’s, you’ll need to provide:
 			initVipers(false)
 		} else {
 			fmt.Println("You're ready to start using Ian. Note that if you try to use some of Ian's\nfeatures you'll be prompted for these details again.")
+			return
 		}
 	}
-	initVipers(true)
+	initVipers(false)
 }
 
 // initVipers return Vipers corresponding to Yaml config files.
@@ -255,4 +259,37 @@ func SetupEnvFileWithPreset(preset string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+// GetCustomCmds returns the commands defined in projects.yml
+func GetCustomCmds(project string) (customCmds []*cobra.Command) {
+	for confLineKey, confLineValue := range Vipers["projects"].GetStringMapString(project) {
+		if strings.HasSuffix(confLineKey, "custom_cmd") {
+			customCmdArgs := strings.Split(confLineValue, "=")
+			customCmds = append(customCmds, &cobra.Command{
+				Use:   strings.TrimSuffix(confLineKey, "_custom_cmd"),
+				Short: customCmdArgs[0],
+				Long:  customCmdArgs[0],
+				Run: func(cmd *cobra.Command, args []string) {
+					termCmd := exec.Command(customCmdArgs[1])
+					command.ExecuteInteractiveCommand(termCmd)
+				},
+			})
+		}
+	}
+	return customCmds
+}
+
+// GetProjects returns the projects defined in projects.yml as non-runnable []*cobra.cmd.
+func GetProjects() (projectCmds map[string]*cobra.Command) {
+	projectCmds = make(map[string]*cobra.Command)
+	for _, project := range Vipers["projects"].AllKeys() {
+		projectParams := Vipers["projects"].GetStringMapString(project)
+		projectCmds[project] = &cobra.Command{
+			Use:   project,
+			Short: projectParams["description"],
+			Long:  projectParams["description"],
+		}
+	}
+	return projectCmds
 }
