@@ -26,10 +26,12 @@ import (
 
 func init() {
 	RootCmd.AddCommand(envCmd)
-	envCmd.AddCommand(envDescribeCmd)
-	envCmd.AddCommand(envUpdateCmd)
-	envCmd.AddCommand(envUpgradeCmd)
-	envCmd.AddCommand(envSaveCmd)
+	envCmd.AddCommand(
+		envDescribeCmd,
+		envUpdateCmd,
+		envUpgradeCmd,
+		envSaveCmd,
+	)
 }
 
 // envCmd represents the env command

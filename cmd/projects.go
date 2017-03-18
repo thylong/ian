@@ -25,9 +25,11 @@ import (
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/projects"
+	"github.com/thylong/ian/backend/repo"
 )
 
 var customCmdDescription string
+var softDeleteCmdParam bool
 
 func init() {
 	RootCmd.AddCommand(projectCmd)
@@ -35,6 +37,8 @@ func init() {
 	for pName, pCmd := range config.GetProjects() {
 		projectCmd.AddCommand(pCmd)
 
+		deleteProjectCmd := deleteProjectCmd()
+		deleteProjectCmd.Flags().BoolVar(&softDeleteCmdParam, "soft", false, "Delete only ian configuration but keeps history")
 		setProjectCmd := setProjectCmd()
 		setProjectCmd.Flags().StringVarP(&customCmdDescription, "description", "d", "", "Description of the custom project command (40 characters maximum)")
 		pCmd.AddCommand(
@@ -45,7 +49,7 @@ func init() {
 			rollbackProjectCmd(),
 			dbProjectCmd(),
 			addProjectCmd(),
-			deleteProjectCmd(),
+			deleteProjectCmd,
 			unsetProjectCmd(),
 			setProjectCmd,
 		)
@@ -189,6 +193,10 @@ func deleteProjectCmd() *cobra.Command {
 		Short: "Delete a project configuration",
 		Long:  `Delete a project configuration.`,
 		Run: func(cmd *cobra.Command, args []string) {
+			if !softDeleteCmdParam {
+				repo.Remove(cmd.Parent().Use)
+			}
+
 			editContent := config.Vipers["projects"].AllSettings()
 			delete(editContent, cmd.Parent().Use)
 
