@@ -58,6 +58,21 @@ Features
 - Support pip_, npm_, Homebrew_, RubyGems_, Cask_, apt_, yum_
 
 
+Documentation
+=============
+
+Documentation can be seen here_. It was built thanks to the awesome Hugo project.
+If you want to check the docs locally or to contribute to it, you can install hugo
+and serve the static website locally using these commands:
+
+.. code-block:: console
+
+    $ brew update && brew install hugo
+    $ cd docs/
+    $ hugo server -t hugo-theme-learn --buildDrafts
+
+
+
 Contributing
 ============
 
@@ -74,6 +89,7 @@ Special thanks
 
 .. _`template`: https://github.com/thylong/ian/blob/master/config/config_example.yml
 .. _Homebrew: http://brew.sh
+.. _here: https://goian.io
 .. _Cask: https://caskroom.github.io
 .. _RubyGems: https://rubygems.org/
 .. _pip: https://packaging.python.org/

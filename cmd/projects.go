@@ -267,9 +267,7 @@ func cloneCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "clone",
 		Short: "Clone project repository",
-		Long: `Clone the project repository.
-
-Example: ian project dotfiles unset bonjour -d "Say bonjour" echo bonjour !.`,
+		Long:  `Clone the project repository in repositories_path path.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
 			if projectRepository, ok := editContent["repository"]; ok {
