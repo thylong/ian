@@ -31,28 +31,7 @@ func init() {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
-
-	RootCmd.SetUsageTemplate(string([]byte(`Usage:{{if .Runnable}}
-  {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
-  {{ .CommandPath}} [command]{{end}}{{if gt .Aliases 0}}
-Aliases:
-  {{.NameAndAliases}}
-{{end}}{{if .HasExample}}
-Examples:
-{{ .Example }}{{end}}{{ if .HasAvailableSubCommands}}
-
-Default Commands:{{range .Commands}}{{if .IsAvailableCommand}}
-  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}
-
-{{end}}{{ if .HasAvailableLocalFlags}}
-Flags:
-{{.LocalFlags.FlagUsages | trimRightSpace}}{{end}}{{ if .HasAvailableInheritedFlags}}
-Global Flags:
-{{.InheritedFlags.FlagUsages | trimRightSpace}}{{end}}{{if .HasHelpSubCommands}}
-Additional help topics:{{range .Commands}}{{if .IsHelpCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasAvailableSubCommands }}
-Use "{{.CommandPath}} [command] --help" for more information about a command.
-{{end}}`)))
+	RootCmd.AddCommand(versionCmd)
 }
 
 // RootCmd is executed by default (top level).
@@ -61,4 +40,14 @@ var RootCmd = &cobra.Command{
 	Short: "Ian is a simple tool to manage your development environment",
 	Long: `Ian is a simple tool to manage your development environment, repositories,
 and projects..`,
+}
+
+// versionCmd execution displays ian version.
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version information",
+	Long:  `Print the version information.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("ian version: alpha")
+	},
 }

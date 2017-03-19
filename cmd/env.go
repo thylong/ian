@@ -22,10 +22,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
+	pm "github.com/thylong/ian/backend/package-managers"
 )
+
+var allCmdParam bool
 
 func init() {
 	RootCmd.AddCommand(envCmd)
+
+	envUpdateCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run update on all Package managers")
+	envUpgradeCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run upgrade on all Package managers")
 	envCmd.AddCommand(
 		envDescribeCmd,
 		envUpdateCmd,
@@ -63,6 +69,14 @@ var envUpdateCmd = &cobra.Command{
 				}
 			}
 		}()
+		if allCmdParam {
+			for _, packageManager := range pm.SupportedPackageManagers {
+				if packageManager.IsInstalled() {
+					packageManager.UpdateAll()
+				}
+			}
+			return
+		}
 		OSPackageManager.UpdateAll()
 	},
 }
@@ -80,6 +94,14 @@ var envUpgradeCmd = &cobra.Command{
 				}
 			}
 		}()
+		if allCmdParam {
+			for _, packageManager := range pm.SupportedPackageManagers {
+				if packageManager.IsInstalled() {
+					packageManager.UpgradeAll()
+				}
+			}
+			return
+		}
 		OSPackageManager.UpgradeAll()
 	},
 }
