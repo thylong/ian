@@ -18,12 +18,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/thylong/ian/cmd"
 )
 
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {
-		fmt.Fprint(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(-1)
 	}
 }

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
@@ -28,7 +29,7 @@ var OSPackageManager pm.PackageManager
 func init() {
 	var err error
 	if OSPackageManager, err = pm.GetOSPackageManager(); err != nil {
-		fmt.Fprint(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 	RootCmd.AddCommand(versionCmd)

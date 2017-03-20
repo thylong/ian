@@ -22,6 +22,7 @@ import (
 	"os/user"
 	"regexp"
 
+	"github.com/fatih/color"
 	"github.com/thylong/ian/backend/command"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
@@ -44,7 +45,7 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 			if _, err := os.Stat(usr.HomeDir + "/" + f.Name()); err != nil {
 				err := os.Symlink(usr.HomeDir+"/.dotfiles/"+f.Name(), usr.HomeDir+"/"+f.Name())
 				if err != nil {
-					fmt.Fprint(os.Stderr, err)
+					fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 				}
 			}
 		}
@@ -64,7 +65,7 @@ func SetupPackages(PackageManager pm.PackageManager, packages []string) {
 
 	for _, packageToInstall := range packages {
 		if err := PackageManager.Install(packageToInstall); err != nil {
-			fmt.Fprint(os.Stderr, err)
+			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		}
 	}
 }

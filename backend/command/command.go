@@ -27,11 +27,11 @@ import (
 func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 	cmdOutReader, err := subCmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("Error creating StdoutPipe for Cmd: %v", err)
+		return fmt.Errorf("Impossible to create StdoutPipe for Cmd: %v", err)
 	}
 	cmdErrReader, err := subCmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf("Error creating StderrPipe for Cmd: %v", err)
+		return fmt.Errorf("Impossible to create StderrPipe for Cmd: %v", err)
 	}
 
 	for _, cmdReader := range []io.ReadCloser{cmdOutReader, cmdErrReader} {
@@ -45,12 +45,12 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 
 	err = subCmd.Start()
 	if err != nil {
-		return fmt.Errorf("Error starting Cmd: %v", err)
+		return fmt.Errorf("Impossible to start Cmd: %v", err)
 	}
 
 	err = subCmd.Wait()
 	if err != nil {
-		return fmt.Errorf("Error waiting for Cmd: %v", err)
+		return fmt.Errorf("Impossible to wait for Cmd: %v", err)
 	}
 	return nil
 }
@@ -60,11 +60,11 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 func MustExecuteCommand(subCmd *exec.Cmd) (err error) {
 	cmdOutReader, err := subCmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("Error creating StdoutPipe for Cmd: %v", err)
+		return fmt.Errorf("Impossible to create StdoutPipe for Cmd: %v", err)
 	}
 	cmdErrReader, err := subCmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf("Error creating StderrPipe for Cmd: %v", err)
+		return fmt.Errorf("Impossible to create StderrPipe for Cmd: %v", err)
 	}
 
 	scannerOut := bufio.NewScanner(cmdOutReader)
@@ -87,16 +87,16 @@ func MustExecuteCommand(subCmd *exec.Cmd) (err error) {
 
 	err = subCmd.Start()
 	if err != nil {
-		return fmt.Errorf("Error starting Cmd: %v StdErr: %v", err, os.Stderr)
+		return fmt.Errorf("Impossible to start Cmd: %v StdErr: %v", err, os.Stderr)
 	}
 
 	err = subCmd.Wait()
 	if err != nil {
-		return fmt.Errorf("Error waiting for Cmd: %v StdErr: %v", err, os.Stderr)
+		return fmt.Errorf("Impossible to wait for Cmd: %v StdErr: %v", err, os.Stderr)
 	}
 
 	if <-failure == true {
-		return errors.New("Command failed to complete without any error")
+		return errors.New("Failed to complete without error")
 	}
 	return nil
 }

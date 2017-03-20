@@ -26,6 +26,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
@@ -62,7 +63,7 @@ var ConfigMap YamlConfigMap
 func init() {
 	usr, err := user.Current()
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 
@@ -124,13 +125,13 @@ func initViper(viperName string, soft bool) (viperInstance *viper.Viper) {
 
 	err := viperInstance.ReadInConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Problem with config file: %s Error: %s", viperName, err.Error())
+		fmt.Fprintf(os.Stderr, "%v Problem with config file: %s: %s", color.RedString("Error:"), viperName, err.Error())
 		os.Exit(1)
 	} else {
 		configContent, _ := ioutil.ReadFile(ConfigFilesPathes[viperName])
 		err = yaml.Unmarshal(configContent, &ConfigMap)
 		if err != nil {
-			fmt.Println("Unable to parse config file.")
+			fmt.Fprintf(os.Stderr, "%v Unable to parse config file.", color.RedString("Error:"))
 			os.Exit(1)
 		}
 	}
@@ -155,7 +156,7 @@ func SetupConfigFile(ConfigFileName string) {
 
 		fmt.Printf("Creating %s\n", ConfigFileName)
 		if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 			os.Exit(1)
 		}
 		return
@@ -176,13 +177,13 @@ func AppendToConfig(lines string, confFilename string) {
 	confPath := ConfigFilesPathes[confFilename]
 	f, err := os.OpenFile(confPath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 	defer f.Close()
 
 	if _, err = f.WriteString(lines); err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 }
@@ -202,11 +203,11 @@ func GetPreset(presetName string) []byte {
 func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
 	out, err := yaml.Marshal(&fileContent)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		fmt.Fprintf(os.Stderr, "%v Failed to update %s.\n", color.RedString("Error:"), fileFullPath)
 		os.Exit(1)
 	}
 	if err := ioutil.WriteFile(fileFullPath, out, 0766); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to update %s.\n", fileFullPath)
+		fmt.Fprintf(os.Stderr, "%v Failed to update %s.\n", color.RedString("Error:"), fileFullPath)
 		os.Exit(1)
 	}
 }
@@ -235,7 +236,7 @@ func SetupEnvFileWithPreset(preset string) {
 	var Envcontent string
 	switch preset {
 	default:
-		fmt.Fprint(os.Stderr, "Cannot find preset.")
+		fmt.Fprintf(os.Stderr, "%v Cannot find preset.", color.RedString("Error:"))
 		return
 	case "1":
 		Envcontent = GetSoftwareEngineerPreset()
@@ -250,13 +251,13 @@ func SetupEnvFileWithPreset(preset string) {
 	confPath := ConfigFilesPathes["env"]
 	f, err := os.OpenFile(confPath, os.O_CREATE|os.O_WRONLY, 0655)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 	defer f.Close()
 
 	if _, err = f.WriteString(Envcontent); err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 }

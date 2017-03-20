@@ -11,6 +11,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+
+	"github.com/fatih/color"
 )
 
 // Upload to transfer.sh
@@ -20,7 +22,7 @@ func Upload(filename string, targetURL string, key string) (string, error) {
 
 	fileWriter, err := bodyWriter.CreateFormFile("uploadfile", filename)
 	if err != nil {
-		fmt.Println("error writing to buffer")
+		fmt.Fprintf(os.Stderr, "%v Failed to write to buffer.", color.RedString("Error:"))
 		return "", err
 	}
 
@@ -28,7 +30,7 @@ func Upload(filename string, targetURL string, key string) (string, error) {
 	if key == "" {
 		fh, err = os.Open(filename)
 		if err != nil {
-			fmt.Println("error opening file")
+			fmt.Fprintf(os.Stderr, "%v Failed to open file.", color.RedString("Error:"))
 			return "", err
 		}
 	} else {
@@ -68,7 +70,8 @@ func EncryptFile(filename string, key []byte) io.Reader {
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
+		os.Exit(1)
 	}
 
 	// The IV needs to be unique, but not secure. Therefore it's common to
@@ -76,7 +79,8 @@ func EncryptFile(filename string, key []byte) io.Reader {
 	ciphertext := make([]byte, aes.BlockSize+len(fileContent))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
+		os.Exit(1)
 	}
 
 	stream := cipher.NewCFBEncrypter(block, iv)

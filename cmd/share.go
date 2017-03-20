@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/share"
@@ -67,7 +68,7 @@ var shareConfigCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Sorry, it looks like I cannot upload configuration file... :(")
+			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(.", color.RedString("Error:"))
 			return
 		}
 		fmt.Println(link)
@@ -84,7 +85,7 @@ var shareProjectsCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Sorry, it looks like I cannot upload configuration file... :(")
+			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(.", color.RedString("Error:"))
 			return
 		}
 		fmt.Println(link)
@@ -101,7 +102,7 @@ var shareEnvCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Sorry, it looks like I cannot upload configuration file... :(")
+			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(.", color.RedString("Error:"))
 			return
 		}
 		fmt.Println(link)
@@ -114,19 +115,19 @@ var shareSetFromLinkCmd = &cobra.Command{
 	Long:  `Set config from config file link.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
+			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
 			cmd.Usage()
 			os.Exit(1)
 		}
 
 		_, err := url.ParseRequestURI(args[0])
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Sorry, it looks like the link you provided is invalid.")
+			fmt.Fprintf(os.Stderr, "%v Sorry, The link you provided is invalid.", color.RedString("Error:"))
 		}
 
 		resp, err := http.Get(args[0])
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Sorry, the link is unreachable.")
+			fmt.Fprintf(os.Stderr, "%v Sorry, The link you provided is unreachable.", color.RedString("Error:"))
 		}
 		defer resp.Body.Close()
 
@@ -145,12 +146,12 @@ var shareSetFromLinkCmd = &cobra.Command{
 			defer f.Close()
 
 			if _, err := io.Copy(f, resp.Body); err != nil {
-				fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+				fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
 				os.Exit(1)
 			}
 			return
 		}
-		fmt.Fprint(os.Stderr, "Sorry, something went wrong.")
+		fmt.Fprintf(os.Stderr, "%v Sorry, something went wrong.", color.RedString("Error:"))
 	},
 }
 

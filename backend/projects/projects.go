@@ -20,6 +20,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/fatih/color"
 )
 
 // Status makes a GET HTTP query and returns OK if response status is 200
@@ -28,14 +30,16 @@ func Status(project string, baseURL string, healthEndpoint string) {
 	url := baseURL + healthEndpoint
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 	}
 	defer resp.Body.Close()
 
 	if statusCode := resp.StatusCode; statusCode == 200 {
-		fmt.Printf("%s : OK", project)
+		fmt.Printf("%s : ", project)
+		color.Green("OK")
 	} else {
-		fmt.Printf("%s : ERROR", project)
+		fmt.Printf("%s : ", project)
+		color.Red("ERROR")
 	}
 }
 
@@ -50,7 +54,7 @@ func Stats(project string, repositoryURL string) {
 
 	var jsonContent map[string]interface{}
 	if err = json.Unmarshal(content, &jsonContent); err != nil {
-		fmt.Printf("Error: %s", err.Error())
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		return
 	}
 

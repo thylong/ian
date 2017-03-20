@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
@@ -41,7 +42,7 @@ var setupCmd = &cobra.Command{
 			fmt.Println("Installing OS package manager...")
 			err = OSPackageManager.Setup()
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Missing OS package manager !")
+				fmt.Fprintf(os.Stderr, "%v Missing OS package manager !.", color.RedString("Error:"))
 				os.Exit(1)
 			}
 		}

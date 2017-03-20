@@ -25,6 +25,7 @@ import (
 	"os/exec"
 	"os/user"
 
+	"github.com/fatih/color"
 	"github.com/thylong/ian/backend/command"
 )
 
@@ -34,7 +35,7 @@ func Describe() {
 
 	resp, err := http.Get(IPCheckerURL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -42,7 +43,7 @@ func Describe() {
 	var jsonContent map[string]string
 	err = json.Unmarshal(content, &jsonContent)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		return
 	}
 
@@ -65,7 +66,7 @@ func EnsureDotfilesDir(dotfilesDirPath string) {
 	if _, err := os.Stat(dotfilesDirPath); err != nil {
 		err = os.Mkdir(dotfilesDirPath, 0766)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
+			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		}
 
 		command.ExecuteCommand(exec.Command("git", "init"))
@@ -83,11 +84,11 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
 		dst := fmt.Sprintf("%s/%s", dotfilesDirPath, dotfileToSave)
 
 		if err := MoveFile(src, dst); err != nil {
-			fmt.Fprintf(os.Stderr, "couldn't move %s !", src)
+			fmt.Fprintf(os.Stderr, "%v couldn't move %s !", color.RedString("Error:"), src)
 			os.Exit(1)
 		}
 		if err := os.Symlink(dst, src); err != nil {
-			fmt.Fprintf(os.Stderr, "couldn't symlink %s !", src)
+			fmt.Fprintf(os.Stderr, "%v couldn't symlink %s !", color.RedString("Error:"), src)
 			os.Exit(1)
 		}
 	}
@@ -104,7 +105,7 @@ func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string)
 	termCmd.Dir = dotfilesDirPath
 
 	if err := command.MustExecuteCommand(termCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "%s repository doesn't exists or is not reachable.", repositoryURL)
+		fmt.Fprintf(os.Stderr, "%v %s repository doesn't exists or is not reachable.", color.RedString("Error:"), repositoryURL)
 		os.Exit(1)
 	}
 }
@@ -119,19 +120,21 @@ func PushDotfiles(message string, dotfilesDirPath string) {
 	addCmd := exec.Command("git", "add", "-A")
 	addCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(addCmd); err != nil {
-		fmt.Fprint(os.Stderr, "Cannot interact with Git")
+		fmt.Fprintf(os.Stderr, "%v Cannot interact with Git.\n", color.RedString("Error:"))
+		return
 	}
 
 	commitCmd := exec.Command("git", "commit", "-m", message)
 	commitCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(commitCmd); err != nil {
-		fmt.Fprint(os.Stderr, "Cannot create a commit")
+		fmt.Fprintf(os.Stderr, "%v Cannot create a commit.\n", color.RedString("Error:"))
+		return
 	}
 
 	termCmd := exec.Command("git", "push", "--force", "origin", "master")
 	termCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(termCmd); err != nil {
-		fmt.Fprint(os.Stderr, "Cannot push to repository")
+		fmt.Fprintf(os.Stderr, "%v Cannot push to repository.\n", color.RedString("Error:"))
 	}
 }
 

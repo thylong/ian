@@ -21,6 +21,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
@@ -216,18 +217,15 @@ func setProjectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "set",
 		Short: "Define a subcommand",
-		Long: `Define a subcommand.
-
-    Usage:
-        ian project set <description> <command>`,
+		Long:  `Define a subcommand.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 2 {
-				fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
+				fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
 				cmd.Usage()
 				os.Exit(1)
 			}
 			if 5 < len(customCmdDescription) && len(customCmdDescription) < 40 {
-				fmt.Fprint(os.Stderr, "Description must be between 5 and 40 alphanumeric characters.\n\n")
+				fmt.Fprintf(os.Stderr, "%v Description must be between 5 and 40 alphanumeric characters.\n\n", color.RedString("Error:"))
 				cmd.Usage()
 				os.Exit(1)
 			}
@@ -265,13 +263,10 @@ func unsetProjectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "unset",
 		Short: "Remove a subcommand",
-		Long: `Remove a subcommand.
-
-    Usage:
-        ian project remove <command>`,
+		Long:  `Remove a subcommand.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 1 {
-				fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
+				fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
 				cmd.Usage()
 				os.Exit(1)
 			}
