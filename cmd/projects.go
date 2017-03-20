@@ -216,7 +216,10 @@ func setProjectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "set",
 		Short: "Define a subcommand",
-		Long:  `Define a subcommand.`,
+		Long: `Define a subcommand.
+
+    Usage:
+        ian project set <description> <command>`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 2 {
 				fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
@@ -262,7 +265,10 @@ func unsetProjectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "unset",
 		Short: "Remove a subcommand",
-		Long:  `Remove a subcommand.`,
+		Long: `Remove a subcommand.
+
+    Usage:
+        ian project remove <command>`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 1 {
 				fmt.Fprint(os.Stderr, "Not enough argument.\n\n")
