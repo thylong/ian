@@ -2,17 +2,17 @@ package share
 
 import (
 	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
+	"github.com/thylong/ian/backend/config"
 )
 
 // Upload to transfer.sh
@@ -22,19 +22,23 @@ func Upload(filename string, targetURL string, key string) (string, error) {
 
 	fileWriter, err := bodyWriter.CreateFormFile("uploadfile", filename)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v Failed to write to buffer.", color.RedString("Error:"))
-		return "", err
+		return "", fmt.Errorf("%v Failed to write to buffer", color.RedString("Error:"))
 	}
 
 	var fh io.Reader
 	if key == "" {
 		fh, err = os.Open(filename)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v Failed to open file.", color.RedString("Error:"))
-			return "", err
+			return "", fmt.Errorf("%v Failed to open file", color.RedString("Error:"))
 		}
 	} else {
-		fh = EncryptFile(filename, []byte(key))
+		text, _ := ioutil.ReadFile(filename)
+		var encrypted []byte
+		encrypted, err = EncryptFile(text, []byte(key))
+		if err != nil {
+			return "", fmt.Errorf("%v Failed to encrypt file", color.RedString("Error:"))
+		}
+		fh = bytes.NewReader(encrypted)
 	}
 
 	// iocopy
@@ -59,37 +63,46 @@ func Upload(filename string, targetURL string, key string) (string, error) {
 	return string(respBody), nil
 }
 
-// ZipConfigFiles produces a Zip archive
-func ZipConfigFiles(filename string) {
-
-}
-
-// EncryptFile encrypt and return a file
-func EncryptFile(filename string, key []byte) io.Reader {
-	fileContent, err := ioutil.ReadFile(filename)
-
-	block, err := aes.NewCipher(key)
+// Download retrieves a distant configuration file
+func Download(URL string, configFileName string, key string) error {
+	_, err := url.ParseRequestURI(URL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
-		os.Exit(1)
+		return fmt.Errorf("%v Sorry, The link you provided is invalid", color.RedString("Error:"))
 	}
 
-	// The IV needs to be unique, but not secure. Therefore it's common to
-	// include it at the beginning of the ciphertext.
-	ciphertext := make([]byte, aes.BlockSize+len(fileContent))
-	iv := ciphertext[:aes.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
-		os.Exit(1)
+	resp, err := http.Get(URL)
+	if err != nil {
+		return fmt.Errorf("%v Sorry, The link you provided is unreachable", color.RedString("Error:"))
 	}
+	defer resp.Body.Close()
 
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], fileContent)
-	return bytes.NewReader(ciphertext)
+	confFileName := strings.TrimSuffix(configFileName, ".yml")
+	if confFilePath, ok := config.ConfigFilesPathes[confFileName]; ok {
+		f, err := os.OpenFile(confFilePath, os.O_TRUNC|os.O_WRONLY, 0600)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		content, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("%v Cannot read from HTTP response", color.RedString("Error:"))
+		}
+		if key != "" {
+			if content, err = DecryptFile(content, []byte(key)); err != nil {
+				return fmt.Errorf("%v Cannot decrypt downloaded file", color.RedString("Error:"))
+			}
+		}
+
+		if _, err := io.Copy(f, bytes.NewReader(content)); err != nil {
+			return fmt.Errorf("%v %s", color.RedString("Error:"), err)
+		}
+	}
+	return nil
 }
 
-// GetshareSetFromLinkCmdUsageTemplate returns shareSetFromLinkCmd usage template
-func GetshareSetFromLinkCmdUsageTemplate() string {
+// GetshareRetrieveFromLinkCmdUsageTemplate returns shareRetrieveFromLinkCmd usage template
+func GetshareRetrieveFromLinkCmdUsageTemplate() string {
 	return `Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "<url> <conf_file> [flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
   {{ .CommandPath}} [command]{{end}}{{if gt .Aliases 0}}

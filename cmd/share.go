@@ -16,11 +16,7 @@ package cmd
 
 import (
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
 	"os"
-	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -31,22 +27,23 @@ import (
 var key = ""
 
 var encryptShareCmdParam bool
+var decryptShareCmdParam bool
 
 // var shortLinkShareCmdParam bool
 
 func init() {
 	RootCmd.AddCommand(shareCmd)
 
-	shareCmd.PersistentFlags().BoolVarP(&encryptShareCmdParam, "encrypt", "s", false, "Encrypt with private key before uploading")
+	shareCmd.PersistentFlags().BoolVarP(&encryptShareCmdParam, "encrypt", "e", false, "Encrypt with private key before uploading")
+	shareCmd.PersistentFlags().BoolVarP(&decryptShareCmdParam, "decrypt", "d", false, "Decrypt config file")
 	// shareCmd.PersistentFlags().BoolVarP(&shortLinkShareCmdParam, "bitlink", "b", false, "Get a Bit.ly shorten URL")
-
-	shareSetFromLinkCmd.SetUsageTemplate(share.GetshareSetFromLinkCmdUsageTemplate())
+	shareRetrieveFromLinkCmd.SetUsageTemplate(share.GetshareRetrieveFromLinkCmdUsageTemplate())
 
 	shareCmd.AddCommand(
 		shareConfigCmd,
 		shareProjectsCmd,
 		shareEnvCmd,
-		shareSetFromLinkCmd,
+		shareRetrieveFromLinkCmd,
 		// shareAllCmd,
 	)
 }
@@ -98,7 +95,7 @@ var shareEnvCmd = &cobra.Command{
 	Long:  `Share a public link to ian env.yml file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if encryptShareCmdParam {
-			key = config.GetUserInput("Enter a secret key: ")
+			key = config.GetUserInput("Enter a secret key (32 characters minimum)")
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
@@ -109,10 +106,10 @@ var shareEnvCmd = &cobra.Command{
 	},
 }
 
-var shareSetFromLinkCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Set config from config file link",
-	Long:  `Set config from config file link.`,
+var shareRetrieveFromLinkCmd = &cobra.Command{
+	Use:   "retrieve",
+	Short: "Retrieve config from config file link",
+	Long:  `Retrieve config from config file link.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
@@ -120,38 +117,15 @@ var shareSetFromLinkCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		_, err := url.ParseRequestURI(args[0])
+		key := ""
+		if decryptShareCmdParam {
+			key = config.GetUserInput("Enter the secret key")
+		}
+		err := share.Download(args[0], args[1], key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v Sorry, The link you provided is invalid.", color.RedString("Error:"))
-		}
-
-		resp, err := http.Get(args[0])
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v Sorry, The link you provided is unreachable.", color.RedString("Error:"))
-		}
-		defer resp.Body.Close()
-
-		if strings.HasSuffix(string(strings.TrimSuffix(args[0], "/")), "_e") {
-			// DecryptFile
-		}
-
-		confFileName := strings.TrimSuffix(args[1], ".yml")
-		fmt.Print(confFileName)
-		if confFilePath, ok := config.ConfigFilesPathes[confFileName]; ok {
-			f, err := os.OpenFile(confFilePath, os.O_TRUNC|os.O_WRONLY, 0600)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			defer f.Close()
-
-			if _, err := io.Copy(f, resp.Body); err != nil {
-				fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
-				os.Exit(1)
-			}
+			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 			return
 		}
-		fmt.Fprintf(os.Stderr, "%v Sorry, something went wrong.", color.RedString("Error:"))
 	},
 }
 
