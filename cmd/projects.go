@@ -177,11 +177,12 @@ func addProjectCmd() *cobra.Command {
 			NewP := make(map[string]string)
 			projectName := config.GetUserInput("Enter the name of the project")
 			NewP["description"] = config.GetUserInput("Enter the project description")
-			NewP["repository"] = config.GetUserInput("Enter the project repository")
-			NewP["health"] = config.GetUserInput("Enter the health check relative URL")
-			NewP["db_cmd"] = config.GetUserInput("Enter the db connection command")
-			NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy command")
-			NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback command")
+			NewP["url"] = config.GetUserInput("Enter the project URL (example: http://goian.io)")
+			NewP["repository"] = config.GetUserInput("Enter the project repository (example: thylong/ian)")
+			NewP["health"] = config.GetUserInput("Enter the health check relative URL (example: /status)")
+			NewP["db_cmd"] = config.GetUserInput("Enter the db connection command (example: mongo localhost)")
+			NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy command (example: bash deploy.sh)")
+			NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback command (example: bash rollback.sh)")
 
 			projectsContent := config.Vipers["projects"].AllSettings()
 			projectsContent[projectName] = NewP
