@@ -82,7 +82,7 @@ and projects.
 
 Learn more about Ian at http://goian.io
 
-To benefit from all of Ian’s feature’s, you’ll need to provide:
+To benefit from all of Ian’s features, you’ll need to provide:
     - A working OS Package Manager (will set up if missing)
     - The full path of your repositories (example: /Users/thylong/repositories)
     - The path of your dotfiles Github repository (example: thylong/dotfiles)
@@ -225,7 +225,8 @@ func GetUserInput(question string) string {
 // GetBoolUserInput ask question and return true if the user agreed otherwise false.
 func GetBoolUserInput(question string) bool {
 	in := GetUserInput(question)
-	if strings.ToLower(in) == "y" && strings.ToLower(in) == "yes" && strings.ToLower(in) == "" {
+
+	if strings.ToLower(in) == "y" || strings.ToLower(in) == "yes" || strings.ToLower(in) == "" {
 		return true
 	}
 	return false
