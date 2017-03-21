@@ -175,15 +175,16 @@ func addProjectCmd() *cobra.Command {
 		Long:  `Add a new project configuration.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			NewP := make(map[string]string)
-			NewP["description"] = config.GetUserInput("Enter the project description: ")
-			NewP["repository"] = config.GetUserInput("Enter the project repository: ")
-			NewP["health"] = config.GetUserInput("Enter the health check URL: ")
-			NewP["db_cmd"] = config.GetUserInput("Enter the db connection command: ")
-			NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy repository: ")
-			NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback repository: ")
+			projectName := config.GetUserInput("Enter the name of the project")
+			NewP["description"] = config.GetUserInput("Enter the project description")
+			NewP["repository"] = config.GetUserInput("Enter the project repository")
+			NewP["health"] = config.GetUserInput("Enter the health check relative URL")
+			NewP["db_cmd"] = config.GetUserInput("Enter the db connection command")
+			NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy command")
+			NewP["rollback_cmd"] = config.GetUserInput("Enter the rollback command")
 
 			projectsContent := config.Vipers["projects"].AllSettings()
-			projectsContent[args[0]] = NewP
+			projectsContent[projectName] = NewP
 			config.UpdateYamlFile(
 				config.ConfigFilesPathes["projects"],
 				projectsContent,

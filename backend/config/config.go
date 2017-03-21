@@ -95,6 +95,10 @@ To benefit from all of Ian’s features, you’ll need to provide:
 			return
 		}
 	}
+	if _, err := os.Stat(ConfigFilesPathes["config"]); err != nil {
+		initVipers(true)
+		return
+	}
 	initVipers(false)
 }
 
@@ -286,6 +290,11 @@ func GetCustomCmds(project string) (customCmds []*cobra.Command) {
 // GetProjects returns the projects defined in projects.yml as non-runnable []*cobra.cmd.
 func GetProjects() (projectCmds map[string]*cobra.Command) {
 	projectCmds = make(map[string]*cobra.Command)
+
+	if _, ok := Vipers["projects"]; !ok {
+		return projectCmds
+	}
+
 	for _, project := range Vipers["projects"].AllKeys() {
 		projectParams := Vipers["projects"].GetStringMapString(project)
 		projectCmds[project] = &cobra.Command{
