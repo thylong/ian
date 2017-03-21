@@ -72,7 +72,7 @@ var projectCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
 			fmt.Println("/!\\ You currently have no projects set up.")
-			in := config.GetUserInput("Would you like to add one using 'ian project new'? (Y/n)")
+			in := config.GetUserInput("Would you like to add one ? (Y/n)")
 			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
 				return
 			}
@@ -178,7 +178,8 @@ func addProjectCmd() *cobra.Command {
 			projectName := config.GetUserInput("Enter the name of the project")
 			NewP["description"] = config.GetUserInput("Enter the project description")
 			NewP["url"] = config.GetUserInput("Enter the project URL (example: http://goian.io)")
-			NewP["repository"] = config.GetUserInput("Enter the project repository (example: thylong/ian)")
+			s := config.GetUserInput("Enter the project repository (example: thylong/ian)")
+			NewP["repository"] = strings.TrimPrefix(strings.TrimSuffix(s, ".git"), "git@github.com:")
 			NewP["health"] = config.GetUserInput("Enter the health check relative URL (example: /status)")
 			NewP["db_cmd"] = config.GetUserInput("Enter the db connection command (example: mongo localhost)")
 			NewP["deploy_cmd"] = config.GetUserInput("Enter the deploy command (example: bash deploy.sh)")
