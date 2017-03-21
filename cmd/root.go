@@ -40,7 +40,7 @@ var RootCmd = &cobra.Command{
 	Use:   "ian",
 	Short: "Ian is a simple tool to manage your development environment",
 	Long: `Ian is a simple tool to manage your development environment, repositories,
-and projects..`,
+and projects.`,
 }
 
 // versionCmd execution displays ian version.
