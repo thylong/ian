@@ -70,6 +70,7 @@ var projectCmd = &cobra.Command{
 	Short: "Interact with local projects",
 	Long:  `Interact with a project using predefined commands, or define custom commands.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Print(config.Vipers["projects"].AllSettings())
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
 			fmt.Println("/!\\ You currently have no projects set up.")
 			in := config.GetUserInput("Would you like to add one ? (Y/n)")
@@ -160,9 +161,12 @@ func dbProjectCmd() *cobra.Command {
 		Short: "Connect to the project's database",
 		Long:  `Connect to the project's database.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			rollbackCmdContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["db_cmd"]
-			dbCmd := strings.Split(rollbackCmdContent, " ")
-			termCmd := exec.Command(dbCmd[0], dbCmd[:1]...)
+			cmdContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["db_cmd"]
+			cmdContent = strings.Replace(cmdContent, "\"", "", -1)
+			dbCmd := strings.Split(cmdContent, " ")
+
+			termCmd := exec.Command(dbCmd[0], dbCmd[1:]...)
+			termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 			command.ExecuteInteractiveCommand(termCmd)
 		},
 	}

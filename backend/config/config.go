@@ -76,52 +76,27 @@ func init() {
 	}
 	if _, err := os.Stat(IanConfigPath); err != nil {
 		_ = os.Mkdir(IanConfigPath, 0766)
-		fmt.Printf("%s", []byte(`Welcome to Ian!
-Ian is a simple tool to manage your development environment, repositories,
-and projects.
-
-Learn more about Ian at http://goian.io
-
-To benefit from all of Ian’s features, you’ll need to provide:
-    - A working OS Package Manager (will set up if missing)
-    - The full path of your repositories (example: /Users/thylong/repositories)
-    - The path of your dotfiles Github repository (example: thylong/dotfiles)
-
-`))
-		if GetBoolUserInput("Do you want to set up Ian now? (Y/n)") == true {
-			initVipers(false)
-		} else {
-			fmt.Println("You're ready to start using Ian. Note that if you try to use some of Ian's\nfeatures you'll be prompted for these details again.")
-			return
-		}
+		fmt.Printf("%s", GetInitialSetupUsage())
 	}
-	if _, err := os.Stat(ConfigFilesPathes["config"]); err != nil {
-		initVipers(true)
-		return
-	}
-	initVipers(false)
+	initVipers()
 }
 
 // initVipers return Vipers corresponding to Yaml config files.
 // The soft argument determine if unexisting files should be written or not.
-func initVipers(soft bool) {
+func initVipers() {
 	ConfigFilesPathes = make(map[string]string)
 	Vipers = make(map[string]*viper.Viper)
 	for _, ConfigFileName := range []string{"config", "env", "projects"} {
 		ConfigFilesPathes[ConfigFileName] = IanConfigPath + fmt.Sprintf("%s.yml", ConfigFileName)
-		Vipers[ConfigFileName] = initViper(ConfigFileName, soft)
+		Vipers[ConfigFileName] = initViper(ConfigFileName)
 	}
 }
 
-func initViper(viperName string, soft bool) (viperInstance *viper.Viper) {
+func initViper(viperName string) (viperInstance *viper.Viper) {
 	viperInstance = viper.New()
 	viperInstance.SetConfigType("yaml")
 	viperInstance.SetConfigName(viperName)
 	viperInstance.AddConfigPath(IanConfigPath)
-
-	if soft {
-		return viperInstance
-	}
 
 	if _, err := os.Stat(fmt.Sprintf("%s/%s.yml", IanConfigPath, viperName)); err != nil {
 		SetupConfigFile(viperName)
@@ -304,4 +279,20 @@ func GetProjects() (projectCmds map[string]*cobra.Command) {
 		}
 	}
 	return projectCmds
+}
+
+// GetInitialSetupUsage returns the usage when using ian for the first time
+func GetInitialSetupUsage() []byte {
+	return []byte(`Welcome to Ian!
+Ian is a simple tool to manage your development environment, repositories,
+and projects.
+
+Learn more about Ian at http://goian.io
+
+To benefit from all of Ian’s features, you’ll need to provide:
+- A working OS Package Manager (will set up if missing)
+- The full path of your repositories (example: /Users/thylong/repositories)
+- The path of your dotfiles Github repository (example: thylong/dotfiles)
+
+`)
 }
