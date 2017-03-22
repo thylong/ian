@@ -15,6 +15,9 @@ import (
 	"github.com/thylong/ian/backend/config"
 )
 
+var httpPost = http.Post
+var httpGet = http.Get
+
 // Upload to transfer.sh
 func Upload(filename string, targetURL string, key string) (string, error) {
 	bodyBuf := &bytes.Buffer{}
@@ -53,7 +56,7 @@ func Upload(filename string, targetURL string, key string) (string, error) {
 	contentType := bodyWriter.FormDataContentType()
 	bodyWriter.Close()
 
-	resp, err := http.Post(targetURL, contentType, bodyBuf)
+	resp, err := httpPost(targetURL, contentType, bodyBuf)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +76,7 @@ func Download(URL string, configFileName string, key string) error {
 		return fmt.Errorf("%v Sorry, The link you provided is invalid", color.RedString("Error:"))
 	}
 
-	resp, err := http.Get(URL)
+	resp, err := httpGet(URL)
 	if err != nil {
 		return fmt.Errorf("%v Sorry, The link you provided is unreachable", color.RedString("Error:"))
 	}
