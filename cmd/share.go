@@ -34,7 +34,7 @@ var decryptShareCmdParam bool
 func init() {
 	RootCmd.AddCommand(shareCmd)
 
-	shareCmd.PersistentFlags().BoolVarP(&encryptShareCmdParam, "encrypt", "e", false, "Encrypt with private key before uploading")
+	shareCmd.PersistentFlags().BoolVarP(&encryptShareCmdParam, "encrypt", "e", false, "Encrypt with key before uploading (32 characters minimum)")
 	shareCmd.PersistentFlags().BoolVarP(&decryptShareCmdParam, "decrypt", "d", false, "Decrypt config file")
 	// shareCmd.PersistentFlags().BoolVarP(&shortLinkShareCmdParam, "bitlink", "b", false, "Get a Bit.ly shorten URL")
 	shareRetrieveFromLinkCmd.SetUsageTemplate(share.GetshareRetrieveFromLinkCmdUsageTemplate())
