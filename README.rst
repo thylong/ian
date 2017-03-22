@@ -82,3 +82,4 @@ Special thanks
 .. _yum: https://fedoraproject.org/wiki/Yum
 .. _`Devin Wilmot`: mailto:devwilmot@gmail.com
 .. _`Trisha Batchoo`: https://github.com/tbat
+.. _`Carl Chinatomby`: https://github.com/Carl-Chinatomby
