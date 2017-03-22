@@ -30,6 +30,7 @@ import (
 )
 
 var customCmdDescription string
+var customCmdName string
 var softDeleteCmdParam bool
 
 func init() {
@@ -44,6 +45,7 @@ func init() {
 
 		deleteProjectCmd.Flags().BoolVar(&softDeleteCmdParam, "soft", false, "Delete only ian configuration but keeps history")
 		setProjectCmd.Flags().StringVarP(&customCmdDescription, "description", "d", "", "Description of the custom project command (40 characters maximum)")
+		setProjectCmd.Flags().StringVarP(&customCmdName, "command", "c", "", "The custom command")
 
 		pCmd.AddCommand(
 			statusProjectCmd(),
@@ -223,22 +225,23 @@ func deleteProjectCmd() *cobra.Command {
 func setProjectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "set",
-		Short: "Define a subcommand",
-		Long:  `Define a subcommand.`,
+		Short: "Define a command for the project",
+		Long: `Define a command for the project
+
+Example: ian project dotfiles set -c bonjour -d "Say bonjour" echo bonjour !.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) < 2 {
-				fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
-				cmd.Usage()
-				os.Exit(1)
+			if len(args) < 2 && (customCmdName == "" || customCmdDescription == "") {
+				customCmdName = config.GetUserInput("Enter the name of the command")
+				customCmdDescription = config.GetUserInput("Enter the description of the project")
 			}
-			if 5 < len(customCmdDescription) && len(customCmdDescription) < 40 {
+			if len(customCmdDescription) < 5 || len(customCmdDescription) > 40 {
 				fmt.Fprintf(os.Stderr, "%v Description must be between 5 and 40 alphanumeric characters.\n\n", color.RedString("Error:"))
 				cmd.Usage()
 				os.Exit(1)
 			}
 
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
-			editContent[fmt.Sprintf("%s_custom_cmd", args[0])] = fmt.Sprintf("%s=%s", customCmdDescription, strings.Join(args[1:], " "))
+			editContent[fmt.Sprintf("%s_custom_cmd", customCmdName)] = fmt.Sprintf("%s=%s", customCmdDescription, strings.Join(args, " "))
 			config.Vipers["projects"].Set(cmd.Parent().Use, editContent)
 
 			projectsContent := config.Vipers["projects"].AllSettings()
@@ -256,7 +259,7 @@ func cloneCmd() *cobra.Command {
 		Short: "Clone project repository",
 		Long: `Clone the project repository.
 
-        Clone the project repository in repositories_path path.`,
+Example: ian project dotfiles unset bonjour.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
 			if projectRepository, ok := editContent["repository"]; ok {
@@ -269,13 +272,11 @@ func cloneCmd() *cobra.Command {
 func unsetProjectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "unset",
-		Short: "Remove a subcommand",
-		Long:  `Remove a subcommand.`,
+		Short: "Remove a project command",
+		Long:  `Remove a project subcommand.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 1 {
-				fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
-				cmd.Usage()
-				os.Exit(1)
+				args[0] = config.GetUserInput("Enter the name of the command to unset")
 			}
 
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
