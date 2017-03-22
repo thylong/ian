@@ -27,6 +27,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/fatih/color"
+	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
@@ -199,6 +200,13 @@ func GetUserInput(question string) string {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
 	}
 	return ""
+}
+
+// GetUserPrivateInput ask question and return user input (silent stdin).
+func GetUserPrivateInput(question string) string {
+	fmt.Printf("%s: ", question)
+	pass, _ := gopass.GetPasswd()
+	return string(pass)
 }
 
 // GetBoolUserInput ask question and return true if the user agreed otherwise false.

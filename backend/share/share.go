@@ -32,6 +32,9 @@ func Upload(filename string, targetURL string, key string) (string, error) {
 			return "", fmt.Errorf("%v Failed to open file", color.RedString("Error:"))
 		}
 	} else {
+		if len(key) < 32 {
+			return "", fmt.Errorf("%v The key is too short (less than 32 characters)", color.RedString("Error: "))
+		}
 		text, _ := ioutil.ReadFile(filename)
 		var encrypted []byte
 		encrypted, err = EncryptFile(text, []byte(key))

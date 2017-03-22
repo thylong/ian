@@ -78,7 +78,7 @@ var shareProjectsCmd = &cobra.Command{
 	Long:  `Share a public link to ian projects.yml file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if encryptShareCmdParam {
-			key = config.GetUserInput("Enter a secret key: ")
+			key = config.GetUserPrivateInput("Enter a secret key: ")
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
@@ -95,7 +95,7 @@ var shareEnvCmd = &cobra.Command{
 	Long:  `Share a public link to ian env.yml file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if encryptShareCmdParam {
-			key = config.GetUserInput("Enter a secret key (32 characters minimum)")
+			key = config.GetUserPrivateInput("Enter a secret key (32 characters minimum)")
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
