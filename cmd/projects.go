@@ -37,6 +37,7 @@ func init() {
 
 	for pName, pCmd := range config.GetProjects() {
 		projectCmd.AddCommand(pCmd)
+		projectCmd.AddCommand(addProjectCmd())
 
 		deleteProjectCmd := deleteProjectCmd()
 		setProjectCmd := setProjectCmd()
@@ -70,7 +71,6 @@ var projectCmd = &cobra.Command{
 	Short: "Interact with local projects",
 	Long:  `Interact with a project using predefined commands, or define custom commands.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Print(config.Vipers["projects"].AllSettings())
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
 			fmt.Println("/!\\ You currently have no projects set up.")
 			in := config.GetUserInput("Would you like to add one ? (Y/n)")
@@ -260,7 +260,7 @@ func cloneCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
 			if projectRepository, ok := editContent["repository"]; ok {
-				repo.Clone(projectRepository)
+				repo.Clone(repo.GetGitRepositorySSHPath(projectRepository))
 			}
 		},
 	}

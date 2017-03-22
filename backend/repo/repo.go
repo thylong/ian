@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/thylong/ian/backend/command"
@@ -41,7 +42,8 @@ func Clone(repository string) error {
 	termCmd := execCommand("git", "clone", "-v", repository)
 	termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
-	return command.ExecuteCommand(termCmd)
+	command.ExecuteInteractiveCommand(termCmd)
+	return nil
 }
 
 // Clean given repository
@@ -113,4 +115,13 @@ func Status(repository string) error {
 	termCmd.Dir = config.Vipers["config"].GetString("repositories_path") + "/" + repository
 
 	return command.ExecuteCommand(termCmd)
+}
+
+// GetGitRepositorySSHPath returns for a given repository path the full SSH path.
+func GetGitRepositorySSHPath(repository string) string {
+	repository = strings.TrimPrefix(strings.TrimSuffix(repository, ".git"), "https://github.com/")
+	if !strings.HasPrefix(repository, "git@github.com:") {
+		repository = fmt.Sprintf("git@github.com:%s.git", repository)
+	}
+	return repository
 }
