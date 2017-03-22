@@ -75,8 +75,8 @@ var projectCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
 			fmt.Println("/!\\ You currently have no projects set up.")
-			in := config.GetUserInput("Would you like to add one ? (Y/n)")
-			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
+			in := config.GetBoolUserInput("Would you like to add one ? (Y/n)")
+			if !in {
 				return
 			}
 			addProjectCmd().Execute()
@@ -91,8 +91,14 @@ func statusProjectCmd() *cobra.Command {
 		Short: "Display health status",
 		Long:  `Display health status.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			baseURL := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["url"]
-			healthEndpoint := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["health"]
+			baseURL, ok := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["url"]
+			if !ok {
+				baseURL = config.GetUserInput("Enter the project URL (example: http://goian.io)")
+			}
+			healthEndpoint, ok := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["health"]
+			if !ok {
+				healthEndpoint = config.GetUserInput("Enter the health check relative URL (example: /status)")
+			}
 			projects.Status(cmd.Parent().Use, baseURL, healthEndpoint)
 			repo.Status(cmd.Parent().Use)
 		},
@@ -259,7 +265,7 @@ func cloneCmd() *cobra.Command {
 		Short: "Clone project repository",
 		Long: `Clone the project repository.
 
-Example: ian project dotfiles unset bonjour.`,
+Example: ian project dotfiles unset bonjour -d "Say bonjour" echo bonjour !.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
 			if projectRepository, ok := editContent["repository"]; ok {
