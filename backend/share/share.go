@@ -12,81 +12,82 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/spf13/afero"
 	"github.com/thylong/ian/backend/config"
 )
+
+// AppFs is a wrapper to OS package
+var AppFs = afero.NewOsFs()
 
 var httpPost = http.Post
 var httpGet = http.Get
 
+// ErrFailedToOpenFile occurs when trying to open a non-existing config file
+var ErrFailedToOpenFile = fmt.Errorf("%v Failed to open file", color.RedString("Error:"))
+
+// ErrConfiFileMissing occurs when trying to open a non existing config file
+var ErrConfiFileMissing = fmt.Errorf("%v Config file doesn't exist", color.RedString("Error:"))
+
+// ErrLinkUnreachable occurs when a link is unreachable or doe not exist
+var ErrLinkUnreachable = fmt.Errorf("%v Sorry, The link you provided is unreachable", color.RedString("Error:"))
+
+// ErrLinkWrongFormat occurs when a link has a wrong format
+var ErrLinkWrongFormat = fmt.Errorf("%v Sorry, The link you provided is invalid", color.RedString("Error:"))
+
 // Upload to transfer.sh
-func Upload(filename string, targetURL string, key string) (string, error) {
+func Upload(filename string, URL string, key string) (respBody string, err error) {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
-	fileWriter, err := bodyWriter.CreateFormFile("uploadfile", filename)
-	if err != nil {
-		return "", fmt.Errorf("%v Failed to write to buffer", color.RedString("Error:"))
-	}
+	fileWriter, _ := bodyWriter.CreateFormFile("uploadfile", filename)
 
 	var fh io.Reader
 	if key == "" {
-		fh, err = os.Open(filename)
+		fh, err = AppFs.Open(filename)
 		if err != nil {
-			return "", fmt.Errorf("%v Failed to open file", color.RedString("Error:"))
+			return "", ErrFailedToOpenFile
 		}
 	} else {
-		if len(key) < 32 {
-			return "", fmt.Errorf("%v The key is too short (less than 32 characters)", color.RedString("Error: "))
-		}
 		text, _ := ioutil.ReadFile(filename)
 		var encrypted []byte
 		encrypted, err = EncryptFile(text, []byte(key))
 		if err != nil {
-			return "", fmt.Errorf("%v Failed to encrypt file", color.RedString("Error:"))
+			return "", err
 		}
 		fh = bytes.NewReader(encrypted)
 	}
-
-	// iocopy
-	_, err = io.Copy(fileWriter, fh)
-	if err != nil {
-		return "", err
-	}
+	io.Copy(fileWriter, fh)
 
 	contentType := bodyWriter.FormDataContentType()
 	bodyWriter.Close()
 
-	resp, err := httpPost(targetURL, contentType, bodyBuf)
+	resp, err := httpPost(URL, contentType, bodyBuf)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	fmt.Println(resp.Status)
-	return string(respBody), nil
+
+	respBodyBytes, err := ioutil.ReadAll(resp.Body)
+	return string(respBodyBytes), err
 }
 
 // Download retrieves a distant configuration file
-func Download(URL string, configFileName string, key string) error {
-	_, err := url.ParseRequestURI(URL)
-	if err != nil {
-		return fmt.Errorf("%v Sorry, The link you provided is invalid", color.RedString("Error:"))
+func Download(filename string, URL string, key string) (err error) {
+	if _, err = url.ParseRequestURI(URL); err != nil {
+		return ErrLinkWrongFormat
 	}
 
 	resp, err := httpGet(URL)
 	if err != nil {
-		return fmt.Errorf("%v Sorry, The link you provided is unreachable", color.RedString("Error:"))
+		return ErrLinkUnreachable
 	}
 	defer resp.Body.Close()
 
-	confFileName := strings.TrimSuffix(configFileName, ".yml")
+	confFileName := strings.TrimSuffix(filename, ".yml")
 	if confFilePath, ok := config.ConfigFilesPathes[confFileName]; ok {
-		f, err := os.OpenFile(confFilePath, os.O_TRUNC|os.O_WRONLY, 0600)
+		f, err := AppFs.OpenFile(confFilePath, os.O_TRUNC|os.O_WRONLY, 0600)
 		if err != nil {
-			return err
+			return ErrConfiFileMissing
 		}
 		defer f.Close()
 
@@ -99,10 +100,7 @@ func Download(URL string, configFileName string, key string) error {
 				return fmt.Errorf("%v Cannot decrypt downloaded file", color.RedString("Error:"))
 			}
 		}
-
-		if _, err := io.Copy(f, bytes.NewReader(content)); err != nil {
-			return fmt.Errorf("%v %s", color.RedString("Error:"), err)
-		}
+		io.Copy(f, bytes.NewReader(content))
 	}
 	return nil
 }

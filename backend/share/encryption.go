@@ -6,11 +6,21 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
+
+	"github.com/fatih/color"
 )
+
+// ErrKeyTooShort occurs when trying to encrypt with a too short key
+var ErrKeyTooShort = fmt.Errorf("%v The key is too short (less than 32 characters)", color.RedString("Error:"))
 
 // EncryptFile encrypt and return a file
 func EncryptFile(text, key []byte) ([]byte, error) {
+	if len(key) < 32 {
+		return []byte{}, ErrKeyTooShort
+	}
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -28,6 +38,10 @@ func EncryptFile(text, key []byte) ([]byte, error) {
 
 // DecryptFile encrypt and return a file
 func DecryptFile(text []byte, key []byte) ([]byte, error) {
+	if len(key) < 32 {
+		return []byte{}, ErrKeyTooShort
+	}
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

@@ -121,7 +121,7 @@ var shareRetrieveFromLinkCmd = &cobra.Command{
 		if decryptShareCmdParam {
 			key = config.GetUserInput("Enter the secret key")
 		}
-		err := share.Download(args[0], args[1], key)
+		err := share.Download(args[1], args[0], key)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 			return
