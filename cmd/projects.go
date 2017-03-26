@@ -99,7 +99,9 @@ func statusProjectCmd() *cobra.Command {
 			if !ok {
 				healthEndpoint = config.GetUserInput("Enter the health check relative URL (example: /status)")
 			}
-			projects.Status(cmd.Parent().Use, baseURL, healthEndpoint)
+			status := projects.Status(cmd.Parent().Use, baseURL, healthEndpoint)
+			fmt.Printf("%v", status)
+
 			repo.Status(cmd.Parent().Use)
 		},
 	}
@@ -115,7 +117,9 @@ func statsProjectCmd() *cobra.Command {
 				"https://api.github.com/repos/%s",
 				config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)["repository"],
 			)
-			projects.Stats(cmd.Parent().Use, repositoryURL)
+			stats, _ := projects.Stats(cmd.Parent().Use, repositoryURL)
+			prettyStats, _ := json.MarshalIndent(stats, "", "  ")
+			fmt.Printf("%s", prettyStats)
 		},
 	}
 }

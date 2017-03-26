@@ -16,51 +16,53 @@ package projects
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
+	"strings"
 
 	"github.com/fatih/color"
 )
 
+var httpGet = http.Get
+
+// ErrStatsUnavailable occurs when stats cannot be retrive from github API
+var ErrStatsUnavailable = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Cannot get stats"))
+
+// ErrJSONPayloadInvalidFormat is returned when the JSON payload format is invalid
+var ErrJSONPayloadInvalidFormat = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Invalid JSON format"))
+
 // Status makes a GET HTTP query and returns OK if response status is 200
 // otherwise ERROR.
-func Status(project string, baseURL string, healthEndpoint string) {
+func Status(project string, baseURL string, healthEndpoint string) string {
 	url := baseURL + healthEndpoint
-	resp, err := http.Get(url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+	resp, err := httpGet(url)
+	if err != nil || resp.StatusCode > 300 {
+		return fmt.Sprintf("%s: %s", project, color.RedString("ERROR"))
 	}
-	defer resp.Body.Close()
 
-	if statusCode := resp.StatusCode; statusCode == 200 {
-		fmt.Printf("%s : ", project)
-		color.Green("OK")
-	} else {
-		fmt.Printf("%s : ", project)
-		color.Red("ERROR")
-	}
+	return fmt.Sprintf("%s: %s", project, color.GreenString("OK"))
 }
 
 // Stats makes a GET HTTP query on Github API and returns the stasts.
-func Stats(project string, repositoryURL string) {
-	resp, err := http.Get(repositoryURL)
-	if err != nil {
-		fmt.Printf("Error: %s", err.Error())
+func Stats(project string, repositoryURL string) (stats map[string]interface{}, err error) {
+	resp, err := httpGet(repositoryURL)
+	if err != nil || resp.StatusCode > 300 {
+		return stats, ErrStatsUnavailable
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
-	var jsonContent map[string]interface{}
-	if err = json.Unmarshal(content, &jsonContent); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
-		return
+	if err = json.Unmarshal(content, &stats); err != nil {
+		return stats, ErrJSONPayloadInvalidFormat
 	}
 
-	fmt.Printf("\n%s:", project)
-	fmt.Printf("\n- Forks: %v", jsonContent["forks_count"])
-	fmt.Printf("\n- Stars: %v", jsonContent["stargazers_count"])
-	fmt.Printf("\n- Open Issues: %v", jsonContent["open_issues_count"])
-	fmt.Printf("\n- Last update: %v", jsonContent["updated_at"])
+	for k := range stats {
+		if strings.HasSuffix(k, "_url") || k == "owner" {
+			delete(stats, k)
+		}
+	}
+
+	return stats, nil
 }
