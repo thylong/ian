@@ -35,10 +35,10 @@ var softDeleteCmdParam bool
 
 func init() {
 	RootCmd.AddCommand(projectCmd)
+	projectCmd.AddCommand(addProjectCmd())
 
 	for pName, pCmd := range config.GetProjects() {
 		projectCmd.AddCommand(pCmd)
-		projectCmd.AddCommand(addProjectCmd())
 
 		deleteProjectCmd := deleteProjectCmd()
 		setProjectCmd := setProjectCmd()
