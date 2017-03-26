@@ -4,39 +4,45 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/spf13/afero"
 )
+
+// AppFs is a wrapper to OS package
+var AppFs = afero.NewOsFs()
+
+// ErrCannotStatFile occurs when stating a non-existing file
+var ErrCannotStatFile = fmt.Errorf("Cannot open file")
 
 // CopyFile copies a file from src to dst. If src and dst files exist, and are
 // the same, then return success. Otherise, attempt to create a hard link
 // between the two files. If that fail, copy the file contents from src to dst.
 func CopyFile(src, dst string) (err error) {
-	sfi, err := os.Stat(src)
+	sfi, err := AppFs.Stat(src)
 	if err != nil {
-		return
+		return ErrCannotStatFile
 	}
 	if !sfi.Mode().IsRegular() {
-		// cannot copy non-regular files (e.g., directories,
-		// symlinks, devices, etc.)
+		// cannot copy non-regular files (e.g., directories, symlinks, devices, etc.)
 		return fmt.Errorf("CopyFile: non-regular source file %s (%q)", sfi.Name(), sfi.Mode().String())
 	}
-	dfi, err := os.Stat(dst)
+	dfi, err := AppFs.Stat(dst)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return
+			return err
 		}
 	} else {
 		if !(dfi.Mode().IsRegular()) {
 			return fmt.Errorf("CopyFile: non-regular destination file %s (%q)", dfi.Name(), dfi.Mode().String())
 		}
 		if os.SameFile(sfi, dfi) {
-			return
+			return err
 		}
 	}
 	if err = os.Link(src, dst); err == nil {
-		return
+		return err
 	}
-	err = copyFileContents(src, dst)
-	return
+	return copyFileContents(src, dst)
 }
 
 // copyFileContents copies the contents of the file named src to the file named
@@ -44,14 +50,14 @@ func CopyFile(src, dst string) (err error) {
 // destination file exists, all it's contents will be replaced by the contents
 // of the source file.
 func copyFileContents(src, dst string) (err error) {
-	in, err := os.Open(src)
+	in, err := AppFs.Open(src)
 	if err != nil {
-		return
+		return err
 	}
 	defer in.Close()
-	out, err := os.Create(dst)
+	out, err := AppFs.Create(dst)
 	if err != nil {
-		return
+		return err
 	}
 	defer func() {
 		cerr := out.Close()
@@ -60,10 +66,9 @@ func copyFileContents(src, dst string) (err error) {
 		}
 	}()
 	if _, err = io.Copy(out, in); err != nil {
-		return
+		return err
 	}
-	err = out.Sync()
-	return
+	return out.Sync()
 }
 
 // MoveFile copies given src to dst and remove dst.
