@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -52,7 +53,9 @@ var envDescribeCmd = &cobra.Command{
 	Short: "Show details of the current development environment",
 	Long:  `Show details of the current development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		env.Describe()
+		if err := env.Describe(); err != nil {
+			fmt.Fprint(os.Stderr, err)
+		}
 	},
 }
 
@@ -112,17 +115,20 @@ var envSaveCmd = &cobra.Command{
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
-			fmt.Println("/!\\ You currently have no defined path to your parent repositories directory.")
+			fmt.Fprintf(os.Stderr, "Warning: You currently have no defined path to your parent repositories directory.")
 			in := config.GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
 			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
 				return
 			}
 		}
-		env.Save(
+		err := env.Save(
 			config.DotfilesDirPath,
 			config.Vipers["config"].GetString("dotfiles_repository"),
 			config.Vipers["config"].GetString("default_save_message"),
 			[]string{".testong"},
 		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Save command failed: %s", err)
+		}
 	},
 }

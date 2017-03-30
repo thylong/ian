@@ -18,6 +18,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -26,116 +27,156 @@ import (
 	"os/user"
 
 	"github.com/fatih/color"
+	"github.com/spf13/afero"
 	"github.com/thylong/ian/backend/command"
 )
 
-// Describe returns env description.
-func Describe() {
-	IPCheckerURL := "http://httpbin.org/ip"
+// AppFs is a wrapper to OS package
+var AppFs = afero.NewOsFs()
 
-	resp, err := http.Get(IPCheckerURL)
+var httpGet = http.Get
+
+var execCommand = exec.Command
+
+// IPCheckerURL is the endpoint to call to get IP data
+var IPCheckerURL = "http://httpbin.org/ip"
+
+// ErrJSONPayloadInvalidFormat is returned when the JSON payload format is invalid
+var ErrJSONPayloadInvalidFormat = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Invalid JSON format"))
+
+// ErrOperationNotPermitted is returned when trying create or write without permissions
+var ErrOperationNotPermitted = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Operation not permitted"))
+
+// ErrCannotMoveDotfile is returned when trying create or write without permissions
+var ErrCannotMoveDotfile = fmt.Errorf("%v couldn't move dotfile", color.RedString("Error:"))
+
+// ErrCannotSymlink is returned when trying to create a Symlink and fails
+var ErrCannotSymlink = fmt.Errorf("%v couldn't create symlink", color.RedString("Error:"))
+
+// ErrCannotInteractWithGit is returned when trying to interact with Git
+var ErrCannotInteractWithGit = fmt.Errorf("%v Cannot interact with Git\n", color.RedString("Error:"))
+
+// ErrHTTPError is returned when failing to reach an endpoint with HTTP
+var ErrHTTPError = fmt.Errorf("%v Cannot reach endpoint", color.RedString("Error:"))
+
+// ErrDotfilesRepository is returned when failing to stat a repository
+var ErrDotfilesRepository = fmt.Errorf("%v dotfiles repository doesn't exists or is not reachable", color.RedString("Error:"))
+
+// Describe returns env description.
+func Describe() (err error) {
+	resp, err := httpGet(IPCheckerURL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		return ErrHTTPError
 	}
 	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("%v %s", color.RedString("Error:"), err)
+	}
 	defer resp.Body.Close()
 
 	var jsonContent map[string]string
 	err = json.Unmarshal(content, &jsonContent)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
-		return
+		return ErrJSONPayloadInvalidFormat
 	}
 
-	command.ExecuteCommand(exec.Command("hostinfo"))
+	command.ExecuteCommand(execCommand("hostinfo"))
 	fmt.Printf("\nExternal IP: %s\n\n", jsonContent["origin"])
 	fmt.Print("Uptime: ")
-	command.ExecuteCommand(exec.Command("uptime"))
+	command.ExecuteCommand(execCommand("uptime"))
+
+	return nil
 }
 
 // Save persists the dotfiles in distant repository.
-func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage string, dotfilesToSave []string) {
-	EnsureDotfilesDir(dotfilesDirPath)
-	ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath)
-	EnsureDotfilesRepository(dotfilesRepository, dotfilesDirPath)
-	PushDotfiles(defaultSaveMessage, dotfilesDirPath)
+func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage string, dotfilesToSave []string) (err error) {
+	if err = EnsureDotfilesDir(dotfilesDirPath); err != nil {
+		return err
+	}
+	if err = ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath); err != nil {
+		return err
+	}
+	if err = EnsureDotfilesRepository(dotfilesRepository, dotfilesDirPath); err != nil {
+		return err
+	}
+	if err = PushDotfiles(defaultSaveMessage, dotfilesDirPath); err != nil {
+		return err
+	}
+	return nil
 }
 
 // EnsureDotfilesDir create the ~/.dotfiles directory if not exists.
-func EnsureDotfilesDir(dotfilesDirPath string) {
-	if _, err := os.Stat(dotfilesDirPath); err != nil {
-		err = os.Mkdir(dotfilesDirPath, 0766)
+func EnsureDotfilesDir(dotfilesDirPath string) (err error) {
+	if _, err := AppFs.Stat(dotfilesDirPath); err != nil {
+		err = AppFs.Mkdir(dotfilesDirPath, 0766)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+			return ErrOperationNotPermitted
 		}
-
-		command.ExecuteCommand(exec.Command("git", "init"))
+		command.ExecuteCommand(execCommand("git", "init"))
 		GitIgnorePath := fmt.Sprintf("%s/.gitignore", dotfilesDirPath)
-		_ = ioutil.WriteFile(GitIgnorePath, []byte(".ssh\n.netrc"), 0766)
-		return
+		ioutil.WriteFile(GitIgnorePath, []byte(".ssh\n.netrc"), 0766)
 	}
+	return nil
 }
 
 // ImportIntoDotfilesDir moves dotfiles into dotfiles directory and create symlinks.
-func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) {
+func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) (err error) {
 	usr, _ := user.Current()
 	for _, dotfileToSave := range dotfilesToSave {
 		src := fmt.Sprintf("%s/%s", usr.HomeDir, dotfileToSave)
 		dst := fmt.Sprintf("%s/%s", dotfilesDirPath, dotfileToSave)
 
 		if err := MoveFile(src, dst); err != nil {
-			fmt.Fprintf(os.Stderr, "%v couldn't move %s !", color.RedString("Error:"), src)
-			os.Exit(1)
+			return ErrCannotMoveDotfile
 		}
 		if err := os.Symlink(dst, src); err != nil {
-			fmt.Fprintf(os.Stderr, "%v couldn't symlink %s !", color.RedString("Error:"), src)
-			os.Exit(1)
+			return ErrCannotSymlink
 		}
 	}
 	fmt.Printf("Moved dotfiles in %s directory.\n", dotfilesDirPath)
+	return nil
 }
 
 // EnsureDotfilesRepository create Dotfiles repository if not exists.
-func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string) {
+func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string) (err error) {
 	if dotfilesRepository == "" {
 		dotfilesRepository = GetDotfilesRepository()
 	}
 	repositoryURL := fmt.Sprintf("git@github.com:%s.git", dotfilesRepository)
-	termCmd := exec.Command("git", "ls-remote", repositoryURL)
-	termCmd.Dir = dotfilesDirPath
+	lsRemoteCmd := execCommand("git", "ls-remote", repositoryURL)
+	lsRemoteCmd.Dir = dotfilesDirPath
 
-	if err := command.MustExecuteCommand(termCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s repository doesn't exists or is not reachable.", color.RedString("Error:"), repositoryURL)
-		os.Exit(1)
+	if err := command.MustExecuteCommand(lsRemoteCmd); err != nil {
+		fmt.Println(err)
+		return ErrDotfilesRepository
 	}
+	return nil
 }
 
 // PushDotfiles local dotfiles to remote.
-func PushDotfiles(message string, dotfilesDirPath string) {
-	var err error
+func PushDotfiles(message string, dotfilesDirPath string) (err error) {
 	if message == "" {
 		message = "Update dotfiles"
 	}
 
-	addCmd := exec.Command("git", "add", "-A")
+	addCmd := execCommand("git", "add", "-A")
 	addCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(addCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "%v Cannot interact with Git.\n", color.RedString("Error:"))
-		return
+		return ErrCannotInteractWithGit
 	}
 
-	commitCmd := exec.Command("git", "commit", "-m", message)
+	commitCmd := execCommand("git", "commit", "-m", message)
 	commitCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(commitCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "%v Cannot create a commit.\n", color.RedString("Error:"))
-		return
+		return fmt.Errorf("%v Cannot create a commit\n", color.RedString("Error:"))
 	}
 
-	termCmd := exec.Command("git", "push", "--force", "origin", "master")
-	termCmd.Dir = dotfilesDirPath
-	if err = command.MustExecuteCommand(termCmd); err != nil {
-		fmt.Fprintf(os.Stderr, "%v Cannot push to repository.\n", color.RedString("Error:"))
+	pushCmd := execCommand("git", "push", "--force", "origin", "master")
+	pushCmd.Dir = dotfilesDirPath
+	if err = command.MustExecuteCommand(pushCmd); err != nil {
+		return fmt.Errorf("%v Cannot push to repository.\n", color.RedString("Error:"))
 	}
+	return nil
 }
 
 // GenerateRepositoriesPath creates conf line containing the user's input.
