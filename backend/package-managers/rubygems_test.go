@@ -67,7 +67,7 @@ func TestRubyGemsCmdWithoutArgs(t *testing.T) {
 }
 
 func TestRubyGemsGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("rubygems").(RubyGemsPackageManager)
+	PackageManager := GetPackageManager("rubygems").(*RubyGemsPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",

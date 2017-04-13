@@ -32,7 +32,7 @@ type CaskPackageManager struct {
 }
 
 // Install given Cask package.
-func (pm CaskPackageManager) Install(packageName string) (err error) {
+func (pm *CaskPackageManager) Install(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "cask", "install", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
@@ -40,7 +40,7 @@ func (pm CaskPackageManager) Install(packageName string) (err error) {
 }
 
 // Uninstall given Cask package.
-func (pm CaskPackageManager) Uninstall(packageName string) (err error) {
+func (pm *CaskPackageManager) Uninstall(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "cask", "uninstall", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
 	}
@@ -48,14 +48,14 @@ func (pm CaskPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup all the local archives and previous versions.
-func (pm CaskPackageManager) Cleanup() error {
+func (pm *CaskPackageManager) Cleanup() error {
 	return command.ExecuteCommand(execCommand(pm.Path, "cask", "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm CaskPackageManager) UpdateOne(packageName string) (err error) {
+func (pm *CaskPackageManager) UpdateOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "cask", "update")); err != nil {
 		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
 	}
@@ -63,7 +63,7 @@ func (pm CaskPackageManager) UpdateOne(packageName string) (err error) {
 }
 
 // UpgradeOne Cask packages to the last known versions.
-func (pm CaskPackageManager) UpgradeOne(packageName string) (err error) {
+func (pm *CaskPackageManager) UpgradeOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "cask", "upgrade")); err != nil {
 		return fmt.Errorf("Cannot %s upgrade %s: %s", pm.Name, packageName, err)
 	}
@@ -73,7 +73,7 @@ func (pm CaskPackageManager) UpgradeOne(packageName string) (err error) {
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm CaskPackageManager) UpdateAll() (err error) {
+func (pm *CaskPackageManager) UpdateAll() (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "cask", "update")); err != nil {
 		return fmt.Errorf("Cannot %s update: %s", pm.Name, err)
 	}
@@ -81,7 +81,7 @@ func (pm CaskPackageManager) UpdateAll() (err error) {
 }
 
 // UpgradeAll Cask packages to the last known versions.
-func (pm CaskPackageManager) UpgradeAll() (err error) {
+func (pm *CaskPackageManager) UpgradeAll() (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "cask", "upgrade")); err != nil {
 		return fmt.Errorf("Cannot %s upgrade: %s", pm.Name, err)
 	}
@@ -89,7 +89,7 @@ func (pm CaskPackageManager) UpgradeAll() (err error) {
 }
 
 // IsInstalled returns true if Cask executable is found.
-func (pm CaskPackageManager) IsInstalled() bool {
+func (pm *CaskPackageManager) IsInstalled() bool {
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
 		return false
 	}
@@ -97,22 +97,22 @@ func (pm CaskPackageManager) IsInstalled() bool {
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (pm CaskPackageManager) IsOSPackageManager() bool {
+func (pm *CaskPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to Cask executable.
-func (pm CaskPackageManager) GetExecPath() string {
+func (pm *CaskPackageManager) GetExecPath() string {
 	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (pm CaskPackageManager) GetName() string {
+func (pm *CaskPackageManager) GetName() string {
 	return pm.Name
 }
 
 // Setup installs Cask
-func (pm CaskPackageManager) Setup() (err error) {
+func (pm *CaskPackageManager) Setup() (err error) {
 	fmt.Print("Installing cask...")
 	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
 		return command.ExecuteCommand(execCommand("brew", "tap", "caskroom/cask"))

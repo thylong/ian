@@ -67,7 +67,7 @@ func TestPIPCmdWithoutArgs(t *testing.T) {
 }
 
 func TestPIPGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("pip").(PipPackageManager)
+	PackageManager := GetPackageManager("pip").(*PipPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",

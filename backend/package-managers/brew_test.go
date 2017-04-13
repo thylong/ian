@@ -67,7 +67,7 @@ func TestBrewCmdWithoutArgs(t *testing.T) {
 }
 
 func TestBrewGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("brew").(BrewPackageManager)
+	PackageManager := GetPackageManager("brew").(*BrewPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",

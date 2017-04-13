@@ -67,7 +67,7 @@ func TestCaskCmdWithoutArgs(t *testing.T) {
 }
 
 func TestCaskGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("cask").(CaskPackageManager)
+	PackageManager := GetPackageManager("cask").(*CaskPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",

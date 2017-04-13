@@ -35,7 +35,7 @@ type BrewPackageManager struct {
 }
 
 // Install given Brew package.
-func (pm BrewPackageManager) Install(packageName string) (err error) {
+func (pm *BrewPackageManager) Install(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
@@ -43,7 +43,7 @@ func (pm BrewPackageManager) Install(packageName string) (err error) {
 }
 
 // Uninstall given Brew package.
-func (pm BrewPackageManager) Uninstall(packageName string) (err error) {
+func (pm *BrewPackageManager) Uninstall(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
 	}
@@ -51,7 +51,7 @@ func (pm BrewPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup all the local archives and previous versions.
-func (pm BrewPackageManager) Cleanup() (err error) {
+func (pm *BrewPackageManager) Cleanup() (err error) {
 	err = command.ExecuteCommand(execCommand(pm.Path, "cleanup"))
 	command.ExecuteCommand(execCommand(pm.Path, "cask", "cleanup"))
 	return err
@@ -60,7 +60,7 @@ func (pm BrewPackageManager) Cleanup() (err error) {
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm BrewPackageManager) UpdateOne(packageName string) (err error) {
+func (pm *BrewPackageManager) UpdateOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "update")); err != nil {
 		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
 	}
@@ -68,7 +68,7 @@ func (pm BrewPackageManager) UpdateOne(packageName string) (err error) {
 }
 
 // UpgradeOne Brew packages to the last known versions.
-func (pm BrewPackageManager) UpgradeOne(packageName string) (err error) {
+func (pm *BrewPackageManager) UpgradeOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade")); err != nil {
 		return fmt.Errorf("Cannot %s upgrade %s: %s", pm.Name, packageName, err)
 	}
@@ -78,7 +78,7 @@ func (pm BrewPackageManager) UpgradeOne(packageName string) (err error) {
 // UpdateAll pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm BrewPackageManager) UpdateAll() (err error) {
+func (pm *BrewPackageManager) UpdateAll() (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "update")); err != nil {
 		return fmt.Errorf("Cannot %s update: %s", pm.Name, err)
 	}
@@ -86,7 +86,7 @@ func (pm BrewPackageManager) UpdateAll() (err error) {
 }
 
 // UpgradeAll Brew packages to the last known versions.
-func (pm BrewPackageManager) UpgradeAll() (err error) {
+func (pm *BrewPackageManager) UpgradeAll() (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade")); err != nil {
 		return fmt.Errorf("Cannot %s upgrade: %s", pm.Name, err)
 	}
@@ -94,7 +94,7 @@ func (pm BrewPackageManager) UpgradeAll() (err error) {
 }
 
 // IsInstalled returns true if Brew executable is found.
-func (pm BrewPackageManager) IsInstalled() bool {
+func (pm *BrewPackageManager) IsInstalled() bool {
 	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
@@ -102,22 +102,22 @@ func (pm BrewPackageManager) IsInstalled() bool {
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (pm BrewPackageManager) IsOSPackageManager() bool {
+func (pm *BrewPackageManager) IsOSPackageManager() bool {
 	return pm.IsInstalled() && runtime.GOOS == "darwin"
 }
 
 // GetExecPath return immutable path to Brew executable.
-func (pm BrewPackageManager) GetExecPath() string {
+func (pm *BrewPackageManager) GetExecPath() string {
 	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (pm BrewPackageManager) GetName() string {
+func (pm *BrewPackageManager) GetName() string {
 	return pm.Name
 }
 
 // Setup installs Brew
-func (pm BrewPackageManager) Setup() (err error) {
+func (pm *BrewPackageManager) Setup() (err error) {
 	resp, err := http.Get(
 		"https://raw.githubusercontent.com/Homebrew/install/master/install",
 	)

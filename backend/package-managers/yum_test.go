@@ -67,7 +67,7 @@ func TestYumCmdWithoutArgs(t *testing.T) {
 }
 
 func TestYumGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("yum").(YumPackageManager)
+	PackageManager := GetPackageManager("yum").(*YumPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",
