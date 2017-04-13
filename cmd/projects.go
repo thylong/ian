@@ -247,7 +247,7 @@ Example: ian project dotfiles set -c bonjour -d "Say bonjour" echo bonjour !.`,
 			if len(customCmdDescription) < 5 || len(customCmdDescription) > 40 {
 				fmt.Fprintf(os.Stderr, "%v Description must be between 5 and 40 alphanumeric characters.\n\n", color.RedString("Error:"))
 				cmd.Usage()
-				os.Exit(1)
+				return
 			}
 
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
