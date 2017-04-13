@@ -15,11 +15,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
@@ -34,6 +36,9 @@ func init() {
 	envUpdateCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run update on all Package managers")
 	envUpgradeCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run upgrade on all Package managers")
 	envCmd.AddCommand(
+		envAddCmd,
+		envRemoveCmd,
+		envShowCmd,
 		envDescribeCmd,
 		envUpdateCmd,
 		envUpgradeCmd,
@@ -48,10 +53,101 @@ var envCmd = &cobra.Command{
 	Long:  `Show details, update and save your development environment.`,
 }
 
+var envAddCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Add new package(s) to ian configuration",
+	Long:  `Add new package(s) to ian env.yml.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			cmd.Usage()
+			return
+		}
+		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
+			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported", args[0])
+			return
+		}
+
+		envContent := config.Vipers["env"].AllSettings()
+		pmContent := config.Vipers["env"].GetStringSlice(args[0])
+		contains := func(e []string, c string) bool {
+			for _, s := range e {
+				if s == c {
+					return true
+				}
+			}
+			return false
+		}
+		for _, p := range args[1:] {
+			if !contains(pmContent, p) {
+				pmContent = append(pmContent, p)
+			}
+		}
+
+		envContent[args[0]] = pmContent
+		config.UpdateYamlFile(
+			config.ConfigFilesPathes["env"],
+			envContent,
+		)
+		fmt.Fprintf(os.Stdout, "Package(s) added to %s list.", args[0])
+	},
+}
+
+var envRemoveCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Remove package(s) to ian configuration",
+	Long:  `Remove package(s) to ian env.yml.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			cmd.Usage()
+			return
+		}
+		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
+			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported", args[0])
+			return
+		}
+
+		envContent := config.Vipers["env"].AllSettings()
+		pmContent := config.Vipers["env"].GetStringSlice(args[0])
+		contains := func(e []string, c string) bool {
+			for _, s := range e {
+				if s == c {
+					return true
+				}
+			}
+			return false
+		}
+		for i, p := range args[1:] {
+			if contains(pmContent, p) {
+				pmContent = append(pmContent[:i], pmContent[i+1:]...)
+			}
+		}
+
+		envContent[args[0]] = pmContent
+		config.UpdateYamlFile(
+			config.ConfigFilesPathes["env"],
+			envContent,
+		)
+		fmt.Fprintf(os.Stdout, "Package(s) removed to %s list.", args[0])
+	},
+}
+
+var envShowCmd = &cobra.Command{
+	Use:   "show",
+	Short: "List all packages persisted in Ian configuration",
+	Long:  `List all packages persisted in Ian configuration.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		settings := config.Vipers["env"].AllSettings()
+		prettySettings, _ := json.MarshalIndent(settings, "", "  ")
+		fmt.Printf("Configuration:\n%s\n}", prettySettings)
+	},
+}
+
 var envDescribeCmd = &cobra.Command{
 	Use:   "describe",
 	Short: "Show details of the current development environment",
-	Long:  `Show details of the current development environment.`,
+	Long:  `Show details of the hardware and network of the current development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := env.Describe(); err != nil {
 			fmt.Fprint(os.Stderr, err)

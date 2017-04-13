@@ -62,6 +62,16 @@ var ErrHTTPError = fmt.Errorf("%v Cannot reach endpoint", color.RedString("Error
 // ErrDotfilesRepository is returned when failing to stat a repository
 var ErrDotfilesRepository = fmt.Errorf("%v dotfiles repository doesn't exists or is not reachable", color.RedString("Error:"))
 
+// Add a package in env.yml.
+func Add(packageManager string, packages []string) (NewPMList []string, err error) {
+	return NewPMList, err
+}
+
+// Remove a package in env.yml.
+func Remove(packageManager string, packages []string) (NewPMList []string, err error) {
+	return NewPMList, err
+}
+
 // Describe returns env description.
 func Describe() (err error) {
 	resp, err := httpGet(IPCheckerURL)
