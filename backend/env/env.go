@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 
 	"github.com/fatih/color"
 	"github.com/spf13/afero"
@@ -117,13 +118,14 @@ func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage 
 
 // EnsureDotfilesDir create the ~/.dotfiles directory if not exists.
 func EnsureDotfilesDir(dotfilesDirPath string) (err error) {
+	dotfilesDirPath = filepath.Dir(dotfilesDirPath)
 	if _, err := AppFs.Stat(dotfilesDirPath); err != nil {
 		err = AppFs.Mkdir(dotfilesDirPath, 0766)
 		if err != nil {
 			return ErrOperationNotPermitted
 		}
 		command.ExecuteCommand(execCommand("git", "init"))
-		GitIgnorePath := fmt.Sprintf("%s/.gitignore", dotfilesDirPath)
+		GitIgnorePath := filepath.Join(dotfilesDirPath, ".gitignore")
 		ioutil.WriteFile(GitIgnorePath, []byte(".ssh\n.netrc"), 0766)
 	}
 	return nil
@@ -133,8 +135,8 @@ func EnsureDotfilesDir(dotfilesDirPath string) (err error) {
 func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) (err error) {
 	usr, _ := user.Current()
 	for _, dotfileToSave := range dotfilesToSave {
-		src := fmt.Sprintf("%s/%s", usr.HomeDir, dotfileToSave)
-		dst := fmt.Sprintf("%s/%s", dotfilesDirPath, dotfileToSave)
+		src := filepath.Join(usr.HomeDir, dotfileToSave)
+		dst := filepath.Join(dotfilesDirPath, dotfileToSave)
 
 		if err := MoveFile(src, dst); err != nil {
 			return ErrCannotMoveDotfile
@@ -152,6 +154,7 @@ func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string)
 	if dotfilesRepository == "" {
 		dotfilesRepository = GetDotfilesRepository()
 	}
+
 	repositoryURL := fmt.Sprintf("git@github.com:%s.git", dotfilesRepository)
 	lsRemoteCmd := execCommand("git", "ls-remote", repositoryURL)
 	lsRemoteCmd.Dir = dotfilesDirPath

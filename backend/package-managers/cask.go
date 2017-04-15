@@ -17,12 +17,15 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Cask immutable instance.
-var Cask = CaskPackageManager{Path: "/usr/local/bin/brew", Name: "cask"}
+var Cask = CaskPackageManager{Path: filepath.Clean("/usr/local/bin/brew"), Name: "cask"}
+
+var caskPath = filepath.Clean("/usr/local/bin/cask")
 
 // CaskPackageManager is an extension of Brew Mac OS package manager.
 // (more: https://caskroom.github.io/)
@@ -90,7 +93,7 @@ func (pm *CaskPackageManager) UpgradeAll() (err error) {
 
 // IsInstalled returns true if Cask executable is found.
 func (pm *CaskPackageManager) IsInstalled() bool {
-	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
+	if _, err := os.Stat(caskPath); err != nil {
 		return false
 	}
 	return true
@@ -114,7 +117,7 @@ func (pm *CaskPackageManager) GetName() string {
 // Setup installs Cask
 func (pm *CaskPackageManager) Setup() (err error) {
 	fmt.Print("Installing cask...")
-	if _, err := os.Stat("/usr/local/bin/cask"); err != nil {
+	if _, err := os.Stat(caskPath); err != nil {
 		return command.ExecuteCommand(execCommand("brew", "tap", "caskroom/cask"))
 	}
 	fmt.Print("cask already installed, skipping...")

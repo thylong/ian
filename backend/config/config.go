@@ -22,6 +22,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
@@ -68,9 +69,9 @@ func init() {
 		os.Exit(1)
 	}
 
-	ConfigDirPath = usr.HomeDir + "/.config"
-	IanConfigPath = ConfigDirPath + "/ian/"
-	DotfilesDirPath = usr.HomeDir + "/.dotfiles"
+	ConfigDirPath = filepath.Join(usr.HomeDir, ".config")
+	IanConfigPath = filepath.Join(ConfigDirPath, "ian")
+	DotfilesDirPath = filepath.Join(usr.HomeDir, ".dotfiles")
 
 	if _, err := os.Stat(ConfigDirPath); err != nil {
 		_ = os.Mkdir(ConfigDirPath, 0766)
@@ -88,7 +89,8 @@ func initVipers() {
 	ConfigFilesPathes = make(map[string]string)
 	Vipers = make(map[string]*viper.Viper)
 	for _, ConfigFileName := range []string{"config", "env", "projects"} {
-		ConfigFilesPathes[ConfigFileName] = IanConfigPath + fmt.Sprintf("%s.yml", ConfigFileName)
+		configFilePath := filepath.Join(IanConfigPath, fmt.Sprintf("%s.yml", ConfigFileName))
+		ConfigFilesPathes[ConfigFileName] = configFilePath
 		Vipers[ConfigFileName] = initViper(ConfigFileName)
 	}
 }
@@ -99,7 +101,8 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 	viperInstance.SetConfigName(viperName)
 	viperInstance.AddConfigPath(IanConfigPath)
 
-	if _, err := os.Stat(fmt.Sprintf("%s/%s.yml", IanConfigPath, viperName)); err != nil {
+	configFilePath := filepath.Join(IanConfigPath, fmt.Sprintf("%s.yml", viperName))
+	if _, err := os.Stat(configFilePath); err != nil {
 		SetupConfigFile(viperName)
 	}
 

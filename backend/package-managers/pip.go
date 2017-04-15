@@ -18,12 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Pip immutable instance.
-var Pip = PipPackageManager{Path: "/usr/local/bin/pip", Name: "pip"}
+var Pip = PipPackageManager{Path: filepath.Clean("/usr/local/bin/pip"), Name: "pip"}
 
 // ErrPipMissingFeature is returned when triggering an unsupported feature.
 var ErrPipMissingFeature = errors.New("pip is not designed to support this feature")

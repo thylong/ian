@@ -18,13 +18,14 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Apt immutable instance.
-var Apt = AptPackageManager{Path: "/usr/bin/apt-get", Name: "apt"}
+var Apt = AptPackageManager{Path: filepath.Clean("/usr/bin/apt-get"), Name: "apt"}
 
 // ErrAptMissingFeature is returned when triggering an unsupported feature.
 var ErrAptMissingFeature = errors.New("apt is not designed to support this feature")

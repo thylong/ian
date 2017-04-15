@@ -17,12 +17,13 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Apm immutable instance.
-var Apm = ApmPackageManager{Path: "/usr/local/bin/apm", Name: "apm"}
+var Apm = ApmPackageManager{Path: filepath.Clean("/usr/local/bin/apm"), Name: "apm"}
 
 // ApmPackageManager is the package manager for Atom text editor.
 // (more: https://github.com/atom/apm)

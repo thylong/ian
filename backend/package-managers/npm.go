@@ -18,12 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Npm immutable instance.
-var Npm = NpmPackageManager{Path: "/usr/local/bin/npm", Name: "npm"}
+var Npm = NpmPackageManager{Path: filepath.Clean("/usr/local/bin/npm"), Name: "npm"}
 
 // ErrNPMMissingFeature is returned when triggering an unsupported feature.
 var ErrNPMMissingFeature = errors.New("npm is not designed to support this feature")

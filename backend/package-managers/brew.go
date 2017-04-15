@@ -19,13 +19,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Brew immutable instance.
-var Brew = BrewPackageManager{Path: "/usr/local/bin/brew", Name: "brew"}
+var Brew = BrewPackageManager{Path: filepath.Clean("/usr/local/bin/brew"), Name: "brew"}
 
 // BrewPackageManager is a (widely used) unofficial Mac OS package manager.
 // (more: https://brew.sh/)

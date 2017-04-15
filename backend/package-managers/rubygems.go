@@ -18,12 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // RubyGems immutable instance.
-var RubyGems = RubyGemsPackageManager{Path: "/usr/local/bin/gem", Name: "rubygems"}
+var RubyGems = RubyGemsPackageManager{Path: filepath.Clean("/usr/local/bin/gem"), Name: "rubygems"}
 
 // ErrRubyGemsMissingFeature is returned when triggering an unsupported feature.
 var ErrRubyGemsMissingFeature = errors.New("gems is not designed to support this feature")

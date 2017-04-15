@@ -17,13 +17,14 @@ package packagemanagers
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Yum immutable instance.
-var Yum = YumPackageManager{Path: "/usr/bin/yum", Name: "yum"}
+var Yum = YumPackageManager{Path: filepath.Clean("/usr/bin/yum"), Name: "yum"}
 
 // YumPackageManager is the official Debian (and associated distributions) package manager.
 // (more: https://wiki.debian.org/Yum)

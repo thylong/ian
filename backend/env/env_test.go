@@ -75,6 +75,8 @@ func TestEnsureDotfilesDir(t *testing.T) {
 		ExpectedErr     error
 	}{
 		{"/Users/thylong/.dotfiles", true, nil},
+		{"/Users/thylong/.dotfiles", true, nil},
+		{"\\Users\\thylong\\.dotfiles", true, nil},
 		{"/Users/thylong/.dotfiles", false, ErrOperationNotPermitted},
 	}
 	for _, tc := range cases {
