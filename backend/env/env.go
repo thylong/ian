@@ -110,7 +110,7 @@ func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage 
 	if err = EnsureDotfilesRepository(dotfilesRepository, dotfilesDirPath); err != nil {
 		return err
 	}
-	if err = PushDotfiles(defaultSaveMessage, dotfilesDirPath); err != nil {
+	if err = PersistDotfiles(defaultSaveMessage, dotfilesDirPath); err != nil {
 		return err
 	}
 	return nil
@@ -166,9 +166,9 @@ func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string)
 	return nil
 }
 
-// PushDotfiles local dotfiles to remote.
-func PushDotfiles(message string, dotfilesDirPath string) (err error) {
-	if message == "" {
+// PersistDotfiles local dotfiles to remote.
+func PersistDotfiles(message string, dotfilesDirPath string) (err error) {
+	if len(message) == 0 {
 		message = "Update dotfiles"
 	}
 
@@ -210,4 +210,19 @@ func GetDotfilesRepository() string {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
 	}
 	return ""
+}
+
+// GetInitialSetupUsage returns the usage when using ian for the first time
+func GetInitialSetupUsage() []byte {
+	return []byte(`Welcome to Ian!
+Ian is a simple tool to manage your development environment, repositories,
+and projects.
+
+Learn more about Ian at http://goian.io
+
+To benefit from all of Ian’s features, you’ll need to provide:
+- The full path of your repositories (example: /Users/thylong/repositories)
+- The path of your dotfiles Github repository (example: thylong/dotfiles)
+
+`)
 }

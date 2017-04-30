@@ -57,12 +57,12 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 	}
 }
 
-// SetupPackages installs listed CLI packages.
-func SetupPackages(PackageManager pm.PackageManager, packages []string) {
+// InstallPackages installs listed CLI packages.
+func InstallPackages(PackageManager pm.PackageManager, packages []string) {
 	fmt.Println("Installing packages...")
 
 	if len(packages) == 0 {
-		fmt.Println("No packages to install")
+		fmt.Println("No packages to install.")
 		return
 	}
 

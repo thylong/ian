@@ -15,8 +15,6 @@
 package config
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -28,7 +26,6 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/fatih/color"
-	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
@@ -78,7 +75,7 @@ func init() {
 	}
 	if _, err := os.Stat(IanConfigPath); err != nil {
 		_ = os.Mkdir(IanConfigPath, 0766)
-		fmt.Printf("%s", GetInitialSetupUsage())
+		fmt.Printf("%s", env.GetInitialSetupUsage())
 	}
 	initVipers()
 }
@@ -177,11 +174,6 @@ func GetConfigDefaultContent(fileName string) []byte {
 	return []byte{}
 }
 
-// GetPreset returns the content of the preset env.yml
-func GetPreset(presetName string) []byte {
-	return []byte{}
-}
-
 // UpdateYamlFile write a Viper content to a yaml file.
 func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
 	out, err := yaml.Marshal(&fileContent)
@@ -191,64 +183,6 @@ func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
 	}
 	if err := ioutil.WriteFile(fileFullPath, out, 0766); err != nil {
 		fmt.Fprintf(os.Stderr, "%v Failed to update %s.\n", color.RedString("Error:"), fileFullPath)
-		os.Exit(1)
-	}
-}
-
-// GetUserInput ask question and return user input.
-func GetUserInput(question string) string {
-	fmt.Printf("%s: ", question)
-	reader := bufio.NewReader(os.Stdin)
-	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
-		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
-	}
-	return ""
-}
-
-// GetUserPrivateInput ask question and return user input (silent stdin).
-func GetUserPrivateInput(question string) string {
-	fmt.Printf("%s: ", question)
-	pass, _ := gopass.GetPasswd()
-	return string(pass)
-}
-
-// GetBoolUserInput ask question and return true if the user agreed otherwise false.
-func GetBoolUserInput(question string) bool {
-	in := GetUserInput(question)
-
-	if strings.ToLower(in) == "y" || strings.ToLower(in) == "yes" || strings.ToLower(in) == "" {
-		return true
-	}
-	return false
-}
-
-// SetupEnvFileWithPreset write an env file with the selected preset.
-func SetupEnvFileWithPreset(preset string) {
-	var Envcontent string
-	switch preset {
-	default:
-		fmt.Fprintf(os.Stderr, "%v Cannot find preset.", color.RedString("Error:"))
-		return
-	case "1":
-		Envcontent = GetSoftwareEngineerPreset()
-	case "2":
-		Envcontent = GetBackendDeveloperPreset()
-	case "3":
-		Envcontent = GetFrontendDeveloperPreset()
-	case "4":
-		Envcontent = GetOpsPreset()
-	}
-
-	confPath := ConfigFilesPathes["env"]
-	f, err := os.OpenFile(confPath, os.O_CREATE|os.O_WRONLY, 0655)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
-		os.Exit(1)
-	}
-	defer f.Close()
-
-	if _, err = f.WriteString(Envcontent); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 }
@@ -290,20 +224,4 @@ func GetProjects() (projectCmds map[string]*cobra.Command) {
 		}
 	}
 	return projectCmds
-}
-
-// GetInitialSetupUsage returns the usage when using ian for the first time
-func GetInitialSetupUsage() []byte {
-	return []byte(`Welcome to Ian!
-Ian is a simple tool to manage your development environment, repositories,
-and projects.
-
-Learn more about Ian at http://goian.io
-
-To benefit from all of Ian’s features, you’ll need to provide:
-- A working OS Package Manager (will set up if missing)
-- The full path of your repositories (example: /Users/thylong/repositories)
-- The path of your dotfiles Github repository (example: thylong/dotfiles)
-
-`)
 }

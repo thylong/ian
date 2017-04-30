@@ -32,7 +32,6 @@ func init() {
 		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
-	RootCmd.AddCommand(versionCmd)
 }
 
 // RootCmd is executed by default (top level).
@@ -41,14 +40,4 @@ var RootCmd = &cobra.Command{
 	Short: "Ian is a simple tool to manage your development environment",
 	Long: `Ian is a simple tool to manage your development environment, repositories,
 and projects.`,
-}
-
-// versionCmd execution displays ian version.
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version information",
-	Long:  `Print the version information.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ian version: alpha")
-	},
 }

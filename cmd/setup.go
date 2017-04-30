@@ -40,9 +40,8 @@ var setupCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 			fmt.Println("Installing OS package manager...")
-			err = OSPackageManager.Setup()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v Missing OS package manager !.", color.RedString("Error:"))
+			if err = OSPackageManager.Setup(); err != nil {
+				fmt.Fprintf(os.Stderr, "%v Missing OS package manager !", color.RedString("Error:"))
 				return
 			}
 		}
@@ -52,18 +51,21 @@ var setupCmd = &cobra.Command{
 			config.DotfilesDirPath,
 		)
 
-		fmt.Printf("You don't have any packages to be installed in your current ian configuration.")
+		fmt.Printf("You don't have any packages to be installed in your current ian configuration.\n")
 		if config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
-			in := config.GetUserInput("Which preset would you like to use:\n1) Software engineer (generalist preset)\n2) Backend developer\n3) Frontend developer\n4) Ops\nEnter your choice:")
-			config.SetupEnvFileWithPreset(in)
+			in := config.GetUserInput(`Which preset would you like to use:
+    1) Software engineer (generalist preset)
+    2) Backend developer
+    3) Frontend developer
+    4) Ops
+Enter your choice`)
+			config.CreateEnvFileWithPreset(in)
 		}
 
-		packageManagerNames := config.Vipers["env"].AllKeys()
-		for _, packageManagerName := range packageManagerNames {
-			packages := config.Vipers["env"].GetStringSlice(packageManagerName)
-			packageManager := pm.GetPackageManager(packageManagerName)
-
-			env.SetupPackages(packageManager, packages)
+		packageManagers := config.Vipers["env"].AllKeys()
+		for _, packageManager := range packageManagers {
+			packages := config.Vipers["env"].GetStringSlice(packageManager)
+			env.InstallPackages(pm.GetPackageManager(packageManager), packages)
 		}
 		fmt.Println("Great! You're ready to start using Ian.")
 	},

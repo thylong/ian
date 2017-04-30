@@ -12,4 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package cmd
+
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
+
+func init() {
+	RootCmd.AddCommand(versionCmd)
+}
+
+// versionCmd execution displays ian version.
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version information",
+	Long:  `Print the version information.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("ian version: alpha")
+	},
+}
