@@ -134,20 +134,11 @@ func TestEnsureDotfilesRepository(t *testing.T) {
 	cases := []struct {
 		DotfilesRepository string
 		DotfilesDirPath    string
-		FileExists         bool
-		PermissionOk       bool
 		ExpectedErr        error
 	}{
-		{"thylong/dotfiles", "/Users/thylong/.dotfiles", false, true, ErrDotfilesRepository},
-		{"", "/Users/thylong/.dotfiles", false, true, ErrDotfilesRepository},
+		{"thylong/dotfiles", "/Users/thylong/.dotfiles", nil},
 	}
 	for _, tc := range cases {
-		if tc.FileExists {
-			AppFs.Mkdir(tc.DotfilesDirPath, 0766)
-		}
-		if !tc.PermissionOk {
-			AppFs = afero.NewReadOnlyFs(AppFs)
-		}
 		if err := EnsureDotfilesRepository(tc.DotfilesRepository, tc.DotfilesDirPath); err != tc.ExpectedErr {
 			t.Errorf("EnsureDotfilesRepository func returned wrong err: got %#v want %#v",
 				err, tc.ExpectedErr)
@@ -156,7 +147,7 @@ func TestEnsureDotfilesRepository(t *testing.T) {
 	}
 }
 
-func TestPushDotfiles(t *testing.T) {
+func TestPersistDotfiles(t *testing.T) {
 	AppFs = afero.NewMemMapFs()
 	execCommand = mockExecCommand
 	defer func() {
@@ -171,7 +162,7 @@ func TestPushDotfiles(t *testing.T) {
 		PermissionOk    bool
 		ExpectedErr     error
 	}{
-		{"coucou", "/Users/thylong/.dotfiles", true, true, ErrCannotInteractWithGit},
+		{"coucou", "/Users/thylong/.dotfiles", true, true, nil},
 	}
 	for _, tc := range cases {
 		if tc.FileExists {
@@ -180,8 +171,9 @@ func TestPushDotfiles(t *testing.T) {
 		if !tc.PermissionOk {
 			AppFs = afero.NewReadOnlyFs(AppFs)
 		}
-		if err := PushDotfiles(tc.Message, tc.DotfilesDirPath); err != tc.ExpectedErr {
-			t.Errorf("PushDotfiles func returned wrong err: got %#v want %#v",
+		if err := PersistDotfiles(tc.Message, tc.DotfilesDirPath); err != tc.ExpectedErr {
+			fmt.Println(AppFs.Name())
+			t.Errorf("PersistDotfiles func returned wrong err: got %#v want %#v",
 				err, tc.ExpectedErr)
 		}
 		AppFs = afero.NewMemMapFs()
