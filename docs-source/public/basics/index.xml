@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Basics on ian</title>
+    <link>https://goian.io/basics/index.xml</link>
+    <description>Recent content in Basics on ian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 21 Mar 2017 16:35:43 -0400</lastBuildDate>
+    <atom:link href="https://goian.io/basics/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Basics</title>
+      <link>https://goian.io/basics/</link>
+      <pubDate>Tue, 21 Mar 2017 16:35:43 -0400</pubDate>
+      
+      <guid>https://goian.io/basics/</guid>
+      <description>
+
+&lt;h3 id=&#34;chapter-1&#34;&gt;Chapter 1&lt;/h3&gt;
+
+&lt;h1 id=&#34;basics&#34;&gt;Basics&lt;/h1&gt;
+
+&lt;p&gt;Discover what this ian is all about and the core-concepts behind it.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>What is this Ian ?</title>
+      <link>https://goian.io/basics/what-is-ian/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://goian.io/basics/what-is-ian/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;Ian is a simple tool to manage your development environment and your coding projects.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;the-idea-behind-ian&#34;&gt;The idea behind Ian&lt;/h2&gt;
+
+&lt;p&gt;Us, developers, love to work with the terminal. More reliable and simpler than most GUIs, this &amp;ldquo;black screen&amp;rdquo; allows also automation through scripting and blazing fast manipulation.&lt;/p&gt;
+
+&lt;p&gt;But even with these capabilities, we still execute pretty repetitive tasks and have troubles to make our local environment portable.
+Sometimes, we&amp;rsquo;re looking in our history to retrieve a database URI, change from one project directory to another one just to execute a command, and so on.&lt;/p&gt;
+
+&lt;p&gt;Ian was designed and created to solve these problems.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-does-ian-tackle-this-problem&#34;&gt;How does ian tackle this problem ?&lt;/h2&gt;
+
+&lt;p&gt;ian propose your to store and persist your projects and env configuration in order to interact with them more easily.
+You can (among others things):&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List the packages installed on your environment and have them installed anytime you run ian on another device.&lt;/li&gt;
+&lt;li&gt;Register commands per projects and give them an alias&lt;/li&gt;
+&lt;li&gt;Update/upgrade your environment with a unified interface&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;every-developer-is-unique&#34;&gt;Every developer is unique&lt;/h2&gt;
+
+&lt;p&gt;&amp;hellip; Which bring us to customization and social interactions (yes, for those who still doubt about it, we are human too) !&lt;/p&gt;
+
+&lt;h3 id=&#34;maximum-customization&#34;&gt;Maximum customization&lt;/h3&gt;
+
+&lt;p&gt;We decided to offer the maximum customization possible to make you able to interact with your environment the way you like it.
+In brief, we give you a set of default commands that we find useful in general and we let you add any subcommands you&amp;rsquo;d like to execute.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-notion-of-project-context&#34;&gt;The notion of project context&lt;/h3&gt;
+
+&lt;p&gt;Projects depend on a huge number of factors: languages, platforms, frameworks, host ressources, etc
+With ian, through an interactive setup you can provide the infos necessary to specific the context of execution of all the project commmands.&lt;/p&gt;
+
+&lt;h3 id=&#34;share-your-configuration&#34;&gt;Share your configuration&lt;/h3&gt;
+
+&lt;p&gt;Using ian share, you can share your ian configuration files&lt;/p&gt;
+
+&lt;p&gt;In the next page, we&amp;rsquo;ll go though the setup together :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Getting started</title>
+      <link>https://goian.io/basics/getting-started/</link>
+      <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
+      
+      <guid>https://goian.io/basics/getting-started/</guid>
+      <description>
+
+&lt;h2 id=&#34;installation&#34;&gt;Installation&lt;/h2&gt;
+
+&lt;p&gt;Installing ian is pretty straightforward.
+All you have to do is to paste this in your terminal:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;# Bash/Zsh
+python -c &amp;quot;$(curl -fsSL https://raw.githubusercontent.com/thylong/ian/master/install/install.py)&amp;quot;
+
+# Fish
+python -c &amp;quot;(curl -fsSL https://raw.githubusercontent.com/thylong/ian/master/install/install.py)&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Configuration</title>
+      <link>https://goian.io/basics/configuration/</link>
+      <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
+      
+      <guid>https://goian.io/basics/configuration/</guid>
+      <description>
+
+&lt;p&gt;Ian relies a lot on configuration files as they describe your environment and your projects.
+It&amp;rsquo;s possible to edit your entire configuration using ian commands (recommended) but if you&amp;rsquo;re stuck
+or if you simply prefer to edit manually your configuration, it&amp;rsquo;s possible !&lt;/p&gt;
+
+&lt;p&gt;Ian configuration files are written with Yaml and are relatively simple to read.
+If you don&amp;rsquo;t have specific ian files, no worries some are going to be generated
+for you when you execute it for the first time.&lt;/p&gt;
+
+&lt;h2 id=&#34;configuration-through-cli&#34;&gt;Configuration through CLI&lt;/h2&gt;
+
+&lt;h3 id=&#34;config&#34;&gt;Config&lt;/h3&gt;
+
+&lt;p&gt;config.yml contains all the settings that are not specific to a project or one of Ian&amp;rsquo;s feature.
+This file is generated at the first run of Ian and can be edited at any time using Ian setup.&lt;/p&gt;
+
+&lt;p&gt;It contains currently 2 variables like in this example:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;dotfiles_repository&lt;/strong&gt;: &lt;em&gt;thylong/dotfiles&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;repositories_path&lt;/strong&gt;: &lt;em&gt;/Users/thylong/www/repositories&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;dotfiles_repository&lt;/strong&gt; is the path to your dotfiles repository.
+This variable is used to manage your dotfiles configuration (learn more about it here: &lt;a href=&#34;https://github.com/webpro/awesome-dotfiles&#34;&gt;https://github.com/webpro/awesome-dotfiles&lt;/a&gt;).
+if you don&amp;rsquo;t have one, you will not be able to use &lt;code&gt;ian env save&lt;/code&gt; feature.&lt;/p&gt;
+
+&lt;div class=&#34;notices info&#34; &gt;&lt;p&gt;For now, only Github is supported but stories to add support for Gitlab and Bitbucket are already in the pipe.
+If you wish to support any new repositories solution, don&amp;rsquo;t hesitate to open an issue and/or make a pull request.&lt;/p&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;repositories_path&lt;/strong&gt; is the fullpath to the directory that contains all your repositories.
+This variable is use by a lot of Ian&amp;rsquo;s commands to interact with your projects reposories,
+by env commands to display stats, by the setup, etc.&lt;/p&gt;
+
+&lt;div class=&#34;notices info&#34; &gt;&lt;p&gt;For now, we support only having a single repositories path but as many languages have their specificities, I&amp;rsquo;m thinking about an easy way to have a more granular configuration if needed.&lt;/p&gt;
+&lt;/div&gt;
+
+
+&lt;h3 id=&#34;env&#34;&gt;Env&lt;/h3&gt;
+
+&lt;p&gt;env.yml contains all the packages to be installed when setting up Ian on a new device.
+This file is your best garantee to don&amp;rsquo;t loose your configuration during a migration and
+to keep it consistent when working on several computers.&lt;/p&gt;
+
+&lt;p&gt;The file content looks like the following example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;    brew:
+        - httpie
+        - mongodb
+
+    cask:
+        - atom
+        - caffeine
+        - dash
+        - google-chrome
+        - iterm2
+        - libreoffice
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div class=&#34;notices note&#34; &gt;&lt;p&gt;This file can contains packages that are not compatible with the current OS
+you&amp;rsquo;re working on, during setup Ian will simply ignore them.&lt;/p&gt;
+&lt;/div&gt;
+
+
+&lt;h3 id=&#34;projects&#34;&gt;Projects&lt;/h3&gt;
+
+&lt;p&gt;projects.yml contains the configurations of your projects. It allows you to
+bind your commands, store your project configuration and generate your own
+subcommands.&lt;/p&gt;
+
+&lt;p&gt;The file content looks like the following example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;    regexrace:
+        deploy_cmd: bash deploy.sh
+        description: Train your regex skills
+        dummy_custom_cmd: this command is really simple=mongo localhost
+        health: /status
+        repository: thylong/regexrace
+        rollback_cmd: bash rollback.sh
+        url: http://regexrace.org
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;editing-yaml-files&#34;&gt;Editing yaml files&lt;/h2&gt;
+
+&lt;p&gt;Ian configuration files can be found in &lt;code&gt;$HOME/.config/ian&lt;/code&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
