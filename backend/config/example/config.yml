@@ -1,6 +1,4 @@
-repositories_path: /Users/t.leveque/www/repositories
+repositories_path: /Users/thylong/www/repositories
 dotfiles:
-    repository: thylong/dotfiles
-    provider: github
-    private: false
-    encrypted: false
+  repository: thylong/dotfiles
+  provider: github

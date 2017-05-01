@@ -21,7 +21,9 @@ func TestCopyFile(t *testing.T) {
 		{"test.yml", true, false, "test.yml", false, nil},
 		{"test.yml", true, false, "test.yml", true, nil},
 		{"test.yml", true, false, "test2.yml", true, nil},
+		{"test.yml", true, true, "test.yml", false, nil},
 		{"test.yml", false, false, "test2.yml", false, ErrCannotStatFile},
+		{"test.yml", false, true, "test2.yml", false, ErrCannotStatFile},
 	}
 	for _, tc := range cases {
 		if tc.SrcExists {

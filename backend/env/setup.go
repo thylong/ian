@@ -59,12 +59,10 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 
 // InstallPackages installs listed CLI packages.
 func InstallPackages(PackageManager pm.PackageManager, packages []string) {
-	fmt.Println("Installing packages...")
-
 	if len(packages) == 0 {
-		fmt.Println("No packages to install.")
 		return
 	}
+	fmt.Printf("Installing %s packages...", PackageManager.GetName())
 
 	for _, packageToInstall := range packages {
 		if err := PackageManager.Install(packageToInstall); err != nil {

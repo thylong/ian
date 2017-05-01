@@ -219,7 +219,7 @@ var envSaveCmd = &cobra.Command{
 		}
 		err := env.Save(
 			config.DotfilesDirPath,
-			config.Vipers["config"].GetString("dotfiles_repository"),
+			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
 			config.Vipers["config"].GetString("default_save_message"),
 			[]string{".testong"},
 		)

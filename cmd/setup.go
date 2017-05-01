@@ -47,7 +47,7 @@ var setupCmd = &cobra.Command{
 		}
 
 		env.SetupDotFiles(
-			config.Vipers["config"].GetString("dotfiles_repository"),
+			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
 			config.DotfilesDirPath,
 		)
 

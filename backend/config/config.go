@@ -125,13 +125,14 @@ func SetupConfigFile(ConfigFileName string) {
 		configContent := GetConfigDefaultContent(ConfigFilePath)
 
 		if ConfigFileName == "config" {
-			repositoriesPathPrefix := "\nrepositories_path: "
+			repositoriesPathPrefix := "repositories_path: "
 			repositoriesPath := env.GenerateRepositoriesPath()
 			configContent = append(configContent, fmt.Sprintf("%s%s", repositoriesPathPrefix, repositoriesPath)...)
 
-			dotfilesRepositoryPrefix := "\ndotfiles_repository: "
-			dotfilesRepository := env.GetDotfilesRepository()
-			configContent = append(configContent, fmt.Sprintf("%s%s", dotfilesRepositoryPrefix, dotfilesRepository)...)
+			dotfilesRepositoryPrefix := "\ndotfiles:\n"
+			dotfilesRepository := fmt.Sprintf("  repository: %s", env.GetDotfilesRepository())
+			repositoryProvider := "  provider: github"
+			configContent = append(configContent, fmt.Sprintf("%s%s%s", dotfilesRepositoryPrefix, dotfilesRepository, repositoryProvider)...)
 		}
 
 		fmt.Printf("Creating %s\n", ConfigFileName)
