@@ -221,7 +221,7 @@ var envSaveCmd = &cobra.Command{
 			config.DotfilesDirPath,
 			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
 			config.Vipers["config"].GetString("default_save_message"),
-			[]string{".testong"},
+			[]string{},
 		)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Save command failed: %s", err)

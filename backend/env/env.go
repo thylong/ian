@@ -26,6 +26,7 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/afero"
@@ -134,6 +135,15 @@ func EnsureDotfilesDir(dotfilesDirPath string) (err error) {
 // ImportIntoDotfilesDir moves dotfiles into dotfiles directory and create symlinks.
 func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) (err error) {
 	usr, _ := user.Current()
+
+	if len(dotfilesToSave) == 0 {
+		files, _ := ioutil.ReadDir(usr.HomeDir)
+		for _, file := range files {
+			if strings.HasPrefix(file.Name(), ".") && file.Name() != ".ssh" && file.Name() != ".bash_history" && file.Name() != ".Trash" {
+				dotfilesToSave = append(dotfilesToSave, file.Name())
+			}
+		}
+	}
 	for _, dotfileToSave := range dotfilesToSave {
 		src := filepath.Join(usr.HomeDir, dotfileToSave)
 		dst := filepath.Join(dotfilesDirPath, dotfileToSave)
