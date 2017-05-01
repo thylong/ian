@@ -21,7 +21,12 @@ import (
 	"io"
 	"os"
 	"os/exec"
+
+	"github.com/fatih/color"
 )
+
+// ErrStartCommand is returned when failing to start command
+var ErrStartCommand = fmt.Errorf("%v Impossible to start Cmd", color.RedString("Error:"))
 
 // ExecuteCommand a command and print output from stdout.
 func ExecuteCommand(subCmd *exec.Cmd) (err error) {
@@ -45,7 +50,7 @@ func ExecuteCommand(subCmd *exec.Cmd) (err error) {
 
 	err = subCmd.Start()
 	if err != nil {
-		return fmt.Errorf("Impossible to start Cmd: %v", err)
+		return ErrStartCommand
 	}
 
 	err = subCmd.Wait()

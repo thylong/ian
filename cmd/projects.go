@@ -247,7 +247,7 @@ Example: ian project dotfiles set -c bonjour -d "Say bonjour" echo bonjour !.`,
 			if len(customCmdDescription) < 5 || len(customCmdDescription) > 40 {
 				fmt.Fprintf(os.Stderr, "%v Description must be between 5 and 40 alphanumeric characters.\n\n", color.RedString("Error:"))
 				cmd.Usage()
-				os.Exit(1)
+				return
 			}
 
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
@@ -267,9 +267,7 @@ func cloneCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "clone",
 		Short: "Clone project repository",
-		Long: `Clone the project repository.
-
-Example: ian project dotfiles unset bonjour -d "Say bonjour" echo bonjour !.`,
+		Long:  `Clone the project repository in repositories_path path.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			editContent := config.Vipers["projects"].GetStringMapString(cmd.Parent().Use)
 			if projectRepository, ok := editContent["repository"]; ok {

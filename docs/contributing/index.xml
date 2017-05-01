@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Contributings on ian</title>
+    <link>https://goian.io/contributing/index.xml</link>
+    <description>Recent content in Contributings on ian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 21 Mar 2017 16:36:26 -0400</lastBuildDate>
+    <atom:link href="https://goian.io/contributing/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Contributing</title>
+      <link>https://goian.io/contributing/</link>
+      <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
+      
+      <guid>https://goian.io/contributing/</guid>
+      <description>
+
+&lt;p&gt;Any contribution to this project is more than welcomed ! As small or big as they are, contributions are what will make this project better. There is still a lot to do : reporting bugs, proposing fixes, new features, helping with the documentation&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;If it’s your first contribution, no worries. As long as you follow the guidelines, everything is going to be fine :)&lt;/p&gt;
+
+&lt;h2 id=&#34;open-an-issue&#34;&gt;Open an issue&lt;/h2&gt;
+
+&lt;p&gt;If you spot a bug or want to propose an enhancement, you can open an issue on Github. Please make sure to avoid duplicates and explain clearly what is your need.&lt;/p&gt;
+
+&lt;h2 id=&#34;coding-guidelines&#34;&gt;Coding guidelines&lt;/h2&gt;
+
+&lt;p&gt;This project wants to stay close to the standard and was inspired by Kubernetes CLI, Cobra and Requests code quality.&lt;/p&gt;
+
+&lt;p&gt;My advice would be to follow effective Go guide and to listen to golinter suggestions.&lt;/p&gt;
+
+&lt;h2 id=&#34;creating-a-pull-request&#34;&gt;Creating a pull request&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Fork the project&lt;/li&gt;
+&lt;li&gt;Install dev dependencies and package&lt;/li&gt;
+&lt;li&gt;Checkout a new branch based on dev&lt;/li&gt;
+&lt;li&gt;Make your change and run the test suite&lt;/li&gt;
+&lt;li&gt;Be sure to respect Go conventions&lt;/li&gt;
+&lt;li&gt;Run the entire test suite before commiting&lt;/li&gt;
+&lt;li&gt;If your commit fixes an open issue, reference it in the commit message&lt;/li&gt;
+&lt;li&gt;Commit with a proper commit message&lt;/li&gt;
+&lt;li&gt;Open a PR using this description structure&lt;/li&gt;
+&lt;li&gt;Travis (CI) will run on your branch&lt;/li&gt;
+&lt;li&gt;If the PR is accepted, it will be merged into the dev branch and then released.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

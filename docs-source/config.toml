@@ -1,0 +1,9 @@
+title = "ian"
+description = "Ian is a simple tool to manage your development environment, repositories, and projects."
+baseURL = "https://goian.io"
+languageCode = "en-us"
+publishDir = "docs"
+
+[params]
+  menu = [ "basics", "contributing", "changelog", "license" ]
+  editURL = "https://github.com/thylong/ian/edit/master/docs/content/"

@@ -18,12 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // Npm immutable instance.
-var Npm = NpmPackageManager{Path: "/usr/local/bin/npm", Name: "npm"}
+var Npm = NpmPackageManager{Path: filepath.Clean("/usr/local/bin/npm"), Name: "npm"}
 
 // ErrNPMMissingFeature is returned when triggering an unsupported feature.
 var ErrNPMMissingFeature = errors.New("npm is not designed to support this feature")
@@ -36,7 +37,7 @@ type NpmPackageManager struct {
 }
 
 // Install given Npm package.
-func (pm NpmPackageManager) Install(packageName string) (err error) {
+func (pm *NpmPackageManager) Install(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "install", "-g", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
@@ -44,7 +45,7 @@ func (pm NpmPackageManager) Install(packageName string) (err error) {
 }
 
 // Uninstall given Npm package.
-func (pm NpmPackageManager) Uninstall(packageName string) (err error) {
+func (pm *NpmPackageManager) Uninstall(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", "-g", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
@@ -52,14 +53,14 @@ func (pm NpmPackageManager) Uninstall(packageName string) (err error) {
 }
 
 // Cleanup the npm cache.
-func (pm NpmPackageManager) Cleanup() error {
+func (pm *NpmPackageManager) Cleanup() error {
 	return command.ExecuteCommand(execCommand(pm.Path, "cache", "clean"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm NpmPackageManager) UpdateOne(packageName string) (err error) {
+func (pm *NpmPackageManager) UpdateOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "update", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
 	}
@@ -67,7 +68,7 @@ func (pm NpmPackageManager) UpdateOne(packageName string) (err error) {
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (pm NpmPackageManager) UpgradeOne(packageName string) (err error) {
+func (pm *NpmPackageManager) UpgradeOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s upgrade %s: %s", pm.Name, packageName, err)
 	}
@@ -75,12 +76,12 @@ func (pm NpmPackageManager) UpgradeOne(packageName string) (err error) {
 }
 
 // UpdateAll does nothing (out of making NPM satisfying PackageManager interface).
-func (pm NpmPackageManager) UpdateAll() error {
+func (pm *NpmPackageManager) UpdateAll() error {
 	return ErrNPMMissingFeature
 }
 
 // UpgradeAll Npm packages to the last known versions.
-func (pm NpmPackageManager) UpgradeAll() (err error) {
+func (pm *NpmPackageManager) UpgradeAll() (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "update", "-g")); err != nil {
 		return fmt.Errorf("Cannot %s update: %s", pm.Name, err)
 	}
@@ -88,7 +89,7 @@ func (pm NpmPackageManager) UpgradeAll() (err error) {
 }
 
 // IsInstalled returns true if Npm executable is found.
-func (pm NpmPackageManager) IsInstalled() bool {
+func (pm *NpmPackageManager) IsInstalled() bool {
 	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
@@ -96,21 +97,21 @@ func (pm NpmPackageManager) IsInstalled() bool {
 }
 
 // IsOSPackageManager returns false because npm is never the main OS Package Manager.
-func (pm NpmPackageManager) IsOSPackageManager() bool {
+func (pm *NpmPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to Npm executable.
-func (pm NpmPackageManager) GetExecPath() string {
+func (pm *NpmPackageManager) GetExecPath() string {
 	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (pm NpmPackageManager) GetName() string {
+func (pm *NpmPackageManager) GetName() string {
 	return pm.Name
 }
 
 // Setup installs Cask
-func (pm NpmPackageManager) Setup() (err error) {
+func (pm *NpmPackageManager) Setup() (err error) {
 	return nil
 }

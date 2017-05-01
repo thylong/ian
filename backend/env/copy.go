@@ -4,12 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/spf13/afero"
 )
-
-// AppFs is a wrapper to OS package
-var AppFs = afero.NewOsFs()
 
 // ErrCannotStatFile occurs when stating a non-existing file
 var ErrCannotStatFile = fmt.Errorf("Cannot open file")
@@ -76,5 +71,5 @@ func MoveFile(src, dst string) (err error) {
 	if err := CopyFile(src, dst); err != nil {
 		return err
 	}
-	return os.Remove(src)
+	return AppFs.Remove(src)
 }

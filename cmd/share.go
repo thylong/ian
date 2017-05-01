@@ -114,7 +114,7 @@ var shareRetrieveFromLinkCmd = &cobra.Command{
 		if len(args) < 1 {
 			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
 			cmd.Usage()
-			os.Exit(1)
+			return
 		}
 
 		key := ""

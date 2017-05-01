@@ -20,6 +20,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"regexp"
 
 	"github.com/fatih/color"
@@ -36,15 +37,17 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 
 		re := regexp.MustCompile(".git$")
 
-		files, _ := ioutil.ReadDir(usr.HomeDir + "/.dotfiles")
+		files, _ := ioutil.ReadDir(filepath.Join(usr.HomeDir, "/.dotfiles"))
 		for _, f := range files {
 			if re.MatchString(f.Name()) {
 				continue
 			}
 
-			if _, err := os.Stat(usr.HomeDir + "/" + f.Name()); err != nil {
-				err := os.Symlink(usr.HomeDir+"/.dotfiles/"+f.Name(), usr.HomeDir+"/"+f.Name())
-				if err != nil {
+			if _, err := os.Stat(filepath.Join(usr.HomeDir, f.Name())); err != nil {
+				if err := os.Symlink(
+					filepath.Join(usr.HomeDir, ".dotfiles", f.Name()),
+					filepath.Join(usr.HomeDir, f.Name()),
+				); err != nil {
 					fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 				}
 			}
@@ -54,14 +57,12 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 	}
 }
 
-// SetupPackages installs listed CLI packages.
-func SetupPackages(PackageManager pm.PackageManager, packages []string) {
-	fmt.Println("Installing packages...")
-
+// InstallPackages installs listed CLI packages.
+func InstallPackages(PackageManager pm.PackageManager, packages []string) {
 	if len(packages) == 0 {
-		fmt.Println("No packages to install")
 		return
 	}
+	fmt.Printf("Installing %s packages...", PackageManager.GetName())
 
 	for _, packageToInstall := range packages {
 		if err := PackageManager.Install(packageToInstall); err != nil {

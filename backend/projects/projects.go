@@ -51,7 +51,7 @@ func Stats(project string, repositoryURL string) (stats map[string]interface{}, 
 	if err != nil || resp.StatusCode > 300 {
 		return stats, ErrStatsUnavailable
 	}
-	content, err := ioutil.ReadAll(resp.Body)
+	content, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
 	if err = json.Unmarshal(content, &stats); err != nil {

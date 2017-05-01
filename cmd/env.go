@@ -15,10 +15,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
@@ -33,6 +36,9 @@ func init() {
 	envUpdateCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run update on all Package managers")
 	envUpgradeCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run upgrade on all Package managers")
 	envCmd.AddCommand(
+		envAddCmd,
+		envRemoveCmd,
+		envShowCmd,
 		envDescribeCmd,
 		envUpdateCmd,
 		envUpgradeCmd,
@@ -47,12 +53,105 @@ var envCmd = &cobra.Command{
 	Long:  `Show details, update and save your development environment.`,
 }
 
+var envAddCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Add new package(s) to ian configuration",
+	Long:  `Add new package(s) to ian env.yml.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			cmd.Usage()
+			return
+		}
+		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
+			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported", args[0])
+			return
+		}
+
+		envContent := config.Vipers["env"].AllSettings()
+		pmContent := config.Vipers["env"].GetStringSlice(args[0])
+		contains := func(e []string, c string) bool {
+			for _, s := range e {
+				if s == c {
+					return true
+				}
+			}
+			return false
+		}
+		for _, p := range args[1:] {
+			if !contains(pmContent, p) {
+				pmContent = append(pmContent, p)
+			}
+		}
+
+		envContent[args[0]] = pmContent
+		config.UpdateYamlFile(
+			config.ConfigFilesPathes["env"],
+			envContent,
+		)
+		fmt.Fprintf(os.Stdout, "Package(s) added to %s list.", args[0])
+	},
+}
+
+var envRemoveCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Remove package(s) to ian configuration",
+	Long:  `Remove package(s) to ian env.yml.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 2 {
+			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			cmd.Usage()
+			return
+		}
+		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
+			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported", args[0])
+			return
+		}
+
+		envContent := config.Vipers["env"].AllSettings()
+		pmContent := config.Vipers["env"].GetStringSlice(args[0])
+		contains := func(e []string, c string) bool {
+			for _, s := range e {
+				if s == c {
+					return true
+				}
+			}
+			return false
+		}
+		for i, p := range args[1:] {
+			if contains(pmContent, p) {
+				pmContent = append(pmContent[:i], pmContent[i+1:]...)
+			}
+		}
+
+		envContent[args[0]] = pmContent
+		config.UpdateYamlFile(
+			config.ConfigFilesPathes["env"],
+			envContent,
+		)
+		fmt.Fprintf(os.Stdout, "Package(s) removed to %s list.", args[0])
+	},
+}
+
+var envShowCmd = &cobra.Command{
+	Use:   "show",
+	Short: "List all packages persisted in Ian configuration",
+	Long:  `List all packages persisted in Ian configuration.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		settings := config.Vipers["env"].AllSettings()
+		prettySettings, _ := json.MarshalIndent(settings, "", "  ")
+		fmt.Printf("Configuration:\n%s\n}", prettySettings)
+	},
+}
+
 var envDescribeCmd = &cobra.Command{
 	Use:   "describe",
 	Short: "Show details of the current development environment",
-	Long:  `Show details of the current development environment.`,
+	Long:  `Show details of the hardware and network of the current development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		env.Describe()
+		if err := env.Describe(); err != nil {
+			fmt.Fprint(os.Stderr, err)
+		}
 	},
 }
 
@@ -112,17 +211,20 @@ var envSaveCmd = &cobra.Command{
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
-			fmt.Println("/!\\ You currently have no defined path to your parent repositories directory.")
+			fmt.Fprintf(os.Stderr, "Warning: You currently have no defined path to your parent repositories directory.")
 			in := config.GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
 			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
 				return
 			}
 		}
-		env.Save(
+		err := env.Save(
 			config.DotfilesDirPath,
-			config.Vipers["config"].GetString("dotfiles_repository"),
+			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
 			config.Vipers["config"].GetString("default_save_message"),
 			[]string{".testong"},
 		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Save command failed: %s", err)
+		}
 	},
 }

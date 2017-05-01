@@ -67,7 +67,7 @@ func TestAPTCmdWithoutArgs(t *testing.T) {
 }
 
 func TestAptGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("apt").(AptPackageManager)
+	PackageManager := GetPackageManager("apt").(*AptPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",

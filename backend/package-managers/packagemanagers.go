@@ -41,14 +41,14 @@ var SupportedPackageManagers = make(map[string]PackageManager)
 var execCommand = exec.Command
 
 func init() {
-	SupportedPackageManagers["brew"] = Brew
-	SupportedPackageManagers["cask"] = Cask
-	SupportedPackageManagers["pip"] = Pip
-	SupportedPackageManagers["npm"] = Npm
-	SupportedPackageManagers["apt"] = Apt
-	SupportedPackageManagers["yum"] = Yum
-	SupportedPackageManagers["rubygems"] = RubyGems
-	SupportedPackageManagers["apm"] = Apm
+	SupportedPackageManagers["brew"] = &Brew
+	SupportedPackageManagers["cask"] = &Cask
+	SupportedPackageManagers["pip"] = &Pip
+	SupportedPackageManagers["npm"] = &Npm
+	SupportedPackageManagers["apt"] = &Apt
+	SupportedPackageManagers["yum"] = &Yum
+	SupportedPackageManagers["rubygems"] = &RubyGems
+	SupportedPackageManagers["apm"] = &Apm
 }
 
 // GetOSPackageManager returns the main Package Manager of the current OS.
@@ -59,7 +59,7 @@ func GetOSPackageManager() (PackageManager, error) {
 			return packageManager, nil
 		}
 	}
-	return Brew, errors.New("No OS Package Manager found.")
+	return &Brew, errors.New("No OS Package Manager found.")
 }
 
 // GetPackageManager returns the corresponding PackageManager otherwise default

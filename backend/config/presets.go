@@ -1,5 +1,48 @@
 package config
 
+import (
+	"fmt"
+	"os"
+
+	"github.com/fatih/color"
+)
+
+// GetPreset returns the content of the preset env.yml
+func GetPreset(presetName string) []byte {
+	return []byte{}
+}
+
+// CreateEnvFileWithPreset write an env file with the selected preset.
+func CreateEnvFileWithPreset(preset string) {
+	var Envcontent string
+	switch preset {
+	default:
+		fmt.Fprintf(os.Stderr, "%v Cannot find preset.", color.RedString("Error:"))
+		return
+	case "1":
+		Envcontent = GetSoftwareEngineerPreset()
+	case "2":
+		Envcontent = GetBackendDeveloperPreset()
+	case "3":
+		Envcontent = GetFrontendDeveloperPreset()
+	case "4":
+		Envcontent = GetOpsPreset()
+	}
+
+	confPath := ConfigFilesPathes["env"]
+	f, err := os.OpenFile(confPath, os.O_CREATE|os.O_WRONLY, 0655)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(Envcontent); err != nil {
+		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		os.Exit(1)
+	}
+}
+
 // GetSoftwareEngineerPreset returns the Software Engineer preset content.
 func GetSoftwareEngineerPreset() string {
 	return string([]byte(`brew:

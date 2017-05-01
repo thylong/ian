@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://goian.io/basics/</loc>
+    <lastmod>2017-03-21T16:35:43-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/basics/what-is-ian/</loc>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/basics/getting-started/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/basics/configuration/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/changelog/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/contributing/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/license/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/basics/</loc>
+    <lastmod>2017-03-21T16:35:43-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/changelog/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/contributing/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/license/</loc>
+    <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://goian.io/</loc>
+    <lastmod>2017-03-21T16:35:43-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

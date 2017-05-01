@@ -18,12 +18,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/thylong/ian/backend/command"
 )
 
 // RubyGems immutable instance.
-var RubyGems = RubyGemsPackageManager{Path: "/usr/local/bin/gem", Name: "rubygems"}
+var RubyGems = RubyGemsPackageManager{Path: filepath.Clean("/usr/local/bin/gem"), Name: "rubygems"}
 
 // ErrRubyGemsMissingFeature is returned when triggering an unsupported feature.
 var ErrRubyGemsMissingFeature = errors.New("gems is not designed to support this feature")
@@ -36,7 +37,7 @@ type RubyGemsPackageManager struct {
 }
 
 // Install given RubyGems package.
-func (pm RubyGemsPackageManager) Install(packageName string) (err error) {
+func (pm *RubyGemsPackageManager) Install(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
 	}
@@ -44,7 +45,7 @@ func (pm RubyGemsPackageManager) Install(packageName string) (err error) {
 }
 
 // Uninstall given RubyGems package.
-func (pm RubyGemsPackageManager) Uninstall(packageName string) (err error) {
+func (pm *RubyGemsPackageManager) Uninstall(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
 	}
@@ -53,19 +54,19 @@ func (pm RubyGemsPackageManager) Uninstall(packageName string) (err error) {
 
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
-func (pm RubyGemsPackageManager) Cleanup() error {
+func (pm *RubyGemsPackageManager) Cleanup() error {
 	return command.ExecuteCommand(execCommand(pm.Path, "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
+func (pm *RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeOne RubyGems packages to the last known versions.
-func (pm RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
+func (pm *RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
 	if err = command.ExecuteCommand(execCommand(pm.Path, "update", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
 	}
@@ -75,17 +76,17 @@ func (pm RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm RubyGemsPackageManager) UpdateAll() (err error) {
+func (pm *RubyGemsPackageManager) UpdateAll() (err error) {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeAll RubyGems packages to the last known versions.
-func (pm RubyGemsPackageManager) UpgradeAll() (err error) {
+func (pm *RubyGemsPackageManager) UpgradeAll() (err error) {
 	return command.ExecuteCommand(execCommand(pm.Path, "update"))
 }
 
 // IsInstalled returns true if RubyGems executable is found.
-func (pm RubyGemsPackageManager) IsInstalled() bool {
+func (pm *RubyGemsPackageManager) IsInstalled() bool {
 	if _, err := os.Stat(pm.Path); err != nil {
 		return false
 	}
@@ -93,21 +94,21 @@ func (pm RubyGemsPackageManager) IsInstalled() bool {
 }
 
 // IsOSPackageManager returns false because pip is never the main OS Package Manager.
-func (pm RubyGemsPackageManager) IsOSPackageManager() bool {
+func (pm *RubyGemsPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to RubyGems executable.
-func (pm RubyGemsPackageManager) GetExecPath() string {
+func (pm *RubyGemsPackageManager) GetExecPath() string {
 	return pm.Path
 }
 
 // GetName return the name of the package manager.
-func (pm RubyGemsPackageManager) GetName() string {
+func (pm *RubyGemsPackageManager) GetName() string {
 	return pm.Name
 }
 
 // Setup installs Cask
-func (pm RubyGemsPackageManager) Setup() (err error) {
+func (pm *RubyGemsPackageManager) Setup() (err error) {
 	return nil
 }

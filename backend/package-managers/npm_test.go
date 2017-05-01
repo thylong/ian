@@ -67,7 +67,7 @@ func TestNPMCmdWithoutArgs(t *testing.T) {
 }
 
 func TestNPMGetExecPath(t *testing.T) {
-	PackageManager := GetPackageManager("npm").(NpmPackageManager)
+	PackageManager := GetPackageManager("npm").(*NpmPackageManager)
 
 	if PackageManager.Path != PackageManager.GetExecPath() {
 		t.Errorf("GetExecPath returned wrong Path: got %v want %v",
