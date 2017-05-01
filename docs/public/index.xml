@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ian</title>
+    <link>https://goian.io/index.xml</link>
+    <description>Recent content on ian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="https://goian.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>What is this Ian ?</title>
+      <link>https://goian.io/basics/what-is-ian/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://goian.io/basics/what-is-ian/</guid>
+      <description>
+
+&lt;p&gt;Ian is a simple tool to manage your development environment and your coding projects.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-idea-behind-ian&#34;&gt;The idea behind Ian&lt;/h2&gt;
+
+&lt;p&gt;Us, developers, love to work with the terminal. More reliable and simpler than most GUIs, this &amp;ldquo;black screen&amp;rdquo; allows also automation through scripting and blazing fast manipulation.&lt;/p&gt;
+
+&lt;p&gt;But even with these capabilities, we still execute pretty repetitive tasks and have troubles to make our local environment portable.
+Sometimes, we&amp;rsquo;re looking in our history to retrieve a database URI, change from one project directory to another one just to execute a command, and so on.&lt;/p&gt;
+
+&lt;p&gt;Ian was designed and created to solve these problems.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-does-ian-tackle-this-problem&#34;&gt;How does ian tackle this problem ?&lt;/h2&gt;
+
+&lt;p&gt;ian propose your to store and persist your projects and env configuration in order to interact with them more easily.
+You can (among others things):&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;List the packages installed on your environment and have them installed anytime you run ian on another device.&lt;/li&gt;
+&lt;li&gt;Register commands per projects and give them an alias&lt;/li&gt;
+&lt;li&gt;Update/upgrade your environment with a unified interface&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;every-developer-is-unique&#34;&gt;Every developer is unique&lt;/h2&gt;
+
+&lt;p&gt;&amp;hellip; Which bring us to customization and social interactions (yes, for those who still doubt about it, we are human too) !&lt;/p&gt;
+
+&lt;h3 id=&#34;maximum-customization&#34;&gt;Maximum customization&lt;/h3&gt;
+
+&lt;p&gt;We decided to offer the maximum customization possible to make you able to interact with your environment the way you like it.
+In brief, we give you a set of default commands that we find useful in general and we let you add any subcommands you&amp;rsquo;d like to execute.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-notion-of-project-context&#34;&gt;The notion of project context&lt;/h3&gt;
+
+&lt;p&gt;Projects depend on a huge number of factors: languages, platforms, frameworks, host ressources, etc
+With ian, through an interactive setup you can provide the infos necessary to specific the context of execution of all the project commmands.&lt;/p&gt;
+
+&lt;h3 id=&#34;share-your-configuration&#34;&gt;Share your configuration&lt;/h3&gt;
+
+&lt;p&gt;Using ian share, you can share your ian configuration files&lt;/p&gt;
+
+&lt;p&gt;In the next page, we&amp;rsquo;ll go though the setup together :)&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
