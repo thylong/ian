@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Licenses on ian</title>
-    <link>https://goian.io/license/index.xml</link>
+    <link>http://goian.io/license/index.xml</link>
     <description>Recent content in Licenses on ian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 21 Mar 2017 16:36:26 -0400</lastBuildDate>
-    <atom:link href="https://goian.io/license/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://goian.io/license/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>License</title>
-      <link>https://goian.io/license/</link>
+      <link>http://goian.io/license/</link>
       <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
       
-      <guid>https://goian.io/license/</guid>
+      <guid>http://goian.io/license/</guid>
       <description>&lt;p&gt;Apache License
                            Version 2.0, January 2004
                         &lt;a href=&#34;http://www.apache.org/licenses/&#34;&gt;http://www.apache.org/licenses/&lt;/a&gt;&lt;/p&gt;

@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Contributings on ian</title>
-    <link>https://goian.io/contributing/index.xml</link>
+    <link>http://goian.io/contributing/index.xml</link>
     <description>Recent content in Contributings on ian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 21 Mar 2017 16:36:26 -0400</lastBuildDate>
-    <atom:link href="https://goian.io/contributing/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://goian.io/contributing/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Contributing</title>
-      <link>https://goian.io/contributing/</link>
+      <link>http://goian.io/contributing/</link>
       <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
       
-      <guid>https://goian.io/contributing/</guid>
+      <guid>http://goian.io/contributing/</guid>
       <description>
 
 &lt;p&gt;Any contribution to this project is more than welcomed ! As small or big as they are, contributions are what will make this project better. There is still a lot to do : reporting bugs, proposing fixes, new features, helping with the documentation&amp;hellip;&lt;/p&gt;

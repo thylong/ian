@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Basics on ian</title>
-    <link>https://goian.io/basics/index.xml</link>
+    <link>http://goian.io/basics/index.xml</link>
     <description>Recent content in Basics on ian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 21 Mar 2017 16:35:43 -0400</lastBuildDate>
-    <atom:link href="https://goian.io/basics/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://goian.io/basics/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Basics</title>
-      <link>https://goian.io/basics/</link>
+      <link>http://goian.io/basics/</link>
       <pubDate>Tue, 21 Mar 2017 16:35:43 -0400</pubDate>
       
-      <guid>https://goian.io/basics/</guid>
+      <guid>http://goian.io/basics/</guid>
       <description>
 
 &lt;h3 id=&#34;chapter-1&#34;&gt;Chapter 1&lt;/h3&gt;
@@ -27,10 +27,10 @@
     
     <item>
       <title>What is this Ian ?</title>
-      <link>https://goian.io/basics/what-is-ian/</link>
+      <link>http://goian.io/basics/what-is-ian/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://goian.io/basics/what-is-ian/</guid>
+      <guid>http://goian.io/basics/what-is-ian/</guid>
       <description>
 
 &lt;p&gt;&lt;strong&gt;Ian is a simple tool to manage your development environment and your coding projects.&lt;/strong&gt;&lt;/p&gt;
@@ -79,10 +79,10 @@ With ian, through an interactive setup you can provide the infos necessary to sp
     
     <item>
       <title>Getting started</title>
-      <link>https://goian.io/basics/getting-started/</link>
+      <link>http://goian.io/basics/getting-started/</link>
       <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
       
-      <guid>https://goian.io/basics/getting-started/</guid>
+      <guid>http://goian.io/basics/getting-started/</guid>
       <description>
 
 &lt;h2 id=&#34;installation&#34;&gt;Installation&lt;/h2&gt;
@@ -101,10 +101,10 @@ python -c &amp;quot;(curl -fsSL https://raw.githubusercontent.com/thylong/ian/ma
     
     <item>
       <title>Configuration</title>
-      <link>https://goian.io/basics/configuration/</link>
+      <link>http://goian.io/basics/configuration/</link>
       <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
       
-      <guid>https://goian.io/basics/configuration/</guid>
+      <guid>http://goian.io/basics/configuration/</guid>
       <description>
 
 &lt;p&gt;Ian relies a lot on configuration files as they describe your environment and your projects.
