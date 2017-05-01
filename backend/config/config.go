@@ -212,16 +212,18 @@ func GetCustomCmds(project string) (customCmds []*cobra.Command) {
 func GetProjects() (projectCmds map[string]*cobra.Command) {
 	projectCmds = make(map[string]*cobra.Command)
 
-	if _, ok := Vipers["projects"]; !ok {
-		return projectCmds
-	}
-
-	for _, project := range Vipers["projects"].AllKeys() {
-		projectParams := Vipers["projects"].GetStringMapString(project)
-		projectCmds[project] = &cobra.Command{
-			Use:   project,
-			Short: projectParams["description"],
-			Long:  projectParams["description"],
+	if _, ok := Vipers["projects"]; ok {
+		keys := make([]string, 0, len(Vipers["projects"].AllSettings()))
+		for k := range Vipers["projects"].AllSettings() {
+			keys = append(keys, k)
+		}
+		for _, project := range keys {
+			projectParams := Vipers["projects"].GetStringMapString(project)
+			projectCmds[project] = &cobra.Command{
+				Use:   project,
+				Short: projectParams["description"],
+				Long:  projectParams["description"],
+			}
 		}
 	}
 	return projectCmds
