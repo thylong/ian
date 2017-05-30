@@ -62,7 +62,7 @@ var ConfigMap YamlConfigMap
 func init() {
 	usr, err := user.Current()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s", color.RedString("Error:"), err)
+		fmt.Fprintf(os.Stderr, "%v %s\n", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 

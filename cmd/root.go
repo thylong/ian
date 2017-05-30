@@ -29,7 +29,7 @@ var OSPackageManager pm.PackageManager
 func init() {
 	var err error
 	if OSPackageManager, err = pm.GetOSPackageManager(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 }
