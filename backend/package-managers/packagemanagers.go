@@ -59,7 +59,7 @@ func GetOSPackageManager() (PackageManager, error) {
 			return packageManager, nil
 		}
 	}
-	return &Brew, errors.New("No OS Package Manager found.")
+	return &Brew, errors.New("No OS Package Manager found")
 }
 
 // GetPackageManager returns the corresponding PackageManager otherwise default
