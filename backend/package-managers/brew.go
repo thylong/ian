@@ -104,7 +104,7 @@ func (pm *BrewPackageManager) IsInstalled() bool {
 
 // IsOSPackageManager returns true for Mac OS.
 func (pm *BrewPackageManager) IsOSPackageManager() bool {
-	return pm.IsInstalled() && runtime.GOOS == "darwin"
+	return runtime.GOOS == "darwin"
 }
 
 // GetExecPath return immutable path to Brew executable.
