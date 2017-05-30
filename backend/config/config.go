@@ -130,7 +130,7 @@ func SetupConfigFile(ConfigFileName string) {
 			configContent = append(configContent, fmt.Sprintf("%s%s", repositoriesPathPrefix, repositoriesPath)...)
 
 			dotfilesRepositoryPrefix := "\ndotfiles:\n"
-			dotfilesRepository := fmt.Sprintf("  repository: %s", env.GetDotfilesRepository())
+			dotfilesRepository := fmt.Sprintf("  repository: %s\n", env.GetDotfilesRepository())
 			repositoryProvider := "  provider: github"
 			configContent = append(configContent, fmt.Sprintf("%s%s%s", dotfilesRepositoryPrefix, dotfilesRepository, repositoryProvider)...)
 		}
