@@ -13,7 +13,12 @@ if __name__ == '__main__':
 
     data = response.read()
     path = "/usr/local/bin/ian"
-    file_ = open(path, 'w')
+
+    directory = os.path.dirname("/usr/local/bin/")
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    file_ = open(path, 'w+')
     file_.write(data)
     file_.close()
 
