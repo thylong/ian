@@ -2,12 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Changelogs on ian</title>
-    <link>http://goian.io/changelog/index.xml</link>
+    <link>http://goian.io/changelog/</link>
     <description>Recent content in Changelogs on ian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 21 Mar 2017 16:36:26 -0400</lastBuildDate>
-    <atom:link href="http://goian.io/changelog/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="http://goian.io/changelog/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Changelog</title>
@@ -15,8 +17,7 @@
       <pubDate>Tue, 21 Mar 2017 16:36:26 -0400</pubDate>
       
       <guid>http://goian.io/changelog/</guid>
-      <description>&lt;p&gt;The CHANGELOG of the project can be seen here: &lt;a href=&#34;https://github.com/thylong/ian/releases&#34;&gt;https://github.com/thylong/ian/releases&lt;/a&gt;&lt;/p&gt;
-</description>
+      <description>The CHANGELOG of the project can be seen here: https://github.com/thylong/ian/releases</description>
     </item>
     
   </channel>

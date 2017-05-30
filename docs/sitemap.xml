@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
     <loc>http://goian.io/basics/</loc>
@@ -42,6 +43,11 @@
   </url>
   
   <url>
+    <loc>http://goian.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://goian.io/changelog/</loc>
     <lastmod>2017-03-21T16:36:26-04:00</lastmod>
     <priority>0</priority>
@@ -56,6 +62,11 @@
   <url>
     <loc>http://goian.io/license/</loc>
     <lastmod>2017-03-21T16:36:26-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://goian.io/tags/</loc>
     <priority>0</priority>
   </url>
   

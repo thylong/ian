@@ -13,8 +13,8 @@ All you have to do is to paste this in your terminal:
 
 ```bash
 # Bash/Zsh
-python -c "$(curl -fsSL https://raw.githubusercontent.com/thylong/ian/master/install/install.py)"
+sudo python -c "$(curl -fsSL https://raw.githubusercontent.com/thylong/ian/master/install/install.py)"
 
 # Fish
-python -c "(curl -fsSL https://raw.githubusercontent.com/thylong/ian/master/install/install.py)"
+sudo python -c "(curl -fsSL https://raw.githubusercontent.com/thylong/ian/master/install/install.py)"
 ```
