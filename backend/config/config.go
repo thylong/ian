@@ -77,19 +77,25 @@ func init() {
 		_ = os.Mkdir(IanConfigPath, 0766)
 		fmt.Printf("%s", env.GetInitialSetupUsage())
 	}
+
+	ConfigFilesPathes = make(map[string]string)
+	Vipers = make(map[string]*viper.Viper)
 	initVipers()
 }
 
 // initVipers return Vipers corresponding to Yaml config files.
 // The soft argument determine if unexisting files should be written or not.
 func initVipers() {
-	ConfigFilesPathes = make(map[string]string)
-	Vipers = make(map[string]*viper.Viper)
 	for _, ConfigFileName := range []string{"config", "env", "projects"} {
 		configFilePath := filepath.Join(IanConfigPath, fmt.Sprintf("%s.yml", ConfigFileName))
 		ConfigFilesPathes[ConfigFileName] = configFilePath
 		Vipers[ConfigFileName] = initViper(ConfigFileName)
 	}
+}
+
+// RefreshVipers is a helper called to refresh the configuration.
+func RefreshVipers() {
+	initVipers()
 }
 
 func initViper(viperName string) (viperInstance *viper.Viper) {

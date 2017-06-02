@@ -50,9 +50,11 @@ var setupCmd = &cobra.Command{
 			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
 			config.DotfilesDirPath,
 		)
+		// Refresh the configuration in case the imported dotfiels contains ian configuration
+		config.RefreshVipers()
 
 		fmt.Printf("You don't have any packages to be installed in your current ian configuration.\n")
-		if config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
+		if _, ok := config.Vipers["env"]; !ok && config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
 			in := config.GetUserInput(`Which preset would you like to use:
     1) Software engineer (generalist preset)
     2) Backend developer
