@@ -19,12 +19,29 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 	"github.com/thylong/ian/cmd"
 )
+
+var version = "undefined"
+
+func init() {
+	cmd.RootCmd.AddCommand(versionCmd)
+}
 
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
 		os.Exit(-1)
 	}
+}
+
+// versionCmd execution displays ian version.
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version information",
+	Long:  `Print the version information.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("ian version: %s\n", version)
+	},
 }
