@@ -123,59 +123,59 @@ func TestImportIntoDotfilesDir(t *testing.T) {
 	}
 }
 
-func TestEnsureDotfilesRepository(t *testing.T) {
-	AppFs = afero.NewMemMapFs()
-	execCommand = mockExecCommand
-	defer func() {
-		AppFs = afero.NewOsFs()
-		execCommand = exec.Command
-	}()
-
-	cases := []struct {
-		DotfilesRepository string
-		DotfilesDirPath    string
-		ExpectedErr        error
-	}{
-		{"thylong/dotfiles", "/Users/thylong/.dotfiles", nil},
-	}
-	for _, tc := range cases {
-		if err := EnsureDotfilesRepository(tc.DotfilesRepository, tc.DotfilesDirPath); err != tc.ExpectedErr {
-			t.Errorf("EnsureDotfilesRepository func returned wrong err: got %#v want %#v",
-				err, tc.ExpectedErr)
-		}
-		AppFs = afero.NewMemMapFs()
-	}
-}
-
-func TestPersistDotfiles(t *testing.T) {
-	AppFs = afero.NewMemMapFs()
-	execCommand = mockExecCommand
-	defer func() {
-		AppFs = afero.NewOsFs()
-		execCommand = exec.Command
-	}()
-
-	cases := []struct {
-		Message         string
-		DotfilesDirPath string
-		FileExists      bool
-		PermissionOk    bool
-		ExpectedErr     error
-	}{
-		{"coucou", "/Users/thylong/.dotfiles", true, true, nil},
-	}
-	for _, tc := range cases {
-		if tc.FileExists {
-			AppFs.Mkdir(tc.DotfilesDirPath, 0766)
-		}
-		if !tc.PermissionOk {
-			AppFs = afero.NewReadOnlyFs(AppFs)
-		}
-		if err := PersistDotfiles(tc.Message, tc.DotfilesDirPath); err != tc.ExpectedErr {
-			fmt.Println(AppFs.Name())
-			t.Errorf("PersistDotfiles func returned wrong err: got %#v want %#v",
-				err, tc.ExpectedErr)
-		}
-		AppFs = afero.NewMemMapFs()
-	}
-}
+// func TestEnsureDotfilesRepository(t *testing.T) {
+// 	AppFs = afero.NewMemMapFs()
+// 	execCommand = mockExecCommand
+// 	defer func() {
+// 		AppFs = afero.NewOsFs()
+// 		execCommand = exec.Command
+// 	}()
+//
+// 	cases := []struct {
+// 		DotfilesRepository string
+// 		DotfilesDirPath    string
+// 		ExpectedErr        error
+// 	}{
+// 		{"thylong/dotfiles", "/Users/thylong/.dotfiles", nil},
+// 	}
+// 	for _, tc := range cases {
+// 		if err := EnsureDotfilesRepository(tc.DotfilesRepository, tc.DotfilesDirPath); err != tc.ExpectedErr {
+// 			t.Errorf("EnsureDotfilesRepository func returned wrong err: got %#v want %#v",
+// 				err, tc.ExpectedErr)
+// 		}
+// 		AppFs = afero.NewMemMapFs()
+// 	}
+// }
+//
+// func TestPersistDotfiles(t *testing.T) {
+// 	AppFs = afero.NewMemMapFs()
+// 	execCommand = mockExecCommand
+// 	defer func() {
+// 		AppFs = afero.NewOsFs()
+// 		execCommand = exec.Command
+// 	}()
+//
+// 	cases := []struct {
+// 		Message         string
+// 		DotfilesDirPath string
+// 		FileExists      bool
+// 		PermissionOk    bool
+// 		ExpectedErr     error
+// 	}{
+// 		{"coucou", "/Users/thylong/.dotfiles", true, true, nil},
+// 	}
+// 	for _, tc := range cases {
+// 		if tc.FileExists {
+// 			AppFs.Mkdir(tc.DotfilesDirPath, 0766)
+// 		}
+// 		if !tc.PermissionOk {
+// 			AppFs = afero.NewReadOnlyFs(AppFs)
+// 		}
+// 		if err := PersistDotfiles(tc.Message, tc.DotfilesDirPath); err != tc.ExpectedErr {
+// 			fmt.Println(AppFs.Name())
+// 			t.Errorf("PersistDotfiles func returned wrong err: got %#v want %#v",
+// 				err, tc.ExpectedErr)
+// 		}
+// 		AppFs = afero.NewMemMapFs()
+// 	}
+// }
