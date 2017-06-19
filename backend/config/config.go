@@ -139,8 +139,11 @@ func SetupConfigFile(ConfigFileName string) {
 			dotfilesRepositoryPrefix := "\ndotfiles:\n"
 			dotfilesRepository := fmt.Sprintf("  repository: %s\n", env.GetDotfilesRepository())
 
+			provider := "github"
 			re := regexp.MustCompile("([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9])\\.[a-zA-Z]{2,}")
-			provider := re.FindStringSubmatch(dotfilesRepository)[1]
+			if len(re.FindStringSubmatch(dotfilesRepository)) > 1 {
+				provider = re.FindStringSubmatch(dotfilesRepository)[1]
+			}
 			repositoryProvider := fmt.Sprintf("  provider: %s", provider)
 			configContent = append(configContent, fmt.Sprintf("%s%s%s", dotfilesRepositoryPrefix, dotfilesRepository, repositoryProvider)...)
 		}
