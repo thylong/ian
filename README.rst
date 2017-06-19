@@ -1,6 +1,9 @@
 Ian
 ===
 
+.. image:: https://travis-ci.org/thylong/ian.svg?branch=master
+    :target: https://travis-ci.org/thylong/ian
+
 Ian is a simple tool to manage your development environment, repositories, and projects.
 
 
