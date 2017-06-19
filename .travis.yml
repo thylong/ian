@@ -5,6 +5,7 @@ before_script:
 - go get -u ./...
 script:
 - go test -cover ./...
+before_deploy:
 - go get -u github.com/inconshreveable/mousetrap
 - make build
 deploy:
@@ -18,4 +19,4 @@ deploy:
       - ian-windows-amd64.exe
   on:
     repo: thylong/ian
-    branch: master
+    tags: true
