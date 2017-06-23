@@ -30,7 +30,6 @@ import (
 
 var httpGet = http.Get
 var version string
-var ianLastCommit = "https://api.github.com/repos/thylong/ian/commits/master"
 var ianLastRelease = "https://api.github.com/repos/thylong/ian/releases/latest"
 
 func init() {
