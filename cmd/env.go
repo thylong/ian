@@ -43,6 +43,7 @@ func init() {
 		envUpdateCmd,
 		envUpgradeCmd,
 		envSaveCmd,
+		envEditCmd,
 	)
 }
 
@@ -224,7 +225,19 @@ var envSaveCmd = &cobra.Command{
 			[]string{},
 		)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Save command failed: %s", err)
+			fmt.Fprintf(os.Stderr, "Save failed: %s", err)
 		}
+	},
+}
+
+var envEditCmd = &cobra.Command{
+	Use:   "edit",
+	Short: "Edit env file",
+	Long:  `Edit env file with the editor defined in $EDITOR environment variable, default to vi.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := env.Edit(config.ConfigFilesPathes["env"]); err != nil {
+			fmt.Fprintf(os.Stderr, "Edit failed: %s", err)
+		}
+		fmt.Printf("Done\n")
 	},
 }

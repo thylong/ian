@@ -117,6 +117,23 @@ func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage 
 	return nil
 }
 
+// Edit env file with the editor defined in $EDITOR environment variable, default to vi.
+func Edit(envFullPath string) error {
+	var editor string
+	if len(os.Getenv("EDITOR")) == 0 {
+		subCmd := execCommand("vi", "-h")
+		if err := command.MustExecuteCommand(subCmd); err != nil {
+			return err
+		}
+		editor = "vi"
+	} else {
+		editor = os.Getenv("EDITOR")
+	}
+	editCommand := execCommand(editor, envFullPath)
+	command.ExecuteInteractiveCommand(editCommand)
+	return nil
+}
+
 // EnsureDotfilesDir create the ~/.dotfiles directory if not exists.
 func EnsureDotfilesDir(dotfilesDirPath string) (err error) {
 	dotfilesDirPath = filepath.Dir(dotfilesDirPath)
