@@ -44,47 +44,28 @@ var selfUpdateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		localVersion := viper.GetString("VERSION")
 
-		resp, err := httpGet(ianLastCommit)
+		resp, err := httpGet(ianLastRelease)
 		if err != nil {
-			fmt.Printf("%v Cannot retrieve ian's last version infos\n", color.RedString("Error:"))
+			fmt.Printf("%v Cannot retrieve ian's last release infos\n", color.RedString("Error:"))
 			return
 		}
 		content, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Printf("%v Cannot retrieve ian's last version infos\n", color.RedString("Error:"))
+			fmt.Printf("%v Cannot retrieve ian's last release infos\n", color.RedString("Error:"))
 			return
 		}
 		defer resp.Body.Close()
 
-		var jsonContent map[string]interface{}
-		err = json.Unmarshal(content, &jsonContent)
+		var lastReleaseContent map[string]interface{}
+		err = json.Unmarshal(content, &lastReleaseContent)
 		if err != nil {
 			fmt.Printf("%v Cannot retrieve ian's last version\n", color.RedString("Error:"))
 			return
 		}
-		remoteVersion := jsonContent["sha"].(string)[:7]
+		remoteVersion := lastReleaseContent["tag_name"]
 
 		if localVersion != remoteVersion {
 			fmt.Printf("ian version outdated... \n")
-			resp, err := httpGet(ianLastRelease)
-			if err != nil {
-				fmt.Printf("%v Cannot retrieve ian's last release infos\n", color.RedString("Error:"))
-				return
-			}
-			content, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Printf("%v Cannot retrieve ian's last release infos\n", color.RedString("Error:"))
-				return
-			}
-			defer resp.Body.Close()
-
-			var lastReleaseContent map[string]interface{}
-			err = json.Unmarshal(content, &lastReleaseContent)
-			if err != nil {
-				fmt.Printf("%v Cannot retrieve ian's last version\n", color.RedString("Error:"))
-				return
-			}
-			fmt.Println(lastReleaseContent)
 			downloadURL := lastReleaseContent["assets"].([]interface{})[0].(map[string]interface{})["browser_download_url"]
 			resp, err = httpGet(downloadURL.(string))
 			if err != nil {
@@ -132,6 +113,8 @@ var selfUpdateCmd = &cobra.Command{
 			os.Remove(destBackup)
 
 			fmt.Printf("ian updated with success to version %s\n", remoteVersion)
+		} else {
+			fmt.Printf("ian is up to date\n")
 		}
 	},
 }

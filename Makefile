@@ -3,7 +3,7 @@
 NAME = ian
 GOARCH = amd64
 PKG := github.com/thylong/ian
-VERSION := $(shell git describe --always --long)
+VERSION := $(shell git describe --abbrev=0 --tags)
 
 build:
 	# Build for MacOS amd64

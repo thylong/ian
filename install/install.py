@@ -9,7 +9,7 @@ def make_executable(path):
 
 
 if __name__ == '__main__':
-    response = urllib2.urlopen('https://github.com/thylong/ian/releases/download/ian-v0.2/ian')
+    response = urllib2.urlopen('https://github.com/thylong/ian/releases/download/ian-v0.2.1/ian-darwin-amd64')
 
     data = response.read()
     path = "/usr/local/bin/ian"
