@@ -102,3 +102,8 @@ Special thanks
 .. _`Devin Wilmot`: mailto:devwilmot@gmail.com
 .. _`Trisha Batchoo`: https://github.com/tbat
 .. _`Carl Chinatomby`: https://github.com/Carl-Chinatomby
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/thylong/ian/badge.svg?style=beer-square)](https://beerpay.io/thylong/ian)  [![Beerpay](https://beerpay.io/thylong/ian/make-wish.svg?style=flat-square)](https://beerpay.io/thylong/ian?focus=wish)
