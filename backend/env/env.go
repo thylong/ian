@@ -214,7 +214,7 @@ func GenerateRepositoriesPath() string {
 
 // GetDotfilesRepository creates conf line containing the user's input.
 func GetDotfilesRepository() string {
-	fmt.Print("\nEnter the full path to your dotfiles Github repository\n(leave blank to skip): ")
+	fmt.Print("\nEnter the full path to your dotfiles repository\n(leave blank to skip): ")
 	reader := bufio.NewReader(os.Stdin)
 	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))

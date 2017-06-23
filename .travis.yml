@@ -1,7 +1,22 @@
 language: go
 go:
-  - '1.8'
+- '1.8'
 before_script:
-  - go get -u ./...
+- go get -u ./...
 script:
-  - go test -cover ./...
+- go test -cover ./...
+before_deploy:
+- go get -u github.com/inconshreveable/mousetrap
+- make build
+deploy:
+  provider: releases
+  api_key:
+    secure: HqimbJ16THwHzXi/1Qznhi4rSH7nu01+ziZR5zVj1J3XcEBzyD9Wu/yM5ZojEt190M+0yYJrADKq8ZvVQLvmbxM05mNN7a8oJlQI0IOvOEO0GCggicXPaLPiYMzEU+/IteCyfYmOtf4S2E59Lly4GnUXkR5wqE/itrKjfMlGCplP1ooYTD6+FltI7BCXN5bJPX271Aack7KAS/pz6S0T9jUpQ4eA5Fp/+C14aXLcV9KJfsGYgLNhAI2unClqUOMJT7mQQoAkaAERw77t4MAT0Z6unL/EGvvF9NQNi6UD8QLqfjyqPv5HcT+GP+MzYjR8NBOreGtufCGiQx4mM8AvTOkfRkNWgfHAVVA2kha/CMqScHYuzWpVbbLltmnuNoLnuMWXmC5LtaMZtJwIsDnYoz7fztFcbazGVVvEKVUvARfGyM29jZNNbbMiv92AFjRYF/1PegAs/MJ5TUzfTKD477McDY6CBHWA5L46RFoX+2klKq2M8vDZsThw3MvObJTrLAJw3ffeyIMV2k5Hsq8epHJNJ0Y+LSO+uxBqchXnhuhJLSjTmJXRGdKY6/bR7oQNVeW0Oi6nLuLE9HX6eIaUITpUvRgdMVfgf1ph8zjtEPygoedaY8OFQ4oLeN4dKr4q3OJy1p872uiHRtPvm0nJx7TgBzdd0EqOQh5lS5r/Si8=
+  skip_cleanup: true
+  file:
+      - ian-darwin-amd64
+      - ian-linux-amd64
+      - ian-windows-amd64.exe
+  on:
+    repo: thylong/ian
+    tags: true

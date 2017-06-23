@@ -20,6 +20,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thylong/ian/cmd"
 )
 
@@ -27,6 +28,7 @@ var version = "undefined"
 
 func init() {
 	cmd.RootCmd.AddCommand(versionCmd)
+	viper.Set("VERSION", version)
 }
 
 func main() {
