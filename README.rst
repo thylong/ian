@@ -4,6 +4,9 @@ Ian
 .. image:: https://travis-ci.org/thylong/ian.svg?branch=master
     :target: https://travis-ci.org/thylong/ian
 
+.. image:: https://beerpay.io/thylong/ian/badge.svg?style=flat
+    :target: https://beerpay.io/thylong/ian
+
 Ian is a simple tool to manage your development environment, repositories, and projects.
 
 
