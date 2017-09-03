@@ -41,7 +41,7 @@ var setupCmd = &cobra.Command{
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 			fmt.Println("Installing OS package manager...")
 			if err = OSPackageManager.Setup(); err != nil {
-				fmt.Fprintf(os.Stderr, "%v Missing OS package manager !", color.RedString("Error:"))
+				fmt.Fprintf(os.Stderr, "%v Missing OS package manager !\n", color.RedString("Error:"))
 				return
 			}
 		}

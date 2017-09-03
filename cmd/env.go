@@ -89,7 +89,7 @@ var envAddCmd = &cobra.Command{
 			config.ConfigFilesPathes["env"],
 			envContent,
 		)
-		fmt.Fprintf(os.Stdout, "Package(s) added to %s list.", args[0])
+		fmt.Fprintf(os.Stdout, "Package(s) added to %s list.\n", args[0])
 	},
 }
 
@@ -104,7 +104,7 @@ var envRemoveCmd = &cobra.Command{
 			return
 		}
 		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
-			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported", args[0])
+			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported\n", args[0])
 			return
 		}
 
@@ -129,7 +129,7 @@ var envRemoveCmd = &cobra.Command{
 			config.ConfigFilesPathes["env"],
 			envContent,
 		)
-		fmt.Fprintf(os.Stdout, "Package(s) removed to %s list.", args[0])
+		fmt.Fprintf(os.Stdout, "Package(s) removed to %s list.\n", args[0])
 	},
 }
 
@@ -211,7 +211,7 @@ var envSaveCmd = &cobra.Command{
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
-			fmt.Fprintf(os.Stderr, "Warning: You currently have no defined path to your parent repositories directory.")
+			fmt.Fprintf(os.Stderr, "Warning: You currently have no defined path to your parent repositories directory.\n")
 			in := config.GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
 			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
 				return
@@ -224,7 +224,7 @@ var envSaveCmd = &cobra.Command{
 			[]string{},
 		)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Save command failed: %s", err)
+			fmt.Fprintf(os.Stderr, "Save command failed: %s\n", err)
 		}
 	},
 }

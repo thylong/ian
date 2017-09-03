@@ -48,7 +48,7 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 					filepath.Join(usr.HomeDir, ".dotfiles", f.Name()),
 					filepath.Join(usr.HomeDir, f.Name()),
 				); err != nil {
-					fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+					fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 				}
 			}
 		}
@@ -66,7 +66,7 @@ func InstallPackages(PackageManager pm.PackageManager, packages []string) {
 
 	for _, packageToInstall := range packages {
 		if err := PackageManager.Install(packageToInstall); err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+			fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 		}
 	}
 }

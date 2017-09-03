@@ -76,7 +76,7 @@ func init() {
 	}
 	if _, err := os.Stat(IanConfigPath); err != nil {
 		_ = os.Mkdir(IanConfigPath, 0766)
-		fmt.Printf("%s", env.GetInitialSetupUsage())
+		fmt.Printf("%s\n", env.GetInitialSetupUsage())
 	}
 
 	ConfigFilesPathes = make(map[string]string)
@@ -112,13 +112,13 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 
 	err := viperInstance.ReadInConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v Problem with config file: %s: %s", color.RedString("Error:"), viperName, err.Error())
+		fmt.Fprintf(os.Stderr, "%v Problem with config file: %s: %s\n", color.RedString("Error:"), viperName, err.Error())
 		os.Exit(1)
 	} else {
 		configContent, _ := ioutil.ReadFile(ConfigFilesPathes[viperName])
 		err = yaml.Unmarshal(configContent, &ConfigMap)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v Unable to parse config file.", color.RedString("Error:"))
+			fmt.Fprintf(os.Stderr, "%v Unable to parse config file.\n", color.RedString("Error:"))
 			os.Exit(1)
 		}
 	}
@@ -150,7 +150,7 @@ func SetupConfigFile(ConfigFileName string) {
 
 		fmt.Printf("Creating %s\n", ConfigFileName)
 		if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+			fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 			os.Exit(1)
 		}
 		return
@@ -171,13 +171,13 @@ func AppendToConfig(lines string, confFilename string) {
 	confPath := ConfigFilesPathes[confFilename]
 	f, err := os.OpenFile(confPath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 	defer f.Close()
 
 	if _, err = f.WriteString(lines); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 		os.Exit(1)
 	}
 }

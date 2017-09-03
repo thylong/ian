@@ -65,7 +65,7 @@ var shareConfigCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(.", color.RedString("Error:"))
+			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(\n", color.RedString("Error:"))
 			return
 		}
 		fmt.Println(link)
@@ -82,7 +82,7 @@ var shareProjectsCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(.", color.RedString("Error:"))
+			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(\n", color.RedString("Error:"))
 			return
 		}
 		fmt.Println(link)
@@ -99,7 +99,7 @@ var shareEnvCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(.", color.RedString("Error:"))
+			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(\n", color.RedString("Error:"))
 			return
 		}
 		fmt.Println(link)
@@ -123,7 +123,7 @@ var shareRetrieveFromLinkCmd = &cobra.Command{
 		}
 		err := share.Download(args[1], args[0], key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+			fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
 			return
 		}
 	},
