@@ -24,7 +24,7 @@ import (
 )
 
 // Pip immutable instance.
-var Pip = PipPackageManager{Path: filepath.Clean("/usr/local/bin/pip"), Name: "pip"}
+var Pip = PipPackageManager{Path: GetDefaultPath(), Name: "pip"}
 
 // ErrPipMissingFeature is returned when triggering an unsupported feature.
 var ErrPipMissingFeature = errors.New("pip is not designed to support this feature")
@@ -100,6 +100,18 @@ func (pm *PipPackageManager) IsOSPackageManager() bool {
 // GetExecPath return immutable path to Pip executable.
 func (pm *PipPackageManager) GetExecPath() string {
 	return pm.Path
+}
+
+// GetDefaultPath return default path to Pip executable.
+func GetDefaultPath() string {
+	defaultPath := filepath.Clean("/usr/local/bin/pip")
+	if _, err := os.Stat(defaultPath); err != nil {
+		if _, err := os.Stat(fmt.Sprintf("%s%s", defaultPath, "2")); err != nil {
+			return defaultPath
+		}
+		return fmt.Sprintf("%s%s", defaultPath, "2")
+	}
+	return defaultPath
 }
 
 // GetName return the name of the package manager.
