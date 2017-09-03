@@ -37,38 +37,38 @@ type RubyGemsPackageManager struct {
 }
 
 // Install given RubyGems package.
-func (pm *RubyGemsPackageManager) Install(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
-		return fmt.Errorf("Cannot %s install %s: %s", pm.Name, packageName, err)
+func (gem *RubyGemsPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(gem.Path, "install", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install %s: %s", gem.Name, packageName, err)
 	}
 	return err
 }
 
 // Uninstall given RubyGems package.
-func (pm *RubyGemsPackageManager) Uninstall(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "uninstall", packageName)); err != nil {
-		return fmt.Errorf("Cannot %s uninstall %s: %s", pm.Name, packageName, err)
+func (gem *RubyGemsPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(gem.Path, "uninstall", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s uninstall %s: %s", gem.Name, packageName, err)
 	}
 	return err
 }
 
 // Cleanup the pip cache.
 // This is done by default since pip 6.0
-func (pm *RubyGemsPackageManager) Cleanup() error {
-	return command.ExecuteCommand(execCommand(pm.Path, "cleanup"))
+func (gem *RubyGemsPackageManager) Cleanup() error {
+	return command.ExecuteCommand(execCommand(gem.Path, "cleanup"))
 }
 
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm *RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
+func (gem *RubyGemsPackageManager) UpdateOne(packageName string) (err error) {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeOne RubyGems packages to the last known versions.
-func (pm *RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "update", packageName)); err != nil {
-		return fmt.Errorf("Cannot %s update %s: %s", pm.Name, packageName, err)
+func (gem *RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(gem.Path, "update", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s update %s: %s", gem.Name, packageName, err)
 	}
 	return err
 }
@@ -76,39 +76,39 @@ func (pm *RubyGemsPackageManager) UpgradeOne(packageName string) (err error) {
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm *RubyGemsPackageManager) UpdateAll() (err error) {
+func (gem *RubyGemsPackageManager) UpdateAll() (err error) {
 	return ErrRubyGemsMissingFeature
 }
 
 // UpgradeAll RubyGems packages to the last known versions.
-func (pm *RubyGemsPackageManager) UpgradeAll() (err error) {
-	return command.ExecuteCommand(execCommand(pm.Path, "update"))
+func (gem *RubyGemsPackageManager) UpgradeAll() (err error) {
+	return command.ExecuteCommand(execCommand(gem.Path, "update"))
 }
 
 // IsInstalled returns true if RubyGems executable is found.
-func (pm *RubyGemsPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(pm.Path); err != nil {
+func (gem *RubyGemsPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(gem.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns false because pip is never the main OS Package Manager.
-func (pm *RubyGemsPackageManager) IsOSPackageManager() bool {
+func (gem *RubyGemsPackageManager) IsOSPackageManager() bool {
 	return false
 }
 
 // GetExecPath return immutable path to RubyGems executable.
-func (pm *RubyGemsPackageManager) GetExecPath() string {
-	return pm.Path
+func (gem *RubyGemsPackageManager) GetExecPath() string {
+	return gem.Path
 }
 
 // GetName return the name of the package manager.
-func (pm *RubyGemsPackageManager) GetName() string {
-	return pm.Name
+func (gem *RubyGemsPackageManager) GetName() string {
+	return gem.Name
 }
 
 // Setup installs Cask
-func (pm *RubyGemsPackageManager) Setup() (err error) {
+func (gem *RubyGemsPackageManager) Setup() (err error) {
 	return nil
 }

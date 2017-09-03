@@ -38,25 +38,25 @@ type AptPackageManager struct {
 }
 
 // Install given Apt package.
-func (pm *AptPackageManager) Install(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "install", packageName)); err != nil {
-		return fmt.Errorf("Cannot %s install: %s", pm.Name, err)
+func (apt *AptPackageManager) Install(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(apt.Path, "install", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s install: %s", apt.Name, err)
 	}
 	return err
 }
 
 // Uninstall given Apt package.
-func (pm *AptPackageManager) Uninstall(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "remove", packageName)); err != nil {
-		return fmt.Errorf("Cannot %s remove: %s", pm.Name, err)
+func (apt *AptPackageManager) Uninstall(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(apt.Path, "remove", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s remove: %s", apt.Name, err)
 	}
 	return err
 }
 
 // Cleanup all the local archives and previous versions.
-func (pm *AptPackageManager) Cleanup() (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "autoremove")); err != nil {
-		return fmt.Errorf("Cannot %s autoremove: %s", pm.Name, err)
+func (apt *AptPackageManager) Cleanup() (err error) {
+	if err = command.ExecuteCommand(execCommand(apt.Path, "autoremove")); err != nil {
+		return fmt.Errorf("Cannot %s autoremove: %s", apt.Name, err)
 	}
 	return err
 }
@@ -64,14 +64,14 @@ func (pm *AptPackageManager) Cleanup() (err error) {
 // UpdateOne pulls last versions infos from related repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm *AptPackageManager) UpdateOne(packageName string) (err error) {
+func (apt *AptPackageManager) UpdateOne(packageName string) (err error) {
 	return ErrAptMissingFeature
 }
 
 // UpgradeOne Npm packages to the last known versions.
-func (pm *AptPackageManager) UpgradeOne(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(pm.Path, "upgrade", packageName)); err != nil {
-		return fmt.Errorf("Cannot %s upgrade: %s", pm.Name, err)
+func (apt *AptPackageManager) UpgradeOne(packageName string) (err error) {
+	if err = command.ExecuteCommand(execCommand(apt.Path, "upgrade", packageName)); err != nil {
+		return fmt.Errorf("Cannot %s upgrade: %s", apt.Name, err)
 	}
 	return err
 }
@@ -79,39 +79,39 @@ func (pm *AptPackageManager) UpgradeOne(packageName string) (err error) {
 // UpdateAll pulls last versions infos from realted repositories.
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
-func (pm *AptPackageManager) UpdateAll() (err error) {
-	return command.ExecuteCommand(execCommand(pm.Path, "update"))
+func (apt *AptPackageManager) UpdateAll() (err error) {
+	return command.ExecuteCommand(execCommand(apt.Path, "update"))
 }
 
 // UpgradeAll Apt packages to the last known versions.
-func (pm *AptPackageManager) UpgradeAll() (err error) {
-	return command.ExecuteCommand(execCommand(pm.Path, "full-upgrade"))
+func (apt *AptPackageManager) UpgradeAll() (err error) {
+	return command.ExecuteCommand(execCommand(apt.Path, "full-upgrade"))
 }
 
 // IsInstalled returns true if Apt executable is found.
-func (pm *AptPackageManager) IsInstalled() bool {
-	if _, err := os.Stat(pm.Path); err != nil {
+func (apt *AptPackageManager) IsInstalled() bool {
+	if _, err := os.Stat(apt.Path); err != nil {
 		return false
 	}
 	return true
 }
 
 // IsOSPackageManager returns true for Mac OS.
-func (pm *AptPackageManager) IsOSPackageManager() bool {
-	return pm.IsInstalled() && runtime.GOOS == "linux"
+func (apt *AptPackageManager) IsOSPackageManager() bool {
+	return apt.IsInstalled() && runtime.GOOS == "linux"
 }
 
 // GetExecPath return immutable path to Apt executable.
-func (pm *AptPackageManager) GetExecPath() string {
-	return pm.Path
+func (apt *AptPackageManager) GetExecPath() string {
+	return apt.Path
 }
 
 // GetName return the name of the package manager.
-func (pm *AptPackageManager) GetName() string {
-	return pm.Name
+func (apt *AptPackageManager) GetName() string {
+	return apt.Name
 }
 
 // Setup does nothing (apt comes by default in Linux distributions)
-func (pm *AptPackageManager) Setup() (err error) {
+func (apt *AptPackageManager) Setup() (err error) {
 	return nil
 }
