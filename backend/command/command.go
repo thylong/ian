@@ -22,11 +22,11 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/fatih/color"
+	"github.com/thylong/ian/backend/log"
 )
 
 // ErrStartCommand is returned when failing to start command
-var ErrStartCommand = fmt.Errorf("%v Impossible to start Cmd", color.RedString("Error:"))
+var ErrStartCommand = errors.New("Impossible to start Cmd")
 
 // ExecuteCommand a command and print output from stdout.
 func ExecuteCommand(subCmd *exec.Cmd) (err error) {
@@ -75,7 +75,7 @@ func MustExecuteCommand(subCmd *exec.Cmd) (err error) {
 	scannerOut := bufio.NewScanner(cmdOutReader)
 	go func() {
 		for scannerOut.Scan() {
-			fmt.Printf("%s\n", scannerOut.Text())
+			log.Infof("%s\n", scannerOut.Text())
 		}
 	}()
 

@@ -15,12 +15,9 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/backend/log"
 	"github.com/thylong/ian/backend/share"
 )
 
@@ -65,10 +62,10 @@ var shareConfigCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(\n", color.RedString("Error:"))
+			log.Errorln("It looks like I cannot upload configuration file... :(")
 			return
 		}
-		fmt.Println(link)
+		log.Infoln(link)
 	},
 }
 
@@ -82,10 +79,10 @@ var shareProjectsCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(\n", color.RedString("Error:"))
+			log.Errorln("It looks like I cannot upload configuration file... :(")
 			return
 		}
-		fmt.Println(link)
+		log.Infoln(link)
 	},
 }
 
@@ -99,10 +96,10 @@ var shareEnvCmd = &cobra.Command{
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v It looks like I cannot upload configuration file... :(\n", color.RedString("Error:"))
+			log.Errorln("It looks like I cannot upload configuration file... :(")
 			return
 		}
-		fmt.Println(link)
+		log.Infoln(link)
 	},
 }
 
@@ -112,7 +109,7 @@ var shareRetrieveFromLinkCmd = &cobra.Command{
 	Long:  `Retrieve config from config file link.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			log.Errorln("Not enough argument\n")
 			cmd.Usage()
 			return
 		}
@@ -123,7 +120,7 @@ var shareRetrieveFromLinkCmd = &cobra.Command{
 		}
 		err := share.Download(args[1], args[0], key)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+			log.Errorf("%s\n", err)
 			return
 		}
 	},

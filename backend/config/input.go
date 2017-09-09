@@ -17,16 +17,17 @@ package config
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"os"
 	"strings"
+
+	"github.com/thylong/ian/backend/log"
 
 	"github.com/howeyc/gopass"
 )
 
 // GetUserInput ask question and return user input.
 func GetUserInput(question string) string {
-	fmt.Printf("%s: ", question)
+	log.Infof("%s: ", question)
 	reader := bufio.NewReader(os.Stdin)
 	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
@@ -36,7 +37,7 @@ func GetUserInput(question string) string {
 
 // GetUserPrivateInput ask question and return user input (silent stdin).
 func GetUserPrivateInput(question string) string {
-	fmt.Printf("%s: ", question)
+	log.Infof("%s: ", question)
 	pass, _ := gopass.GetPasswd()
 	return string(pass)
 }

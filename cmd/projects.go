@@ -17,14 +17,13 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/backend/log"
 	"github.com/thylong/ian/backend/projects"
 	"github.com/thylong/ian/backend/repo"
 )
@@ -74,9 +73,9 @@ var projectCmd = &cobra.Command{
 	Long:  `Interact with a project using predefined commands, or define custom commands.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
-			fmt.Println("/!\\ You currently have no projects set up.")
-			in := config.GetBoolUserInput("Would you like to add one ? (Y/n)")
-			if !in {
+			log.Warningln("/!\\ You currently have no projects set up.")
+
+			if in := config.GetBoolUserInput("Would you like to add one ? (Y/n)"); !in {
 				return
 			}
 			addProjectCmd().Execute()
@@ -100,7 +99,7 @@ func statusProjectCmd() *cobra.Command {
 				healthEndpoint = config.GetUserInput("Enter the health check relative URL (example: /status)")
 			}
 			status := projects.Status(cmd.Parent().Use, baseURL, healthEndpoint)
-			fmt.Printf("%v", status)
+			log.Infoln(status)
 
 			repo.Status(cmd.Parent().Use)
 		},
@@ -119,7 +118,7 @@ func statsProjectCmd() *cobra.Command {
 			)
 			stats, _ := projects.Stats(cmd.Parent().Use, repositoryURL)
 			prettyStats, _ := json.MarshalIndent(stats, "", "  ")
-			fmt.Printf("%s", prettyStats)
+			log.Infoln(prettyStats)
 		},
 	}
 }
@@ -132,7 +131,7 @@ func configProjectCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			settings := config.Vipers["projects"].GetStringMap(cmd.Parent().Use)
 			prettySettings, _ := json.MarshalIndent(settings, "", "  ")
-			fmt.Printf("%s configuration:\n%s\n}", cmd.Parent().Use, prettySettings)
+			log.Infof("%s configuration:\n%s\n}", cmd.Parent().Use, prettySettings)
 		},
 	}
 }
@@ -245,7 +244,7 @@ Example: ian project dotfiles set -c bonjour -d "Say bonjour" echo bonjour !.`,
 				customCmdDescription = config.GetUserInput("Enter the description of the project")
 			}
 			if len(customCmdDescription) < 5 || len(customCmdDescription) > 40 {
-				fmt.Fprintf(os.Stderr, "%v Description must be between 5 and 40 alphanumeric characters.\n\n", color.RedString("Error:"))
+				log.Errorln("Description must be between 5 and 40 alphanumeric characters\n")
 				cmd.Usage()
 				return
 			}

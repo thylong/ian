@@ -1,10 +1,9 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/fatih/color"
+	"github.com/thylong/ian/backend/log"
 )
 
 // GetPreset returns the content of the preset env.yml
@@ -17,7 +16,7 @@ func CreateEnvFileWithPreset(preset string) {
 	var Envcontent string
 	switch preset {
 	default:
-		fmt.Fprintf(os.Stderr, "%v Cannot find preset.\n", color.RedString("Error:"))
+		log.Errorln("Cannot find preset.")
 		return
 	case "1":
 		Envcontent = GetSoftwareEngineerPreset()
@@ -32,13 +31,13 @@ func CreateEnvFileWithPreset(preset string) {
 	confPath := ConfigFilesPathes["env"]
 	f, err := os.OpenFile(confPath, os.O_CREATE|os.O_WRONLY, 0655)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorln(err)
 		os.Exit(1)
 	}
 	defer f.Close()
 
 	if _, err = f.WriteString(Envcontent); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorln(err)
 		os.Exit(1)
 	}
 }

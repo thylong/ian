@@ -21,9 +21,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/backend/log"
 )
 
 var execCommand = exec.Command
@@ -31,7 +31,7 @@ var execCommand = exec.Command
 // List local repositories
 func List() error {
 	termCmd := execCommand("ls")
-	fmt.Printf("repositories_path: %s\n", config.Vipers["config"].GetString("repositories_path"))
+	log.Infof("repositories_path: %s\n", config.Vipers["config"].GetString("repositories_path"))
 	termCmd.Dir = config.Vipers["config"].GetString("repositories_path")
 
 	return command.ExecuteCommand(termCmd)
@@ -58,7 +58,7 @@ func Clean(repository string) error {
 func UpdateAll() {
 	files, err := ioutil.ReadDir(config.Vipers["config"].GetString("repositories_path"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorln(err)
 		os.Exit(1)
 	}
 	for _, file := range files {
@@ -80,7 +80,7 @@ func UpdateOne(repository string) error {
 func UpgradeAll() {
 	files, err := ioutil.ReadDir(config.Vipers["config"].GetString("repositories_path"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorln(err)
 		os.Exit(1)
 	}
 	for _, file := range files {
@@ -101,7 +101,7 @@ func UpgradeOne(repository string) error {
 // Remove local repository
 func Remove(repository string) error {
 	if repository == "/*" || repository == "/" {
-		fmt.Fprintf(os.Stderr, "%v\n", color.RedString("Error: Cmon man, don't do that..."))
+		log.Errorln("Cmon, don't do that...")
 	}
 	termCmd := execCommand("rm", "-rf", repository)
 	termCmd.Dir = config.Vipers["config"].GetString("repositories_path")

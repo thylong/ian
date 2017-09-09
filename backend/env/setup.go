@@ -15,7 +15,6 @@
 package env
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -23,8 +22,8 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/fatih/color"
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/log"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
 
@@ -48,12 +47,12 @@ func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {
 					filepath.Join(usr.HomeDir, ".dotfiles", f.Name()),
 					filepath.Join(usr.HomeDir, f.Name()),
 				); err != nil {
-					fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+					log.Errorln(err)
 				}
 			}
 		}
 	} else {
-		fmt.Println("Skipping dotfiles configuration.")
+		log.Infoln("Skipping dotfiles configuration.")
 	}
 }
 
@@ -62,11 +61,11 @@ func InstallPackages(PackageManager pm.PackageManager, packages []string) {
 	if len(packages) == 0 {
 		return
 	}
-	fmt.Printf("Installing %s packages...", PackageManager.GetName())
+	log.Infof("Installing %s packages...", PackageManager.GetName())
 
 	for _, packageToInstall := range packages {
 		if err := PackageManager.Install(packageToInstall); err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+			log.Errorln(err)
 		}
 	}
 }

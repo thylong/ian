@@ -1,13 +1,14 @@
 package env
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 )
 
 // ErrCannotStatFile occurs when stating a non-existing file
-var ErrCannotStatFile = fmt.Errorf("Cannot open file")
+var ErrCannotStatFile = errors.New("Cannot open file")
 
 // CopyFile copies a file from src to dst. If src and dst files exist, and are
 // the same, then return success. Otherise, attempt to create a hard link

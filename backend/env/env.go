@@ -28,9 +28,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/spf13/afero"
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/log"
 )
 
 // AppFs is a wrapper to OS package
@@ -44,25 +44,25 @@ var execCommand = exec.Command
 var IPCheckerURL = "http://httpbin.org/ip"
 
 // ErrJSONPayloadInvalidFormat is returned when the JSON payload format is invalid
-var ErrJSONPayloadInvalidFormat = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Invalid JSON format"))
+var ErrJSONPayloadInvalidFormat = errors.New("Invalid JSON format")
 
 // ErrOperationNotPermitted is returned when trying create or write without permissions
-var ErrOperationNotPermitted = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Operation not permitted"))
+var ErrOperationNotPermitted = errors.New("Operation not permitted")
 
 // ErrCannotMoveDotfile is returned when trying create or write without permissions
-var ErrCannotMoveDotfile = fmt.Errorf("%v couldn't move dotfile", color.RedString("Error:"))
+var ErrCannotMoveDotfile = errors.New("Couldn't move dotfile")
 
 // ErrCannotSymlink is returned when trying to create a Symlink and fails
-var ErrCannotSymlink = fmt.Errorf("%v couldn't create symlink", color.RedString("Error:"))
+var ErrCannotSymlink = errors.New("Couldn't create symlink")
 
 // ErrCannotInteractWithGit is returned when trying to interact with Git
-var ErrCannotInteractWithGit = fmt.Errorf("%v Cannot interact with Git\n", color.RedString("Error:"))
+var ErrCannotInteractWithGit = errors.New("Cannot interact with Git")
 
 // ErrHTTPError is returned when failing to reach an endpoint with HTTP
-var ErrHTTPError = fmt.Errorf("%v Cannot reach endpoint", color.RedString("Error:"))
+var ErrHTTPError = errors.New("Cannot reach endpoint")
 
 // ErrDotfilesRepository is returned when failing to stat a repository
-var ErrDotfilesRepository = fmt.Errorf("%v dotfiles repository doesn't exists or is not reachable", color.RedString("Error:"))
+var ErrDotfilesRepository = errors.New("dotfiles repository doesn't exists or is not reachable")
 
 // Add a package in env.yml.
 func Add(packageManager string, packages []string) (NewPMList []string, err error) {
@@ -82,7 +82,7 @@ func Describe() (err error) {
 	}
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("%v %s", color.RedString("Error:"), err)
+		return err
 	}
 	defer resp.Body.Close()
 
@@ -93,8 +93,8 @@ func Describe() (err error) {
 	}
 
 	command.ExecuteCommand(execCommand("hostinfo"))
-	fmt.Printf("\nExternal IP: %s\n\n", jsonContent["origin"])
-	fmt.Print("Uptime: ")
+	log.Infof("\nExternal IP: %s\n\n", jsonContent["origin"])
+	log.Infof("Uptime: ")
 	command.ExecuteCommand(execCommand("uptime"))
 
 	return nil
@@ -155,7 +155,7 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) (err
 			return ErrCannotSymlink
 		}
 	}
-	fmt.Printf("Moved dotfiles in %s directory.\n", dotfilesDirPath)
+	log.Infof("Moved dotfiles in %s directory\n", dotfilesDirPath)
 	return nil
 }
 
@@ -170,7 +170,7 @@ func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string)
 	lsRemoteCmd.Dir = dotfilesDirPath
 
 	if err := command.MustExecuteCommand(lsRemoteCmd); err != nil {
-		fmt.Println(err)
+		log.Errorln(err)
 		return ErrDotfilesRepository
 	}
 	return nil
@@ -191,13 +191,13 @@ func PersistDotfiles(message string, dotfilesDirPath string) (err error) {
 	commitCmd := execCommand("git", "commit", "-m", message)
 	commitCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(commitCmd); err != nil {
-		return fmt.Errorf("%v Cannot create a commit\n", color.RedString("Error:"))
+		return errors.New("Cannot create a commit")
 	}
 
 	pushCmd := execCommand("git", "push", "--force", "origin", "master")
 	pushCmd.Dir = dotfilesDirPath
 	if err = command.MustExecuteCommand(pushCmd); err != nil {
-		return fmt.Errorf("%v Cannot push to repository.\n", color.RedString("Error:"))
+		return errors.New("Cannot push to repository")
 	}
 	return nil
 }
@@ -205,7 +205,7 @@ func PersistDotfiles(message string, dotfilesDirPath string) (err error) {
 // GenerateRepositoriesPath creates conf line containing the user's input.
 func GenerateRepositoriesPath() string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("\nEnter the full path to the parent directory of your repositories\n(leave blank to skip): ")
+	log.Infoln("\nEnter the full path to the parent directory of your repositories\n(leave blank to skip): ")
 	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return input
 	}
@@ -214,7 +214,7 @@ func GenerateRepositoriesPath() string {
 
 // GetDotfilesRepository creates conf line containing the user's input.
 func GetDotfilesRepository() string {
-	fmt.Print("\nEnter the full path to your dotfiles repository\n(leave blank to skip): ")
+	log.Infoln("\nEnter the full path to your dotfiles repository\n(leave blank to skip): ")
 	reader := bufio.NewReader(os.Stdin)
 	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
 		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))

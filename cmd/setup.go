@@ -15,13 +15,12 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
+	"github.com/thylong/ian/backend/log"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
 
@@ -39,9 +38,9 @@ var setupCmd = &cobra.Command{
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
-			fmt.Println("Installing OS package manager...")
+			log.Infoln("Installing OS package manager...")
 			if err = OSPackageManager.Setup(); err != nil {
-				fmt.Fprintf(os.Stderr, "%v Missing OS package manager !\n", color.RedString("Error:"))
+				log.Errorln("Missing OS package manager !")
 				return
 			}
 		}
@@ -53,7 +52,7 @@ var setupCmd = &cobra.Command{
 		// Refresh the configuration in case the imported dotfiels contains ian configuration
 		config.RefreshVipers()
 
-		fmt.Printf("You don't have any packages to be installed in your current ian configuration.\n")
+		log.Warningln("You don't have any packages to be installed in your current ian configuration.")
 		if _, ok := config.Vipers["env"]; !ok && config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
 			in := config.GetUserInput(`Which preset would you like to use:
     1) Software engineer (generalist preset)
@@ -69,6 +68,6 @@ Enter your choice`)
 			packages := config.Vipers["env"].GetStringSlice(packageManager)
 			env.InstallPackages(pm.GetPackageManager(packageManager), packages)
 		}
-		fmt.Println("Great! You're ready to start using Ian.")
+		log.Infoln("Great! You're ready to start using Ian.")
 	},
 }

@@ -28,10 +28,10 @@ import (
 var httpGet = http.Get
 
 // ErrStatsUnavailable occurs when stats cannot be retrive from github API
-var ErrStatsUnavailable = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Cannot get stats"))
+var ErrStatsUnavailable = errors.New("Cannot get stats")
 
 // ErrJSONPayloadInvalidFormat is returned when the JSON payload format is invalid
-var ErrJSONPayloadInvalidFormat = fmt.Errorf("%v %s", color.RedString("Error:"), errors.New("Invalid JSON format"))
+var ErrJSONPayloadInvalidFormat = errors.New("Invalid JSON format")
 
 // Status makes a GET HTTP query and returns OK if response status is 200
 // otherwise ERROR.

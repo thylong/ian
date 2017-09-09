@@ -22,7 +22,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/fatih/color"
+	"github.com/thylong/ian/backend/log"
+
 	"github.com/mitchellh/ioprogress"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -46,12 +47,12 @@ var selfUpdateCmd = &cobra.Command{
 
 		resp, err := httpGet(ianLastRelease)
 		if err != nil {
-			fmt.Printf("%v Cannot retrieve ian's last release infos\n", color.RedString("Error:"))
+			log.Errorln("Cannot retrieve ian's last release infos.")
 			return
 		}
 		content, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Printf("%v Cannot retrieve ian's last release infos\n", color.RedString("Error:"))
+			log.Errorf("Cannot retrieve ian's last release infos\n")
 			return
 		}
 		defer resp.Body.Close()
@@ -59,17 +60,17 @@ var selfUpdateCmd = &cobra.Command{
 		var lastReleaseContent map[string]interface{}
 		err = json.Unmarshal(content, &lastReleaseContent)
 		if err != nil {
-			fmt.Printf("%v Cannot retrieve ian's last version\n", color.RedString("Error:"))
+			log.Errorln("Cannot retrieve ian's last version")
 			return
 		}
 		remoteVersion := lastReleaseContent["tag_name"]
 
 		if localVersion != remoteVersion {
-			fmt.Printf("ian version outdated... \n")
+			log.Infoln("ian version outdated...")
 			downloadURL := lastReleaseContent["assets"].([]interface{})[0].(map[string]interface{})["browser_download_url"]
 			resp, err = httpGet(downloadURL.(string))
 			if err != nil {
-				fmt.Printf("%v Cannot download ian's last version\n", color.RedString("Error:"))
+				log.Errorln("Cannot download ian's last version")
 				return
 			}
 			defer resp.Body.Close()
@@ -86,12 +87,12 @@ var selfUpdateCmd = &cobra.Command{
 
 			data, err := ioutil.ReadAll(progressR)
 			if err != nil {
-				fmt.Printf("%v ian's last version seems broken\n", color.RedString("Error:"))
+				log.Errorln("ian's last version seems broken")
 				return
 			}
 			dest, err := os.Executable()
 			if err != nil {
-				fmt.Printf("%v ian's last version seems not executable\n", color.RedString("Error:"))
+				log.Errorln("%v ian's last version seems not executable")
 				return
 			}
 
@@ -102,19 +103,19 @@ var selfUpdateCmd = &cobra.Command{
 				os.Rename(dest, destBackup)
 			}
 
-			fmt.Printf("Downloading ian's new version to %s\n", dest)
+			log.Infof("Downloading ian's new version to %s\n", dest)
 			if err := ioutil.WriteFile(dest, data, 0755); err != nil {
 				os.Rename(destBackup, dest)
-				fmt.Printf("%v Failed to update ian\n", color.RedString("Error:"))
+				log.Errorln("Failed to update ian")
 				return
 			}
 
 			// Removing backup
 			os.Remove(destBackup)
 
-			fmt.Printf("ian updated with success to version %s\n", remoteVersion)
+			log.Errorf("ian updated with success to version %s\n", remoteVersion)
 		} else {
-			fmt.Printf("ian is up to date\n")
+			log.Errorln("ian is up to date")
 		}
 	},
 }

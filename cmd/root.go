@@ -15,10 +15,10 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/fatih/color"
+	"github.com/thylong/ian/backend/log"
+
 	"github.com/spf13/cobra"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
@@ -30,7 +30,7 @@ func init() {
 	var err error
 	OSPackageManager, err = pm.GetOSPackageManager()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorf("%s\n", err)
 		os.Exit(1)
 	}
 	if !OSPackageManager.IsInstalled() {

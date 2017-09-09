@@ -15,12 +15,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/thylong/ian/backend/log"
 	"github.com/thylong/ian/cmd"
 )
 
@@ -33,7 +32,7 @@ func init() {
 
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.", color.RedString("Error:"), err)
+		log.Errorln(err)
 		os.Exit(-1)
 	}
 }
@@ -44,6 +43,6 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version information",
 	Long:  `Print the version information.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("ian version: %s\n", version)
+		log.Infoln("ian version:", version)
 	},
 }

@@ -16,15 +16,13 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
+	"github.com/thylong/ian/backend/log"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
 
@@ -59,12 +57,12 @@ var envAddCmd = &cobra.Command{
 	Long:  `Add new package(s) to ian env.yml.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 2 {
-			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			log.Errorln("Not enough argument")
 			cmd.Usage()
 			return
 		}
 		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
-			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported", args[0])
+			log.Errorf("Package Manager %s is not supported\n", args[0])
 			return
 		}
 
@@ -89,7 +87,7 @@ var envAddCmd = &cobra.Command{
 			config.ConfigFilesPathes["env"],
 			envContent,
 		)
-		fmt.Fprintf(os.Stdout, "Package(s) added to %s list.\n", args[0])
+		log.Infof("Package(s) added to %s list\n", args[0])
 	},
 }
 
@@ -99,12 +97,12 @@ var envRemoveCmd = &cobra.Command{
 	Long:  `Remove package(s) to ian env.yml.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 2 {
-			fmt.Fprintf(os.Stderr, "%v Not enough argument.\n\n", color.RedString("Error:"))
+			log.Errorln("Not enough argument")
 			cmd.Usage()
 			return
 		}
 		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
-			fmt.Fprintf(os.Stderr, "Package Manger %s doesn't exist or is not supported\n", args[0])
+			log.Errorf("Package Manager %s is not supported\n", args[0])
 			return
 		}
 
@@ -129,7 +127,7 @@ var envRemoveCmd = &cobra.Command{
 			config.ConfigFilesPathes["env"],
 			envContent,
 		)
-		fmt.Fprintf(os.Stdout, "Package(s) removed to %s list.\n", args[0])
+		log.Infof("Package(s) removed to %s list\n", args[0])
 	},
 }
 
@@ -140,7 +138,7 @@ var envShowCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		settings := config.Vipers["env"].AllSettings()
 		prettySettings, _ := json.MarshalIndent(settings, "", "  ")
-		fmt.Printf("Configuration:\n%s\n}", prettySettings)
+		log.Infof("Configuration:\n%s\n}", prettySettings)
 	},
 }
 
@@ -150,7 +148,7 @@ var envDescribeCmd = &cobra.Command{
 	Long:  `Show details of the hardware and network of the current development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := env.Describe(); err != nil {
-			fmt.Fprint(os.Stderr, err)
+			log.Errorln(err)
 		}
 	},
 }
@@ -163,7 +161,7 @@ var envUpdateCmd = &cobra.Command{
 		go func() {
 			for {
 				for _, v := range `-\|/` {
-					fmt.Printf("\r Updating env... %c", v)
+					log.Infof("\r Updating env... %c", v)
 					time.Sleep(100 * time.Millisecond)
 				}
 			}
@@ -188,7 +186,7 @@ var envUpgradeCmd = &cobra.Command{
 		go func() {
 			for {
 				for _, v := range `-\|/` {
-					fmt.Printf("\r Upgrading env... %c", v)
+					log.Infof("\r Upgrading env... %c", v)
 					time.Sleep(100 * time.Millisecond)
 				}
 			}
@@ -211,7 +209,8 @@ var envSaveCmd = &cobra.Command{
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(config.Vipers["projects"].AllSettings()) == 0 {
-			fmt.Fprintf(os.Stderr, "Warning: You currently have no defined path to your parent repositories directory.\n")
+			log.Warningf("You currently have no defined path to your parent repositories directory\n")
+
 			in := config.GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
 			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
 				return
@@ -224,7 +223,7 @@ var envSaveCmd = &cobra.Command{
 			[]string{},
 		)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Save command failed: %s\n", err)
+			log.Errorf("Save command failed: %s\n", err)
 		}
 	},
 }

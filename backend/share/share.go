@@ -2,7 +2,7 @@ package share
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/spf13/afero"
 	"github.com/thylong/ian/backend/config"
 )
@@ -23,16 +22,16 @@ var httpPost = http.Post
 var httpGet = http.Get
 
 // ErrFailedToOpenFile occurs when trying to open a non-existing config file
-var ErrFailedToOpenFile = fmt.Errorf("%v Failed to open file", color.RedString("Error:"))
+var ErrFailedToOpenFile = errors.New("Failed to open file")
 
 // ErrConfiFileMissing occurs when trying to open a non existing config file
-var ErrConfiFileMissing = fmt.Errorf("%v Config file doesn't exist", color.RedString("Error:"))
+var ErrConfiFileMissing = errors.New("Config file doesn't exist")
 
 // ErrLinkUnreachable occurs when a link is unreachable or doe not exist
-var ErrLinkUnreachable = fmt.Errorf("%v Sorry, The link you provided is unreachable", color.RedString("Error:"))
+var ErrLinkUnreachable = errors.New("Sorry, The link you provided is unreachable")
 
 // ErrLinkWrongFormat occurs when a link has a wrong format
-var ErrLinkWrongFormat = fmt.Errorf("%v Sorry, The link you provided is invalid", color.RedString("Error:"))
+var ErrLinkWrongFormat = errors.New("Sorry, The link you provided is invalid")
 
 // Upload to transfer.sh
 func Upload(filename string, URL string, key string) (respBody string, err error) {
@@ -93,11 +92,11 @@ func Download(filename string, URL string, key string) (err error) {
 
 		content, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("%v Cannot read from HTTP response", color.RedString("Error:"))
+			return errors.New("Cannot read from HTTP response")
 		}
 		if key != "" {
 			if content, err = DecryptFile(content, []byte(key)); err != nil {
-				return fmt.Errorf("%v Cannot decrypt downloaded file", color.RedString("Error:"))
+				return errors.New("Cannot decrypt downloaded file")
 			}
 		}
 		io.Copy(f, bytes.NewReader(content))

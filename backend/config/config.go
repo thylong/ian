@@ -26,11 +26,11 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/env"
+	"github.com/thylong/ian/backend/log"
 )
 
 // ConfigDirPath represents the path to config directory.
@@ -63,7 +63,7 @@ var ConfigMap YamlConfigMap
 func init() {
 	usr, err := user.Current()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s\n", color.RedString("Error:"), err)
+		log.Errorln(err)
 		os.Exit(1)
 	}
 
@@ -76,7 +76,7 @@ func init() {
 	}
 	if _, err := os.Stat(IanConfigPath); err != nil {
 		_ = os.Mkdir(IanConfigPath, 0766)
-		fmt.Printf("%s\n", env.GetInitialSetupUsage())
+		log.Infoln(env.GetInitialSetupUsage())
 	}
 
 	ConfigFilesPathes = make(map[string]string)
@@ -112,13 +112,13 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 
 	err := viperInstance.ReadInConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v Problem with config file: %s: %s\n", color.RedString("Error:"), viperName, err.Error())
+		log.Errorf("Problem with config file: %s: %s\n", viperName, err.Error())
 		os.Exit(1)
 	} else {
 		configContent, _ := ioutil.ReadFile(ConfigFilesPathes[viperName])
 		err = yaml.Unmarshal(configContent, &ConfigMap)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v Unable to parse config file.\n", color.RedString("Error:"))
+			log.Errorln("Unable to parse config file.")
 			os.Exit(1)
 		}
 	}
@@ -148,14 +148,14 @@ func SetupConfigFile(ConfigFileName string) {
 			configContent = append(configContent, fmt.Sprintf("%s%s%s", dotfilesRepositoryPrefix, dotfilesRepository, repositoryProvider)...)
 		}
 
-		fmt.Printf("Creating %s\n", ConfigFileName)
+		log.Infof("Creating %s\n", ConfigFileName)
 		if err := ioutil.WriteFile(ConfigFilePath, configContent, 0766); err != nil {
-			fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+			log.Errorf("%s\n", err)
 			os.Exit(1)
 		}
 		return
 	}
-	fmt.Printf("Existing %s.yml found.\n", ConfigFileName)
+	log.Infof("Existing %s.yml found\n", ConfigFileName)
 }
 
 // SetupConfigFiles creates a config directory and the config files if not exists.
@@ -171,13 +171,13 @@ func AppendToConfig(lines string, confFilename string) {
 	confPath := ConfigFilesPathes[confFilename]
 	f, err := os.OpenFile(confPath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorln("%s\n", err)
 		os.Exit(1)
 	}
 	defer f.Close()
 
 	if _, err = f.WriteString(lines); err != nil {
-		fmt.Fprintf(os.Stderr, "%v %s.\n", color.RedString("Error:"), err)
+		log.Errorln("%s\n", err)
 		os.Exit(1)
 	}
 }
@@ -192,11 +192,11 @@ func GetConfigDefaultContent(fileName string) []byte {
 func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
 	out, err := yaml.Marshal(&fileContent)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v Failed to update %s.\n", color.RedString("Error:"), fileFullPath)
+		log.Errorf("Failed to update %s\n", fileFullPath)
 		os.Exit(1)
 	}
 	if err := ioutil.WriteFile(fileFullPath, out, 0766); err != nil {
-		fmt.Fprintf(os.Stderr, "%v Failed to update %s.\n", color.RedString("Error:"), fileFullPath)
+		log.Errorf("Failed to update %s\n", fileFullPath)
 		os.Exit(1)
 	}
 }
