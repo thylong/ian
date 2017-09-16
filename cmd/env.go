@@ -161,7 +161,7 @@ var envUpdateCmd = &cobra.Command{
 		go func() {
 			for {
 				for _, v := range `-\|/` {
-					log.Infof("\r Updating env... %c", v)
+					log.Infof("\rUpdating env... %c", v)
 					time.Sleep(100 * time.Millisecond)
 				}
 			}
@@ -186,7 +186,7 @@ var envUpgradeCmd = &cobra.Command{
 		go func() {
 			for {
 				for _, v := range `-\|/` {
-					log.Infof("\r Upgrading env... %c", v)
+					log.Infof("\rUpgrading env... %c", v)
 					time.Sleep(100 * time.Millisecond)
 				}
 			}
