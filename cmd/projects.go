@@ -72,7 +72,7 @@ var projectCmd = &cobra.Command{
 	Short: "Interact with local projects",
 	Long:  `Interact with a project using predefined commands, or define custom commands.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(config.Vipers["projects"].AllSettings()) == 0 {
+		if len(config.GetProjects()) == 0 {
 			log.Warningln("/!\\ You currently have no projects set up.")
 
 			if in := config.GetBoolUserInput("Would you like to add one ? (Y/n)"); !in {

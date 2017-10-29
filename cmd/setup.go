@@ -15,13 +15,9 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
-	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/env"
 	"github.com/thylong/ian/backend/log"
-	pm "github.com/thylong/ian/backend/package-managers"
 )
 
 func init() {
@@ -37,37 +33,8 @@ var setupCmd = &cobra.Command{
     With projects subcommand being one of the core function of Ian, setup will
     install what is necessessary to deploy on GCE.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
-			log.Infoln("Installing OS package manager...")
-			if err = OSPackageManager.Setup(); err != nil {
-				log.Errorln("Missing OS package manager !")
-				return
-			}
-		}
+		env.Setup(OSPackageManager)
 
-		env.SetupDotFiles(
-			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
-			config.DotfilesDirPath,
-		)
-		// Refresh the configuration in case the imported dotfiels contains ian configuration
-		config.RefreshVipers()
-
-		log.Warningln("You don't have any packages to be installed in your current ian configuration.")
-		if _, ok := config.Vipers["env"]; !ok && config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
-			in := config.GetUserInput(`Which preset would you like to use:
-    1) Software engineer (generalist preset)
-    2) Backend developer
-    3) Frontend developer
-    4) Ops
-Enter your choice`)
-			config.CreateEnvFileWithPreset(in)
-		}
-
-		packageManagers := config.Vipers["env"].AllKeys()
-		for _, packageManager := range packageManagers {
-			packages := config.Vipers["env"].GetStringSlice(packageManager)
-			env.InstallPackages(pm.GetPackageManager(packageManager), packages)
-		}
 		log.Infoln("Great! You're ready to start using Ian.")
 	},
 }

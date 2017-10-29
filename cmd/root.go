@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"os"
+	"time"
 
 	"github.com/thylong/ian/backend/log"
 
@@ -44,4 +45,13 @@ var RootCmd = &cobra.Command{
 	Short: "Ian is a simple tool to manage your development environment",
 	Long: `Ian is a simple tool to manage your development environment, repositories,
 and projects.`,
+}
+
+func spinner() {
+	for {
+		for _, v := range `-\|/` {
+			log.Infof("\rUpdating env... %c", v)
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
 }

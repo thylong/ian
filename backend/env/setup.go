@@ -23,9 +23,46 @@ import (
 	"regexp"
 
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/log"
 	pm "github.com/thylong/ian/backend/package-managers"
 )
+
+// Setup installs Ian and configuration Ian's environment.
+func Setup(OSPackageManager pm.PackageManager) {
+	if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
+		log.Infoln("Installing OS package manager...")
+		if err = OSPackageManager.Setup(); err != nil {
+			log.Errorln("Missing OS package manager !")
+			return
+		}
+	}
+
+	SetupDotFiles(
+		config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
+		config.DotfilesDirPath,
+	)
+
+	// Refresh the configuration in case the imported dotfiels contains ian configuration
+	config.RefreshVipers()
+
+	log.Warningln("You don't have any packages to be installed in your current ian configuration.")
+	if _, ok := config.Vipers["env"]; !ok && config.GetBoolUserInput("Would you like to use a preset? (Y/n)") {
+		in := config.GetUserInput(`Which preset would you like to use:
+1) Software engineer (generalist preset)
+2) Backend developer
+3) Frontend developer
+4) Ops
+Enter your choice`)
+		config.CreateEnvFileWithPreset(in)
+	}
+
+	packageManagers := config.Vipers["env"].AllKeys()
+	for _, packageManager := range packageManagers {
+		packages := config.Vipers["env"].GetStringSlice(packageManager)
+		InstallPackages(pm.GetPackageManager(packageManager), packages)
+	}
+}
 
 // SetupDotFiles ask and retrieve a dotfiles repository.
 func SetupDotFiles(dotfilesRepository string, dotfilesDirPath string) {

@@ -16,8 +16,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/thylong/ian/backend/config"
@@ -62,33 +60,17 @@ var envAddCmd = &cobra.Command{
 			cmd.Usage()
 			return
 		}
-		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
-			log.Errorf("Package Manager %s is not supported\n", args[0])
+
+		packageManagerName := args[0]
+		packages := args[1:]
+
+		if !pm.IsSupportedPackageManager(packageManagerName) {
+			log.Errorf("Package Manager %s is not supported\n", packageManagerName)
 			return
 		}
 
-		envContent := config.Vipers["env"].AllSettings()
-		pmContent := config.Vipers["env"].GetStringSlice(args[0])
-		contains := func(e []string, c string) bool {
-			for _, s := range e {
-				if s == c {
-					return true
-				}
-			}
-			return false
-		}
-		for _, p := range args[1:] {
-			if !contains(pmContent, p) {
-				pmContent = append(pmContent, p)
-			}
-		}
-
-		envContent[args[0]] = pmContent
-		config.UpdateYamlFile(
-			config.ConfigFilesPathes["env"],
-			envContent,
-		)
-		log.Infof("Package(s) added to %s list\n", args[0])
+		env.AddPackagesToEnvFile(packageManagerName, packages)
+		log.Infof("Package(s) added to %s list\n", packageManagerName)
 	},
 }
 
@@ -102,32 +84,16 @@ var envRemoveCmd = &cobra.Command{
 			cmd.Usage()
 			return
 		}
-		if _, ok := pm.SupportedPackageManagers[args[0]]; !ok {
-			log.Errorf("Package Manager %s is not supported\n", args[0])
+
+		packageManagerName := args[0]
+		packages := args[1:]
+
+		if !pm.IsSupportedPackageManager(packageManagerName) {
+			log.Errorf("Package Manager %s is not supported\n", packageManagerName)
 			return
 		}
 
-		envContent := config.Vipers["env"].AllSettings()
-		pmContent := config.Vipers["env"].GetStringSlice(args[0])
-		contains := func(e []string, c string) bool {
-			for _, s := range e {
-				if s == c {
-					return true
-				}
-			}
-			return false
-		}
-		for i, p := range args[1:] {
-			if contains(pmContent, p) {
-				pmContent = append(pmContent[:i], pmContent[i+1:]...)
-			}
-		}
-
-		envContent[args[0]] = pmContent
-		config.UpdateYamlFile(
-			config.ConfigFilesPathes["env"],
-			envContent,
-		)
+		env.RemovePackagesFromEnvFile(packageManagerName, packages)
 		log.Infof("Package(s) removed to %s list\n", args[0])
 	},
 }
@@ -159,20 +125,9 @@ var envUpdateCmd = &cobra.Command{
 	Short: "Update the development environment",
 	Long:  `Update the development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		go func() {
-			for {
-				for _, v := range `-\|/` {
-					log.Infof("\rUpdating env... %c", v)
-					time.Sleep(100 * time.Millisecond)
-				}
-			}
-		}()
+		go spinner()
 		if allCmdParam {
-			for _, packageManager := range pm.SupportedPackageManagers {
-				if packageManager.IsInstalled() {
-					packageManager.UpdateAll()
-				}
-			}
+			pm.UpdateAllPackageManagers()
 			return
 		}
 		OSPackageManager.UpdateAll()
@@ -184,20 +139,9 @@ var envUpgradeCmd = &cobra.Command{
 	Short: "Upgrade the development environment",
 	Long:  `Upgrade the development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		go func() {
-			for {
-				for _, v := range `-\|/` {
-					log.Infof("\rUpgrading env... %c", v)
-					time.Sleep(100 * time.Millisecond)
-				}
-			}
-		}()
+		go spinner()
 		if allCmdParam {
-			for _, packageManager := range pm.SupportedPackageManagers {
-				if packageManager.IsInstalled() {
-					packageManager.UpgradeAll()
-				}
-			}
+			pm.UpgradeAllPackageManagers()
 			return
 		}
 		OSPackageManager.UpgradeAll()
@@ -209,21 +153,9 @@ var envSaveCmd = &cobra.Command{
 	Short: "Save current configuration files to the dotfiles repository",
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(config.Vipers["projects"].AllSettings()) == 0 {
-			log.Warningf("You currently have no defined path to your parent repositories directory\n")
+		config.RequiresProjectsConfigFile()
 
-			in := config.GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
-			if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
-				return
-			}
-		}
-		err := env.Save(
-			config.DotfilesDirPath,
-			config.Vipers["config"].GetStringMapString("dotfiles")["repository"],
-			config.Vipers["config"].GetString("default_save_message"),
-			[]string{},
-		)
-		if err != nil {
+		if err := env.Save([]string{}); err != nil {
 			log.Errorf("Save command failed: %s\n", err)
 		}
 	},

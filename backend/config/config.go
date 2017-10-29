@@ -15,6 +15,8 @@
 package config
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -29,7 +31,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/env"
 	"github.com/thylong/ian/backend/log"
 )
 
@@ -76,7 +77,7 @@ func init() {
 	}
 	if _, err := os.Stat(IanConfigPath); err != nil {
 		_ = os.Mkdir(IanConfigPath, 0766)
-		log.Infoln(env.GetInitialSetupUsage())
+		log.Infoln(GetInitialSetupUsage())
 	}
 
 	ConfigFilesPathes = make(map[string]string)
@@ -125,6 +126,21 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 	return viperInstance
 }
 
+// GetInitialSetupUsage returns the usage when using ian for the first time
+func GetInitialSetupUsage() []byte {
+	return []byte(`Welcome to Ian!
+Ian is a simple tool to manage your development environment, repositories,
+and projects.
+
+Learn more about Ian at http://goian.io
+
+To benefit from all of Ian’s features, you’ll need to provide:
+- The full path of your repositories (example: /Users/thylong/repositories)
+- The path of your dotfiles Github repository (example: thylong/dotfiles)
+
+`)
+}
+
 // SetupConfigFile creates a config directory and the config file if not exists.
 func SetupConfigFile(ConfigFileName string) {
 	ConfigFilePath := ConfigFilesPathes[ConfigFileName]
@@ -133,11 +149,11 @@ func SetupConfigFile(ConfigFileName string) {
 
 		if ConfigFileName == "config" {
 			repositoriesPathPrefix := "repositories_path: "
-			repositoriesPath := env.GenerateRepositoriesPath()
+			repositoriesPath := GenerateRepositoriesPath()
 			configContent = append(configContent, fmt.Sprintf("%s%s", repositoriesPathPrefix, repositoriesPath)...)
 
 			dotfilesRepositoryPrefix := "\ndotfiles:\n"
-			dotfilesRepository := fmt.Sprintf("  repository: %s\n", env.GetDotfilesRepository())
+			dotfilesRepository := fmt.Sprintf("  repository: %s\n", GetDotfilesRepository())
 
 			provider := "github"
 			re := regexp.MustCompile("([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9])\\.[a-zA-Z]{2,}")
@@ -240,4 +256,46 @@ func GetProjects() (projectCmds map[string]*cobra.Command) {
 		}
 	}
 	return projectCmds
+}
+
+// GenerateRepositoriesPath creates conf line containing the user's input.
+func GenerateRepositoriesPath() string {
+	reader := bufio.NewReader(os.Stdin)
+	log.Infoln("\nEnter the full path to the parent directory of your repositories\n(leave blank to skip): ")
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
+		return input
+	}
+	return ""
+}
+
+// GetDotfilesRepository creates conf line containing the user's input.
+func GetDotfilesRepository() string {
+	log.Infoln("\nEnter the full path to your dotfiles repository\n(leave blank to skip): ")
+	reader := bufio.NewReader(os.Stdin)
+	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
+		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+	}
+	return ""
+}
+
+// GetDotfilesRepositoryPath returns the dotfiles repository path.
+func GetDotfilesRepositoryPath() string {
+	return Vipers["config"].GetStringMapString("dotfiles")["repository"]
+}
+
+// RequiresProjectsConfigFile ensures the ian/projects.yml file has been initialized.
+func RequiresProjectsConfigFile() {
+	if len(Vipers["projects"].AllSettings()) == 0 {
+		log.Warningf("You currently have no defined path to your parent repositories directory\n")
+
+		in := GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
+		if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
+			return
+		}
+	}
+}
+
+// GetDefaultSaveMessage returns as a string the default save message.
+func GetDefaultSaveMessage() string {
+	return Vipers["config"].GetString("default_save_message")
 }

@@ -73,3 +73,30 @@ func GetPackageManager(PackageManagerFlag string) PackageManager {
 	OSPackageManager, _ := GetOSPackageManager()
 	return OSPackageManager
 }
+
+// UpdateAllPackageManagers updates all packages managers.
+func UpdateAllPackageManagers() {
+	for _, packageManager := range SupportedPackageManagers {
+		if packageManager.IsInstalled() {
+			packageManager.UpdateAll()
+		}
+	}
+}
+
+// UpgradeAllPackageManagers upgrades all packages from package managers.
+func UpgradeAllPackageManagers() {
+	for _, packageManager := range SupportedPackageManagers {
+		if packageManager.IsInstalled() {
+			packageManager.UpdateAll()
+		}
+	}
+}
+
+// IsSupportedPackageManager returns true if the PackageManager is supported by
+// Ian else returns false.
+func IsSupportedPackageManager(packageManager string) bool {
+	if _, ok := SupportedPackageManagers[packageManager]; !ok {
+		return false
+	}
+	return true
+}

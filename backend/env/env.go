@@ -15,8 +15,6 @@
 package env
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,6 +28,7 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/backend/config"
 	"github.com/thylong/ian/backend/log"
 )
 
@@ -42,27 +41,6 @@ var execCommand = exec.Command
 
 // IPCheckerURL is the endpoint to call to get IP data
 var IPCheckerURL = "http://httpbin.org/ip"
-
-// ErrJSONPayloadInvalidFormat is returned when the JSON payload format is invalid
-var ErrJSONPayloadInvalidFormat = errors.New("Invalid JSON format")
-
-// ErrOperationNotPermitted is returned when trying create or write without permissions
-var ErrOperationNotPermitted = errors.New("Operation not permitted")
-
-// ErrCannotMoveDotfile is returned when trying create or write without permissions
-var ErrCannotMoveDotfile = errors.New("Couldn't move dotfile")
-
-// ErrCannotSymlink is returned when trying to create a Symlink and fails
-var ErrCannotSymlink = errors.New("Couldn't create symlink")
-
-// ErrCannotInteractWithGit is returned when trying to interact with Git
-var ErrCannotInteractWithGit = errors.New("Cannot interact with Git")
-
-// ErrHTTPError is returned when failing to reach an endpoint with HTTP
-var ErrHTTPError = errors.New("Cannot reach endpoint")
-
-// ErrDotfilesRepository is returned when failing to stat a repository
-var ErrDotfilesRepository = errors.New("dotfiles repository doesn't exists or is not reachable")
 
 // Add a package in env.yml.
 func Add(packageManager string, packages []string) (NewPMList []string, err error) {
@@ -101,17 +79,17 @@ func Describe() (err error) {
 }
 
 // Save persists the dotfiles in distant repository.
-func Save(dotfilesDirPath string, dotfilesRepository string, defaultSaveMessage string, dotfilesToSave []string) (err error) {
-	if err = EnsureDotfilesDir(dotfilesDirPath); err != nil {
+func Save(dotfilesToSave []string) (err error) {
+	if err = EnsureDotfilesDir(config.DotfilesDirPath); err != nil {
 		return err
 	}
-	if err = ImportIntoDotfilesDir(dotfilesToSave, dotfilesDirPath); err != nil {
+	if err = ImportIntoDotfilesDir(dotfilesToSave, config.DotfilesDirPath); err != nil {
 		return err
 	}
-	if err = EnsureDotfilesRepository(dotfilesRepository, dotfilesDirPath); err != nil {
+	if err = EnsureDotfilesRepository(config.GetDotfilesRepositoryPath(), config.DotfilesDirPath); err != nil {
 		return err
 	}
-	if err = PersistDotfiles(defaultSaveMessage, dotfilesDirPath); err != nil {
+	if err = PersistDotfiles(config.GetDefaultSaveMessage(), config.DotfilesDirPath); err != nil {
 		return err
 	}
 	return nil
@@ -162,7 +140,7 @@ func ImportIntoDotfilesDir(dotfilesToSave []string, dotfilesDirPath string) (err
 // EnsureDotfilesRepository create Dotfiles repository if not exists.
 func EnsureDotfilesRepository(dotfilesRepository string, dotfilesDirPath string) (err error) {
 	if dotfilesRepository == "" {
-		dotfilesRepository = GetDotfilesRepository()
+		dotfilesRepository = config.GetDotfilesRepository()
 	}
 
 	repositoryURL := fmt.Sprintf("git@github.com:%s.git", dotfilesRepository)
@@ -202,37 +180,52 @@ func PersistDotfiles(message string, dotfilesDirPath string) (err error) {
 	return nil
 }
 
-// GenerateRepositoriesPath creates conf line containing the user's input.
-func GenerateRepositoriesPath() string {
-	reader := bufio.NewReader(os.Stdin)
-	log.Infoln("\nEnter the full path to the parent directory of your repositories\n(leave blank to skip): ")
-	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
-		return input
+// AddPackagesToEnvFile adds packages to the env.yml file.
+func AddPackagesToEnvFile(packageManagerName string, packages []string) {
+	envContent := config.Vipers["env"].AllSettings()
+	pmContent := config.Vipers["env"].GetStringSlice(packageManagerName)
+	contains := func(e []string, c string) bool {
+		for _, s := range e {
+			if s == c {
+				return true
+			}
+		}
+		return false
 	}
-	return ""
+	for _, p := range packages {
+		if !contains(pmContent, p) {
+			pmContent = append(pmContent, p)
+		}
+	}
+
+	envContent[packageManagerName] = pmContent
+	config.UpdateYamlFile(
+		config.ConfigFilesPathes["env"],
+		envContent,
+	)
 }
 
-// GetDotfilesRepository creates conf line containing the user's input.
-func GetDotfilesRepository() string {
-	log.Infoln("\nEnter the full path to your dotfiles repository\n(leave blank to skip): ")
-	reader := bufio.NewReader(os.Stdin)
-	if input, _ := reader.ReadString('\n'); input != "\n" && input != "" {
-		return string(bytes.TrimSuffix([]byte(input), []byte("\n")))
+// RemovePackagesFromEnvFile removes packages from the env.yml file.
+func RemovePackagesFromEnvFile(packageManagerName string, packages []string) {
+	envContent := config.Vipers["env"].AllSettings()
+	pmContent := config.Vipers["env"].GetStringSlice(packageManagerName)
+	contains := func(e []string, c string) bool {
+		for _, s := range e {
+			if s == c {
+				return true
+			}
+		}
+		return false
 	}
-	return ""
-}
+	for i, p := range packages {
+		if contains(pmContent, p) {
+			pmContent = append(pmContent[:i], pmContent[i+1:]...)
+		}
+	}
 
-// GetInitialSetupUsage returns the usage when using ian for the first time
-func GetInitialSetupUsage() []byte {
-	return []byte(`Welcome to Ian!
-Ian is a simple tool to manage your development environment, repositories,
-and projects.
-
-Learn more about Ian at http://goian.io
-
-To benefit from all of Ian’s features, you’ll need to provide:
-- The full path of your repositories (example: /Users/thylong/repositories)
-- The path of your dotfiles Github repository (example: thylong/dotfiles)
-
-`)
+	envContent[packageManagerName] = pmContent
+	config.UpdateYamlFile(
+		config.ConfigFilesPathes["env"],
+		envContent,
+	)
 }
