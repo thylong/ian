@@ -60,7 +60,7 @@ func (apm *ApmPackageManager) Cleanup() (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (apm *ApmPackageManager) UpdateOne(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(apm.Path, "update")); err != nil {
+	if err = command.ExecuteCommand(execCommand(apm.Path, "update", "--confirm=false")); err != nil {
 		return fmt.Errorf("Cannot %s update %s: %s", apm.Name, packageName, err)
 	}
 	return err
@@ -68,7 +68,7 @@ func (apm *ApmPackageManager) UpdateOne(packageName string) (err error) {
 
 // UpgradeOne Apm packages to the last known versions.
 func (apm *ApmPackageManager) UpgradeOne(packageName string) (err error) {
-	if err = command.ExecuteCommand(execCommand(apm.Path, "upgrade", packageName)); err != nil {
+	if err = command.ExecuteCommand(execCommand(apm.Path, "upgrade", "--confirm=false", packageName)); err != nil {
 		return fmt.Errorf("Cannot %s upgrade %s: %s", apm.Name, packageName, err)
 	}
 	return err
@@ -78,7 +78,7 @@ func (apm *ApmPackageManager) UpgradeOne(packageName string) (err error) {
 // This is not performing any updates and should be coupled
 // with upgradeAll command.
 func (apm *ApmPackageManager) UpdateAll() (err error) {
-	if err = command.ExecuteCommand(execCommand(apm.Path, "update")); err != nil {
+	if err = command.ExecuteCommand(execCommand(apm.Path, "update", "--confirm=false")); err != nil {
 		return fmt.Errorf("Cannot %s update: %s", apm.Name, err)
 	}
 	return err
@@ -86,7 +86,7 @@ func (apm *ApmPackageManager) UpdateAll() (err error) {
 
 // UpgradeAll Apm packages to the last known versions.
 func (apm *ApmPackageManager) UpgradeAll() (err error) {
-	if err = command.ExecuteCommand(execCommand(apm.Path, "upgrade")); err != nil {
+	if err = command.ExecuteCommand(execCommand(apm.Path, "upgrade", "--confirm=false")); err != nil {
 		return fmt.Errorf("Cannot %s upgrade: %s", apm.Name, err)
 	}
 	return err
