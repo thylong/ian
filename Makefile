@@ -11,6 +11,7 @@ build:
 	# Build for Linux amd64
 	GOOS=linux GOARCH=${GOARCH} go build -i -v -o ${NAME}-linux-${GOARCH} -ldflags="-X main.version=${VERSION}" ${PKG}
 	# Build for Windows amd64
+	go get github.com/inconshreveable/mousetrap
 	GOOS=windows GOARCH=${GOARCH} go build -i -v -o ${NAME}-windows-${GOARCH}.exe -ldflags="-X main.version=${VERSION}" ${PKG}
 
 test:
