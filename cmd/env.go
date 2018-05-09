@@ -139,8 +139,6 @@ var envSaveCmd = &cobra.Command{
 	Short: "Save current configuration files to the dotfiles repository",
 	Long:  `Save current configuration files to the dotfiles repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config.RequiresProjectsConfigFile()
-
 		if err := env.Save([]string{}); err != nil {
 			log.Errorf("Save command failed: %s\n", err)
 		}

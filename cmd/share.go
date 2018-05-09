@@ -24,7 +24,6 @@ func init() {
 
 	shareCmd.AddCommand(
 		shareConfigCmd,
-		shareProjectsCmd,
 		shareEnvCmd,
 		shareRetrieveFromLinkCmd,
 		// shareAllCmd,
@@ -45,23 +44,6 @@ var shareConfigCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if encryptShareCmdParam {
 			key = config.GetUserInput("Enter a secret key: ")
-		}
-		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
-		if err != nil {
-			log.Errorln("It looks like I cannot upload configuration file... :(")
-			return
-		}
-		log.Infoln(link)
-	},
-}
-
-var shareProjectsCmd = &cobra.Command{
-	Use:   "projects",
-	Short: "Share a public link to ian projects.yml file",
-	Long:  `Share a public link to ian projects.yml file.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if encryptShareCmdParam {
-			key = config.GetUserPrivateInput("Enter a secret key: ")
 		}
 		link, err := share.Upload(config.ConfigFilesPathes[cmd.Use], "https://transfer.sh/", key)
 		if err != nil {

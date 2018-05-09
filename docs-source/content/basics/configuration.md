@@ -5,7 +5,7 @@ prev: /basics/getting-started
 weight: 5
 ---
 
-Ian relies a lot on configuration files as they describe your environment and your projects.
+Ian relies a lot on configuration files as they describe your environments.
 It's possible to edit your entire configuration using ian commands (recommended) but if you're stuck
 or if you simply prefer to edit manually your configuration, it's possible !
 
@@ -18,7 +18,7 @@ for you when you execute it for the first time.
 
 ### Config
 
-config.yml contains all the settings that are not specific to a project or one of Ian's feature.
+config.yml contains all the settings that are not specific to Ian's feature.
 This file is generated at the first run of Ian and can be edited at any time using Ian setup.
 
 It contains currently 2 variables like in this example:
@@ -36,7 +36,7 @@ If you wish to support any new repositories solution, don't hesitate to open an 
 {{% /notice %}}
 
 **repositories_path** is the fullpath to the directory that contains all your repositories.
-This variable is use by a lot of Ian's commands to interact with your projects reposories,
+This variable is use by a lot of Ian's commands to interact with your repositories,
 by env commands to display stats, by the setup, etc.
 
 {{% notice info %}}
@@ -68,24 +68,6 @@ The file content looks like the following example:
 This file can contains packages that are not compatible with the current OS
 you're working on, during setup Ian will simply ignore them.
 {{% /notice %}}
-
-### Projects
-
-projects.yml contains the configurations of your projects. It allows you to
-bind your commands, store your project configuration and generate your own
-subcommands.
-
-The file content looks like the following example:
-```yaml
-    regexrace:
-        deploy_cmd: bash deploy.sh
-        description: Train your regex skills
-        dummy_custom_cmd: this command is really simple=mongo localhost
-        health: /status
-        repository: thylong/regexrace
-        rollback_cmd: bash rollback.sh
-        url: http://regexrace.org
-```
 
 ## Editing yaml files
 

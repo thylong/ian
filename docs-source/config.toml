@@ -1,5 +1,5 @@
 title = "ian"
-description = "Ian is a simple tool to manage your development environment, repositories, and projects."
+description = "Ian is a simple tool to manage your development environment and repositories."
 baseURL = "http://goian.io"
 languageCode = "en-us"
 publishDir = "docs"

@@ -5,7 +5,7 @@ next: /basics/getting-started
 weight: 1
 ---
 
-**Ian is a simple tool to manage your development environment and your coding projects.**
+**Ian is a simple tool to manage your development environment.**
 
 
 ## The idea behind Ian
@@ -24,7 +24,6 @@ ian propose your to store and persist your projects and env configuration in ord
 You can (among others things):
 
 - List the packages installed on your environment and have them installed anytime you run ian on another device.
-- Register commands per projects and give them an alias
 - Update/upgrade your environment with a unified interface
 
 
@@ -37,11 +36,6 @@ You can (among others things):
 
 We decided to offer the maximum customization possible to make you able to interact with your environment the way you like it.
 In brief, we give you a set of default commands that we find useful in general and we let you add any subcommands you'd like to execute.
-
-### The notion of project context
-
-Projects depend on a huge number of factors: languages, platforms, frameworks, host ressources, etc
-With ian, through an interactive setup you can provide the infos necessary to specific the context of execution of all the project commmands.
 
 ### Share your configuration
 

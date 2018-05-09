@@ -6,17 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"os/user"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/thylong/ian/backend/command"
 	"github.com/thylong/ian/backend/log"
 )
 
@@ -32,14 +28,13 @@ var DotfilesDirPath string
 // ConfigFilesPathes contains every config file pathes per filename.
 var ConfigFilesPathes map[string]string
 
-// Vipers contains all the initialized Vipers (config, env, projects)
+// Vipers contains all the initialized Vipers (config, env)
 var Vipers map[string]*viper.Viper
 
 // YamlConfigMap is used to marshal/unmarshal config file.
 type YamlConfigMap struct {
 	Managers     map[string]map[string]string `json:"managers"`
 	Repositories map[string]string            `json:"repositories"`
-	Projects     map[string]map[string]string `json:"projects"`
 	Setup        map[string][]string          `json:"setup"`
 	Packages     map[string]map[string]string `json:"packages"`
 }
@@ -74,7 +69,7 @@ func init() {
 // initVipers return Vipers corresponding to Yaml config files.
 // The soft argument determine if unexisting files should be written or not.
 func initVipers() {
-	for _, ConfigFileName := range []string{"config", "env", "projects"} {
+	for _, ConfigFileName := range []string{"config", "env"} {
 		configFilePath := filepath.Join(IanConfigPath, fmt.Sprintf("%s.yml", ConfigFileName))
 		ConfigFilesPathes[ConfigFileName] = configFilePath
 		Vipers[ConfigFileName] = initViper(ConfigFileName)
@@ -115,8 +110,7 @@ func initViper(viperName string) (viperInstance *viper.Viper) {
 // GetInitialSetupUsage returns the usage when using ian for the first time
 func GetInitialSetupUsage() []byte {
 	return []byte(`Welcome to Ian!
-Ian is a simple tool to manage your development environment, repositories,
-and projects.
+Ian is a simple tool to manage your development environment and repositories.
 
 Learn more about Ian at http://goian.io
 
@@ -203,47 +197,6 @@ func UpdateYamlFile(fileFullPath string, fileContent map[string]interface{}) {
 	}
 }
 
-// GetCustomCmds returns the commands defined in projects.yml
-func GetCustomCmds(project string) (customCmds []*cobra.Command) {
-	for confLineKey, confLineValue := range Vipers["projects"].GetStringMapString(project) {
-		if strings.HasSuffix(confLineKey, "custom_cmd") {
-			customCmdArgs := strings.Split(confLineValue, "=")
-			customCmds = append(customCmds, &cobra.Command{
-				Use:   strings.TrimSuffix(confLineKey, "_custom_cmd"),
-				Short: customCmdArgs[0],
-				Long:  customCmdArgs[0],
-				Run: func(cmd *cobra.Command, args []string) {
-					subCmdArgs := strings.SplitN(customCmdArgs[1], " ", 2)
-					termCmd := exec.Command(subCmdArgs[0], subCmdArgs[1])
-					command.ExecuteInteractiveCommand(termCmd)
-				},
-			})
-		}
-	}
-	return customCmds
-}
-
-// GetProjects returns the projects defined in projects.yml as non-runnable []*cobra.cmd.
-func GetProjects() (projectCmds map[string]*cobra.Command) {
-	projectCmds = make(map[string]*cobra.Command)
-
-	if _, ok := Vipers["projects"]; ok {
-		keys := make([]string, 0, len(Vipers["projects"].AllSettings()))
-		for k := range Vipers["projects"].AllSettings() {
-			keys = append(keys, k)
-		}
-		for _, project := range keys {
-			projectParams := Vipers["projects"].GetStringMapString(project)
-			projectCmds[project] = &cobra.Command{
-				Use:   project,
-				Short: projectParams["description"],
-				Long:  projectParams["description"],
-			}
-		}
-	}
-	return projectCmds
-}
-
 // GenerateRepositoriesPath creates conf line containing the user's input.
 func GenerateRepositoriesPath() string {
 	reader := bufio.NewReader(os.Stdin)
@@ -267,18 +220,6 @@ func GetDotfilesRepository() string {
 // GetDotfilesRepositoryPath returns the dotfiles repository path.
 func GetDotfilesRepositoryPath() string {
 	return Vipers["config"].GetStringMapString("dotfiles")["repository"]
-}
-
-// RequiresProjectsConfigFile ensures the ian/projects.yml file has been initialized.
-func RequiresProjectsConfigFile() {
-	if len(Vipers["projects"].AllSettings()) == 0 {
-		log.Warningf("You currently have no defined path to your parent repositories directory\n")
-
-		in := GetUserInput("Would you like to provide the repositories_path now? (Y/n)")
-		if strings.ToLower(in) != "y" && strings.ToLower(in) != "yes" && strings.ToLower(in) != "" {
-			return
-		}
-	}
 }
 
 // GetDefaultSaveMessage returns as a string the default save message.

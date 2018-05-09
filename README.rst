@@ -13,7 +13,7 @@ Ian
 .. image:: https://beerpay.io/thylong/ian/badge.svg?style=flat
     :target: https://beerpay.io/thylong/ian
 
-Ian is a simple tool to manage your development environment, repositories, and projects.
+Ian is a simple CLI tool to make your development environment portable.
 
 
 Installing
@@ -36,7 +36,7 @@ Ian requires Homebrew_.
 
 .. code-block:: console
 
-    $ go get github.com/thylong/ian
+    $ go get -u github.com/thylong/ian
 
 
 Usage
@@ -45,7 +45,7 @@ Usage
 .. code-block:: console
 
     $ ian
-    Ian is a simple tool to manage your development environment, repositories, and projects.
+    Ian is a simple tool to manage your development environment and repositories.
 
     Learn more about Ian at http://goian.io
 
@@ -54,7 +54,6 @@ Usage
 
     Default Commands:
       env         Manage development environment
-      project     Interact with local projects
       repo        Manage local repositories
       setup       Set up ian configuration
 
@@ -63,9 +62,7 @@ Usage
 Features
 ========
 
-- Manage dev environment (update OS package manager packages, Fetch diff on repos, etc).
-- Interact with git repositories.
-- Manage projects (deploy, rollback, healthcheck, etc).
+- Manage development environment (update OS package manager packages, etc).
 - Self-Setup (import dotfiles and install related packages)
 - Support pip_, npm_, Homebrew_, RubyGems_, Cask_, apt_, yum_
 
