@@ -15,9 +15,7 @@ var allCmdParam bool
 func init() {
 	RootCmd.AddCommand(envCmd)
 
-	envUpdateCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run update on all Package managers")
-	envUpgradeCmd.Flags().BoolVarP(&allCmdParam, "all", "a", false, "Run upgrade on all Package managers")
-	envCmd.AddCommand(
+	RootCmd.AddCommand(
 		envAddCmd,
 		envRemoveCmd,
 		envShowCmd,
@@ -61,7 +59,7 @@ var envAddCmd = &cobra.Command{
 }
 
 var envRemoveCmd = &cobra.Command{
-	Use:   "remove",
+	Use:   "rm",
 	Short: "Remove package(s) to ian configuration",
 	Long:  `Remove package(s) to ian env.yml.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -112,11 +110,7 @@ var envUpdateCmd = &cobra.Command{
 	Long:  `Update the development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		go spinner()
-		if allCmdParam {
-			pm.UpdateAllPackageManagers()
-			return
-		}
-		OSPackageManager.UpdateAll()
+		pm.UpdateAllPackageManagers()
 	},
 }
 
@@ -126,11 +120,7 @@ var envUpgradeCmd = &cobra.Command{
 	Long:  `Upgrade the development environment.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		go spinner()
-		if allCmdParam {
-			pm.UpgradeAllPackageManagers()
-			return
-		}
-		OSPackageManager.UpgradeAll()
+		pm.UpgradeAllPackageManagers()
 	},
 }
 
