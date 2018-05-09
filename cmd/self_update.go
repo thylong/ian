@@ -99,9 +99,9 @@ var selfUpdateCmd = &cobra.Command{
 			// Removing backup
 			os.Remove(destBackup)
 
-			log.Errorf("ian updated with success to version %s\n", remoteVersion)
+			log.Infof("ian updated with success to version %s\n", remoteVersion)
 		} else {
-			log.Errorln("ian is up to date")
+			log.Infoln("ian is up to date")
 		}
 	},
 }

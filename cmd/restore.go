@@ -7,16 +7,16 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(setupCmd)
+	RootCmd.AddCommand(restore)
 }
 
-// setupCmd represents the setup command
-var setupCmd = &cobra.Command{
-	Use:   "setup",
-	Short: "Set up ian configuration",
+// restore represents the setup command
+var restore = &cobra.Command{
+	Use:   "restore",
+	Short: "Restore ian configuration",
 	Long:  `Ian requires you to be able to interact with Github through Git CLI.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		env.Setup(OSPackageManager)
+		env.Restore(OSPackageManager)
 
 		log.Infoln("Great! You're ready to start using Ian.")
 	},

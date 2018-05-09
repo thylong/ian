@@ -14,8 +14,8 @@ import (
 	pm "github.com/thylong/ian/backend/package-managers"
 )
 
-// Setup installs Ian and configuration Ian's environment.
-func Setup(OSPackageManager pm.PackageManager) {
+// Restore installs Ian and configuration Ian's environment.
+func Restore(OSPackageManager pm.PackageManager) {
 	if _, err := os.Stat(OSPackageManager.GetExecPath()); err != nil {
 		log.Infoln("Installing OS package manager...")
 		if err = OSPackageManager.Setup(); err != nil {
