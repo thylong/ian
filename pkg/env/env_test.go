@@ -1,11 +1,7 @@
 package env
 
 import (
-	"bytes"
 	"fmt"
-	"io"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"os/exec"
 	"os/user"
@@ -28,41 +24,6 @@ func mockExecCommand(command string, args ...string) *exec.Cmd {
 	cmd := exec.Command(os.Args[0], cs...)
 	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
 	return cmd
-}
-
-func TestDescribe(t *testing.T) {
-	cases := []struct {
-		Body                io.Reader
-		UnreachableEndpoint bool
-		ExpectedErr         error
-	}{
-		{bytes.NewBuffer([]byte(`{"origin":"127.0.0.1"}`)), false, nil},
-		{bytes.NewBuffer([]byte(`{"test:"127.0.0.1"}`)), false, ErrJSONPayloadInvalidFormat},
-		{nil, false, ErrJSONPayloadInvalidFormat},
-		{nil, true, ErrHTTPError},
-	}
-	for _, tc := range cases {
-		httpGet = http.Get
-
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintln(w, tc.Body)
-		}))
-		defer ts.Close()
-
-		if tc.UnreachableEndpoint {
-			httpGet = func(url string) (resp *http.Response, err error) {
-				return nil, ErrHTTPError
-			}
-		}
-
-		IPCheckerURL = ts.URL
-		defer func() { IPCheckerURL = "http://httpbin.org/ip" }()
-
-		if err := Describe(); err != tc.ExpectedErr {
-			t.Errorf("Describe func returned wrong err: got %#v want %#v",
-				err, tc.ExpectedErr)
-		}
-	}
 }
 
 func TestEnsureDotfilesDir(t *testing.T) {

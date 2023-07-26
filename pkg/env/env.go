@@ -15,7 +15,6 @@
 package env
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -50,32 +49,6 @@ func Add(packageManager string, packages []string) (NewPMList []string, err erro
 // Remove a package in env.yml.
 func Remove(packageManager string, packages []string) (NewPMList []string, err error) {
 	return NewPMList, err
-}
-
-// Describe returns env description.
-func Describe() (err error) {
-	resp, err := httpGet(IPCheckerURL)
-	if err != nil {
-		return ErrHTTPError
-	}
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	var jsonContent map[string]string
-	err = json.Unmarshal(content, &jsonContent)
-	if err != nil {
-		return ErrJSONPayloadInvalidFormat
-	}
-
-	command.ExecuteCommand(execCommand("hostinfo"))
-	log.Infof("\nExternal IP: %s\n\n", jsonContent["origin"])
-	log.Infof("Uptime: ")
-	command.ExecuteCommand(execCommand("uptime"))
-
-	return nil
 }
 
 // Save persists the dotfiles in distant repository.

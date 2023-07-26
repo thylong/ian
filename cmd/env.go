@@ -19,7 +19,6 @@ func init() {
 		envAddCmd,
 		envRemoveCmd,
 		envShowCmd,
-		envDescribeCmd,
 		envUpdateCmd,
 		envUpgradeCmd,
 		envSaveCmd,
@@ -90,17 +89,6 @@ var envShowCmd = &cobra.Command{
 		settings := config.Vipers["env"].AllSettings()
 		prettySettings, _ := json.MarshalIndent(settings, "", "  ")
 		log.Infof("Configuration:\n%s\n}", prettySettings)
-	},
-}
-
-var envDescribeCmd = &cobra.Command{
-	Use:   "describe",
-	Short: "Show details of the current development environment",
-	Long:  `Show details of the hardware and network of the current development environment.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := env.Describe(); err != nil {
-			log.Errorln(err)
-		}
 	},
 }
 
