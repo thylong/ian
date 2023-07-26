@@ -22,7 +22,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/log"
 )
 
 // ErrStartCommand is returned when failing to start command

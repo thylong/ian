@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/log"
 
 	"github.com/mitchellh/ioprogress"
 	"github.com/spf13/cobra"

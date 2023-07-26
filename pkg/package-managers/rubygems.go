@@ -20,7 +20,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/pkg/command"
 )
 
 // RubyGems immutable instance.

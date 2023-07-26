@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/thylong/ian/backend/command"
+	"github.com/thylong/ian/pkg/command"
 )
 
 // Brew immutable instance.

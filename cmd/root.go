@@ -4,10 +4,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/log"
 
 	"github.com/spf13/cobra"
-	pm "github.com/thylong/ian/backend/package-managers"
+	pm "github.com/thylong/ian/pkg/package-managers"
 )
 
 // OSPackageManager is the main package manager used by the current OS.

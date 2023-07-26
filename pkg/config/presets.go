@@ -17,7 +17,7 @@ package config
 import (
 	"os"
 
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/log"
 )
 
 // GetPreset returns the content of the preset env.yml

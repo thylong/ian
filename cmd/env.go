@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 
 	"github.com/spf13/cobra"
-	"github.com/thylong/ian/backend/config"
-	"github.com/thylong/ian/backend/env"
-	"github.com/thylong/ian/backend/log"
-	pm "github.com/thylong/ian/backend/package-managers"
+	"github.com/thylong/ian/pkg/config"
+	"github.com/thylong/ian/pkg/env"
+	"github.com/thylong/ian/pkg/log"
+	pm "github.com/thylong/ian/pkg/package-managers"
 )
 
 var allCmdParam bool

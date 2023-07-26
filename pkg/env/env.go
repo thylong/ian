@@ -27,9 +27,9 @@ import (
 	"strings"
 
 	"github.com/spf13/afero"
-	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/config"
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/command"
+	"github.com/thylong/ian/pkg/config"
+	"github.com/thylong/ian/pkg/log"
 )
 
 // AppFs is a wrapper to OS package

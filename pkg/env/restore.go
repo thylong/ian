@@ -22,10 +22,10 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/config"
-	"github.com/thylong/ian/backend/log"
-	pm "github.com/thylong/ian/backend/package-managers"
+	"github.com/thylong/ian/pkg/command"
+	"github.com/thylong/ian/pkg/config"
+	"github.com/thylong/ian/pkg/log"
+	pm "github.com/thylong/ian/pkg/package-managers"
 )
 
 // Restore installs Ian and configuration Ian's environment.

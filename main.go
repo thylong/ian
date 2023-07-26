@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/thylong/ian/backend/log"
 	"github.com/thylong/ian/cmd"
+	"github.com/thylong/ian/pkg/log"
 )
 
 var version = "undefined"

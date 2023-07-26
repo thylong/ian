@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/thylong/ian/backend/env"
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/env"
+	"github.com/thylong/ian/pkg/log"
 )
 
 func init() {

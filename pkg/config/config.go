@@ -27,7 +27,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"github.com/spf13/viper"
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/log"
 )
 
 // ConfigDirPath represents the path to config directory.

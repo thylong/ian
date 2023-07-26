@@ -20,7 +20,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/log"
 
 	"github.com/howeyc/gopass"
 )

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/spf13/afero"
-	"github.com/thylong/ian/backend/config"
+	"github.com/thylong/ian/pkg/config"
 )
 
 func TestUpload(t *testing.T) {

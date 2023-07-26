@@ -21,9 +21,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/thylong/ian/backend/command"
-	"github.com/thylong/ian/backend/config"
-	"github.com/thylong/ian/backend/log"
+	"github.com/thylong/ian/pkg/command"
+	"github.com/thylong/ian/pkg/config"
+	"github.com/thylong/ian/pkg/log"
 )
 
 var execCommand = exec.Command
