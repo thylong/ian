@@ -7,12 +7,12 @@ VERSION := $(shell git describe --abbrev=0 --tags)
 .PHONY: build
 build: ## build Go binaries for targeted platforms
 	# Build for MacOS amd64
-	GOOS=darwin GOARCH=${GOARCH} go build -i -v -o ${NAME}-darwin-${GOARCH} -ldflags="-X main.version=${VERSION}" ${PKG}
+	GOOS=darwin GOARCH=${GOARCH} go build -v -o ${NAME}-darwin-${GOARCH} -ldflags="-X main.version=${VERSION}" ${PKG}
 	# Build for Linux amd64
-	GOOS=linux GOARCH=${GOARCH} go build -i -v -o ${NAME}-linux-${GOARCH} -ldflags="-X main.version=${VERSION}" ${PKG}
+	GOOS=linux GOARCH=${GOARCH} go build -v -o ${NAME}-linux-${GOARCH} -ldflags="-X main.version=${VERSION}" ${PKG}
 	# Build for Windows amd64
 	go get github.com/inconshreveable/mousetrap
-	GOOS=windows GOARCH=${GOARCH} go build -i -v -o ${NAME}-windows-${GOARCH}.exe -ldflags="-X main.version=${VERSION}" ${PKG}
+	GOOS=windows GOARCH=${GOARCH} go build -v -o ${NAME}-windows-${GOARCH}.exe -ldflags="-X main.version=${VERSION}" ${PKG}
 
 .PHONY: test
 test: ## run all tests
