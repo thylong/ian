@@ -19,8 +19,6 @@ func init() {
 		envAddCmd,
 		envRemoveCmd,
 		envShowCmd,
-		envUpdateCmd,
-		envUpgradeCmd,
 		envSaveCmd,
 		envFreezeCmd,
 	)
@@ -89,26 +87,6 @@ var envShowCmd = &cobra.Command{
 		settings := config.Vipers["env"].AllSettings()
 		prettySettings, _ := json.MarshalIndent(settings, "", "  ")
 		log.Infof("Configuration:\n%s\n}", prettySettings)
-	},
-}
-
-var envUpdateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Update the development environment",
-	Long:  `Update the development environment.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		go spinner()
-		pm.UpdateAllPackageManagers()
-	},
-}
-
-var envUpgradeCmd = &cobra.Command{
-	Use:   "upgrade",
-	Short: "Upgrade the development environment",
-	Long:  `Upgrade the development environment.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		go spinner()
-		pm.UpgradeAllPackageManagers()
 	},
 }
 
