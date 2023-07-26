@@ -1,5 +1,3 @@
-.PHONY: build doc-publish doc-serve
-
 .DEFAULT_GOAL := help
 NAME = ian
 GOARCH = amd64
@@ -24,9 +22,17 @@ test: ## run all tests
 doc-publish: ## create live documentation static assets
 	hugo -t hugo-theme-learn -s docs-source -d ../docs
 
-.PHONY: doc-serve
-doc-serve: ## serve doc site on localhost
+.PHONY: doc
+doc: ## serve doc site on localhost
 	hugo server --buildDrafts -t hugo-theme-learn -s docs-source -w
+
+.PHONY: license-check
+license-check: ## Check if licence headers are missing on any files
+	docker run -it --rm -v $(PWD):/github/workspace apache/skywalking-eyes header check
+
+.PHONY: license-fix
+license-fix: ## Fix missing licence headers on any files
+	docker run -it --rm -v $(PWD):/github/workspace apache/skywalking-eyes header fix
 
 # Implements this pattern for autodocumenting Makefiles:
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html

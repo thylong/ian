@@ -1,0 +1,43 @@
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: Théotime Levêque
+
+  paths-ignore:
+    - 'dist'
+    - '.gitignore'
+    - '.dockerignore'
+    - 'Dockerfile'
+    - 'docker-compose.yaml'
+    - '.golangci.yaml'
+    - '.licenserc.yaml'
+    - '.pre-commit-config.yaml'
+    - '.envrc'
+    - 'vendor'
+    - 'Makefile'
+    - 'licenses'
+    - '**/*.md'
+    - '**/*.json'
+    - '**/*.yml'
+    - '**/*.yaml'
+    - '**/*_test.go'
+    - '**/*.service'
+    - '**/go.mod'
+    - '**/go.sum'
+    - 'scripts/wait-for-it.sh'
+    - 'LICENSE'
+    - 'NOTICE'
+    - 'cmd/env.go'
+    - 'cmd/restore.go'
+    - 'cmd/self_update.go'
+    - 'cmd/share.go'
+    - 'cmd/root.go'
+    - 'docs/'
+    - 'docs-source/'
+    - 'install/install.py'
+    - 'main.go'
+  comment: on-failure
+
+dependency:
+  files:
+  - go.mod
