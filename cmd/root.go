@@ -30,6 +30,9 @@ var RootCmd = &cobra.Command{
 	Use:   "ian",
 	Short: "Ian is a simple tool to manage your development environment",
 	Long:  `Ian is a simple tool to manage your development environment and repositories.`,
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	},
 }
 
 func spinner() {
