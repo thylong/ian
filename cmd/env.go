@@ -8,20 +8,11 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(envCmd)
-
 	RootCmd.AddCommand(
 		envAddCmd,
 		envRemoveCmd,
 		envSaveCmd,
 	)
-}
-
-// envCmd represents the env command
-var envCmd = &cobra.Command{
-	Use:   "env",
-	Short: "Manage development environment",
-	Long:  `Show details, update and save your development environment.`,
 }
 
 var envAddCmd = &cobra.Command{
