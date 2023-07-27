@@ -31,19 +31,25 @@ Usage
 =====
 
 ```bash
-ian
-
 Ian is a simple tool to manage your development environment and repositories.
 
-Learn more about Ian at http://goian.io
-
 Usage:
-    ian [command]
+  ian [command]
 
-Default Commands:
-    env         Manage development environment
-    repo        Manage local repositories
-    setup       Set up ian configuration
+Available Commands:
+  add         Add new package(s) to ian configuration
+  help        Help about any command
+  restore     Restore ian configuration
+  rm          Remove package(s) to ian configuration
+  save        Save current configuration files to the dotfiles repository
+  self-update Update ian to the last version
+  version     Print the version information
+
+Flags:
+  -h, --help   help for ian
+
+Additional help topics:
+  ian env         Manage development environment
 
 Use "ian [command] --help" for more information about a command.
 ```
