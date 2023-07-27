@@ -14,7 +14,6 @@ func init() {
 		envAddCmd,
 		envRemoveCmd,
 		envSaveCmd,
-		envFreezeCmd,
 	)
 }
 
@@ -81,13 +80,5 @@ var envSaveCmd = &cobra.Command{
 		if err := env.Save([]string{}); err != nil {
 			log.Errorf("Save command failed: %s\n", err)
 		}
-	},
-}
-
-var envFreezeCmd = &cobra.Command{
-	Use:   "freeze",
-	Short: "Freeze all packages installed through package managers in Ian env file",
-	Long:  `Freeze all packages installed through package managers in Ian env file, they can then be saved to your dotfiles repository or shared.`,
-	Run: func(cmd *cobra.Command, args []string) {
 	},
 }
