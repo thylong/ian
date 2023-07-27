@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"time"
 
 	"github.com/thylong/ian/pkg/log"
 
@@ -33,13 +32,4 @@ var RootCmd = &cobra.Command{
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	},
-}
-
-func spinner() {
-	for {
-		for _, v := range `-\|/` {
-			log.Infof("\rUpdating env... %c", v)
-			time.Sleep(100 * time.Millisecond)
-		}
-	}
 }
